@@ -1,3 +1,5 @@
+import { useNavigate } from "react-router-dom";
+
 import { ActivePlanDialog } from "./Modal/ActivePlanDialog";
 import { CancelSubscriptionDialog } from "./Modal/CancelSubscripitionModel";
 
@@ -25,6 +27,7 @@ interface ActiveSubscriptionProps {
 export const ActiveSubscription: React.FC<ActiveSubscriptionProps> = ({
   activePlan,
 }) => {
+  const navigate = useNavigate();
   if (!activePlan) {
     return (
       <div className="bg-white shadow-sm rounded-lg p-6 text-center text-gray-500">
@@ -87,7 +90,10 @@ export const ActiveSubscription: React.FC<ActiveSubscriptionProps> = ({
           <CancelSubscriptionDialog
             subscriptionId={"" + activePlan.stripe_subscription_id}
           />
-          <button className="px-4 py-2 bg-gray-100 text-gray-700 text-sm font-medium rounded-md hover:bg-gray-200 transition-colors">
+          <button
+            className="px-4 py-2 bg-gray-100 text-gray-700 text-sm font-medium rounded-md hover:bg-gray-200 transition-colors"
+            onClick={() => navigate("/owner/dashboard/invoices")}
+          >
             View Invoice History
           </button>
         </div>

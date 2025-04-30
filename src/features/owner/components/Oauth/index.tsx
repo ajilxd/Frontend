@@ -19,11 +19,20 @@ function OAuth() {
       const auth = getAuth(app);
       const result = await signInWithPopup(auth, provider);
       const { displayName, email } = result.user;
-      const res = await axios.post(`${baseUrl}/owner/google`, {
-        name: displayName,
-        email: email,
-      });
-
+      const res = await axios.post(
+        `${baseUrl}/owner/google`,
+        {
+          name: displayName,
+          email: email,
+        },
+        { withCredentials: true }
+      );
+      console.log("response from server", res.data);
+      const { accessToken } = res.data;
+      if (!accessToken) {
+        throw new Error("No access token found on response");
+      }
+      localStorage.setItem("ownerAccessToken", accessToken);
       dispatch(ownerLoginSuccess(res.data.data));
       navigate("/owner/dashboard");
     } catch (error: unknown) {

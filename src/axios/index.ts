@@ -2,7 +2,9 @@ import axios, { AxiosInstance } from "axios";
 
 import { baseUrl } from "@/constants/app";
 
-const createApi = (role: string) => {
+const createApi = (role: string): AxiosInstance => {
+  console.log("inside interceptor...");
+
   return axios.create({
     baseURL: baseUrl,
     withCredentials: true,
@@ -28,40 +30,55 @@ export const setupInterceptors = ({
   navigate: (path: string) => void;
 }) => {
   apiInstance.interceptors.request.use((config) => {
-    console.log(`${role}AccessToken`);
     const accessToken = localStorage.getItem(`${role}AccessToken`);
-    console.log("accessToken", accessToken);
-    if (accessToken) {
+    console.log("access token from axios request", accessToken);
+    const excludeUrls = ["/owner/login", "/owner/register"];
+
+    if (excludeUrls.some((url) => config.url && config.url.includes(url))) {
+      return config;
+    }
+
+    if (accessToken && config.headers) {
       config.headers["Authorization"] = `Bearer ${accessToken}`;
     }
+
     return config;
   });
 
   apiInstance.interceptors.response.use(
     (response) => response,
     async (error) => {
-      console.log("error from the axios", error);
       const originalRequest = error.config;
 
-      if (error.response?.status === 401 && !originalRequest._retry) {
+      if (
+        error.response?.status === 401 &&
+        originalRequest &&
+        originalRequest.url &&
+        !originalRequest._retry
+      ) {
         originalRequest._retry = true;
 
         try {
+          console.log("hey im response intercepter");
           const res = await axios.post(
             `${baseUrl}/refresh-token`,
             {},
             { withCredentials: true }
           );
-          //   console.log("resposne", res);
-          const newAccessToken = res.data.accessToken;
-          //   console.log("new Access Token", newAccessToken);
-          //   console.log("settig token for ", `${role}AccessToken`);
+          console.log(res.data.data);
+
+          const newAccessToken = res.data.data.accessToken;
           localStorage.setItem(`${role}AccessToken`, newAccessToken);
 
-          originalRequest.headers["Authorization"] = `Bearer ${newAccessToken}`;
+          if (originalRequest.headers) {
+            originalRequest.headers[
+              "Authorization"
+            ] = `Bearer ${newAccessToken}`;
+          }
 
           return apiInstance(originalRequest);
-        } catch (err) {
+        } catch (refreshError) {
+          console.log(refreshError);
           if (role === "admin") {
             navigate("/admin/login");
           } else if (role === "owner") {
@@ -70,7 +87,7 @@ export const setupInterceptors = ({
             navigate("/auth/login-email");
           }
 
-          return Promise.reject(err);
+          return Promise.reject(refreshError);
         }
       }
 

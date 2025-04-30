@@ -1,7 +1,7 @@
 import { useFormik } from "formik";
 import { Check, Plus } from "lucide-react";
 import { enqueueSnackbar } from "notistack";
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { useSelector } from "react-redux";
 
 import { Button } from "@/components/ui/button";
@@ -25,6 +25,7 @@ import { RootState } from "@/redux/store/appStore";
 
 import { ownerAddCompanyDetails } from "../api/owner.api";
 import companyDetailsSchema from "../validation/owner.validation";
+import { OwnerContext } from "@/context/OwnerContext";
 
 interface Industry {
   value: string;
@@ -45,6 +46,7 @@ export function AddCompanyDetailsForm() {
   const [open, setOpen] = useState(false);
   const [newIndustry, setNewIndustry] = useState("");
   const owner = useSelector((state: RootState) => state.owner);
+  const { updateCompany } = useContext(OwnerContext);
 
   const formik = useFormik({
     initialValues: {
@@ -65,6 +67,7 @@ export function AddCompanyDetailsForm() {
         enqueueSnackbar("Company details added succesfully", {
           variant: "success",
         });
+        updateCompany(res.data.data);
         formik.resetForm();
       } else {
         enqueueSnackbar(res.message, {

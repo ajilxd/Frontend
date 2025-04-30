@@ -1,5 +1,3 @@
-import axios from "axios";
-
 import { ownerApi } from "@/axios";
 import { baseUrl } from "@/constants/app";
 import { companyDataType } from "@/context/OwnerContext";
@@ -8,13 +6,9 @@ import { OwnerLoginResponseType, ServerResponseType } from "@/types";
 
 type CompanyDetailsType = {
   companyName: string;
-
   websiteURL: string;
-
   description: string;
-
   industry: string[];
-
   ownerId: string;
 };
 
@@ -30,7 +24,7 @@ export async function ownerSigninService(formData: {
   password: string;
 }): Promise<ServerResponseType<OwnerLoginResponseType>> {
   try {
-    const response = await axios.post(`${baseUrl}/owner/login`, formData);
+    const response = await ownerApi.post(`${baseUrl}/owner/login`, formData);
 
     if (response.status == 200) {
       return {
@@ -264,6 +258,7 @@ export async function ownerAddCompanyDetails(data: CompanyDetailsType) {
       return {
         success: true,
         message: "company details added succesfully",
+        data: response.data,
       };
     }
     throw new Error("unexpected response from server");
