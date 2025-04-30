@@ -1,10 +1,14 @@
 import { User, LayoutDashboard, Building2, Wallet, Text } from "lucide-react";
-import { useState } from "react";
-import { Outlet, useNavigate } from "react-router-dom";
+import { useContext, useState } from "react";
+import { Outlet, useLocation, useNavigate } from "react-router-dom";
 
 import { SignOutModal } from "@/shared/components/signoutModal";
 
 import SidebarItem from "../components/SIdebarItem";
+import { useSelector } from "react-redux";
+import { RootState } from "@/redux/store/appStore";
+import { SubscriptionPaywall } from "@/shared/components/SubscriptionPaywall";
+import { OwnerContext } from "@/context/OwnerContext";
 
 const sidebarsArray: { icon: React.ElementType; label: string }[] = [
   { icon: LayoutDashboard, label: "Dashboard" },
@@ -17,7 +21,17 @@ const sidebarsArray: { icon: React.ElementType; label: string }[] = [
 export default function OwnerDashboard() {
   const [activeItem, setActiveItem] = useState<string>("Dashboard");
   const navigate = useNavigate();
-
+  const hasSubscriptionFromRedux = useSelector(
+    (state: RootState) => state.owner.subscription
+  );
+  const { activeSubscription: hasSubscriptionFromContext } =
+    useContext(OwnerContext);
+  const hasSubscription =
+    hasSubscriptionFromContext || hasSubscriptionFromRedux;
+  const location = useLocation();
+  const canShowSubscripitionPaywall =
+    location.pathname !== "/owner/dashboard/subscriptions";
+  console.log(location.pathname);
   return (
     <div className="min-h-screen flex bg-black text-white">
       {/* Sidebar */}
@@ -51,6 +65,9 @@ export default function OwnerDashboard() {
 
       {/* Main content */}
       <main className="flex-1 p-8 space-y-6">
+        {!hasSubscription && canShowSubscripitionPaywall && (
+          <SubscriptionPaywall />
+        )}
         <Outlet />
       </main>
     </div>

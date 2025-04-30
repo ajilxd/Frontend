@@ -62,19 +62,23 @@ const Invoices: React.FC = () => {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {invoices.length &&
+              {invoices.length === 0 ? (
+                <p className="text-gray-500 dark:text-gray-400 text-sm p-5">
+                  No invoice data found
+                </p>
+              ) : (
                 invoices.map((invoice) => (
                   <TableRow key={invoice.created}>
                     <TableCell>{invoice.id}</TableCell>
                     <TableCell>{invoice.customer_email}</TableCell>
                     <TableCell>{new Date().toLocaleDateString()}</TableCell>
-                    <TableCell>${invoice.total.toFixed(2) * 0.01}</TableCell>
+                    <TableCell>${+invoice.total.toFixed(2) * 0.01}</TableCell>
 
                     <TableCell>
                       <PDFDownloadLink
                         document={<InvoicePDF invoice={invoice} />}
                         fileName="invoice.pdf"
-                        className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+                        className="border border-indigo-500 text-indigo-500 rounded hover:bg-indigo-500/10 dark:hover:bg-indigo-500/20 transition-colors p-2 "
                       >
                         {({ loading }) =>
                           loading ? "Preparing PDF..." : "Download Invoice"
@@ -82,7 +86,8 @@ const Invoices: React.FC = () => {
                       </PDFDownloadLink>
                     </TableCell>
                   </TableRow>
-                ))}
+                ))
+              )}
             </TableBody>
           </Table>
         </div>

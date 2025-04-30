@@ -1,8 +1,14 @@
-import { ExternalLink } from "lucide-react";
-
+import { ExternalLink, Building2, Globe, FileText } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
 import { EditCompanyDetailsModal } from "./EditCompanyDetails";
 
 interface CompanyDetailsProps {
@@ -17,59 +23,86 @@ interface CompanyDetailsProps {
 
 const CompanyDetails: React.FC<CompanyDetailsProps> = ({ companyData }) => {
   return (
-    <Card className="w-full max-w-2xl shadow-md border border-slate-200 dark:border-slate-700 overflow-hidden">
-      <CardHeader className="flex flex-row items-start justify-between">
-        <CardTitle className="text-2xl font-semibold text-blue-800 dark:text-blue-200">
-          {companyData.companyName}
-        </CardTitle>
-        <EditCompanyDetailsModal />
+    <Card className="w-full max-w-2xl bg-card border-border shadow-xl">
+      <CardHeader className="pb-2 space-y-1">
+        <div className="flex justify-between items-center">
+          <CardTitle className="text-2xl font-bold text-foreground">
+            {companyData.companyName}
+          </CardTitle>
+          <EditCompanyDetailsModal />
+        </div>
       </CardHeader>
 
-      <CardContent className="p-6 space-y-6 bg-white dark:bg-slate-900">
+      <Separator className="my-1" />
+
+      <CardContent className="pt-4 pb-6 space-y-6">
         {/* Website Section */}
-        <div className="space-y-2">
-          <h3 className="text-sm font-medium text-slate-600 dark:text-slate-400">
-            Website
-          </h3>
-          <a
-            href={companyData.websiteURL}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center text-blue-600 dark:text-blue-300 hover:underline"
-          >
-            {companyData.websiteURL}
-            <ExternalLink className="ml-1 h-4 w-4" />
-          </a>
+        <div className="flex items-start space-x-3">
+          <Globe className="h-5 w-5 text-primary mt-0.5" />
+          <div className="space-y-1.5">
+            <h3 className="text-sm font-medium text-muted-foreground">
+              Website
+            </h3>
+            <a
+              href={companyData.websiteURL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center text-primary hover:text-primary/90 underline-offset-4 hover:underline transition-colors"
+            >
+              {companyData.websiteURL}
+              <ExternalLink className="ml-1 h-4 w-4" />
+            </a>
+          </div>
         </div>
 
         {/* Industry Section */}
-        <div className="space-y-2">
-          <h3 className="text-sm font-medium text-slate-600 dark:text-slate-400">
-            Industries
-          </h3>
-          <div className="flex flex-wrap gap-2">
-            {companyData.industry.map((industry, index) => (
-              <Badge
-                key={index}
-                variant="outline"
-                className="bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-300 dark:border-slate-600"
-              >
-                {industry}
-              </Badge>
-            ))}
+        <div className="flex items-start space-x-3">
+          <Building2 className="h-5 w-5 text-primary mt-0.5" />
+          <div className="space-y-1.5">
+            <h3 className="text-sm font-medium text-muted-foreground">
+              Industries
+            </h3>
+            <div className="flex flex-wrap gap-2">
+              {companyData.industry.map((industry, index) => (
+                <Badge
+                  key={index}
+                  variant="secondary"
+                  className="text-xs font-medium"
+                >
+                  {industry}
+                </Badge>
+              ))}
+            </div>
           </div>
         </div>
 
         {/* Description Section */}
-        <div className="space-y-2">
-          <h3 className="text-sm font-medium text-slate-600 dark:text-slate-400">
-            Description
-          </h3>
-          <p className="text-slate-700 dark:text-slate-300 leading-relaxed">
-            {companyData.description}
-          </p>
+        <div className="flex items-start space-x-3">
+          <FileText className="h-5 w-5 text-primary mt-0.5" />
+          <div className="space-y-1.5">
+            <h3 className="text-sm font-medium text-muted-foreground">
+              Description
+            </h3>
+            <p className="text-foreground leading-relaxed">
+              {companyData.description}
+            </p>
+          </div>
         </div>
       </CardContent>
+
+      <CardFooter className="pt-0 pb-4 px-6">
+        <Button variant="outline" className="w-full" asChild>
+          <a
+            href={companyData.websiteURL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center justify-center"
+          >
+            Visit Website
+            <ExternalLink className="ml-2 h-4 w-4" />
+          </a>
+        </Button>
+      </CardFooter>
     </Card>
   );
 };

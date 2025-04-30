@@ -79,16 +79,11 @@ const Subscription: React.FC = () => {
   // Fetch available plans
   useEffect(() => {
     const fetchPlans = async () => {
-      try {
-        const response = await ownerFetchSubscriptions();
-        if (response.success) {
-          setAvailablePlans(response.data.data);
-        } else {
-          enqueueSnackbar("Error fetching subscriptions", { variant: "error" });
-        }
-      } catch (err) {
-        console.error(err);
-        enqueueSnackbar("Error fetching subscriptions", { variant: "error" });
+      const response = await ownerFetchSubscriptions();
+      if (response.success) {
+        setAvailablePlans(response.data.data);
+      } else {
+        console.warn("error occured while fetching subscriptions");
       }
     };
     fetchPlans();
@@ -156,19 +151,25 @@ const Subscription: React.FC = () => {
           </CardHeader>
           <CardContent className="pt-2">
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {availablePlans
-                .filter((plan) => plan._id && plan.stripe_price_id)
-                .map((plan) => (
-                  <PlanCard
-                    key={plan._id}
-                    name={plan.name}
-                    amount={plan.amount}
-                    onKnowMore={() => handleKnowMore(plan.name)}
-                    onSubscribe={() => {
-                      handleSubscribe(plan.stripe_price_id!, plan._id);
-                    }}
-                  />
-                ))}
+              {availablePlans.length === 0 ? (
+                <p className="text-gray-500 dark:text-gray-400 text-sm">
+                  No plans available.
+                </p>
+              ) : (
+                availablePlans
+                  .filter((p) => p._id && p.stripe_price_id)
+                  .map((plan) => (
+                    <PlanCard
+                      key={plan._id}
+                      name={plan.name}
+                      amount={plan.amount}
+                      onKnowMore={() => handleKnowMore(plan.name)}
+                      onSubscribe={() =>
+                        handleSubscribe(plan.stripe_price_id!, plan._id)
+                      }
+                    />
+                  ))
+              )}
             </div>
           </CardContent>
         </Card>
