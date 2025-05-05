@@ -1,6 +1,7 @@
+import { useQueryClient } from "@tanstack/react-query";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import { enqueueSnackbar } from "notistack";
-import { useContext, useState } from "react";
+import { useState } from "react";
 import { useSelector } from "react-redux";
 
 import { Button } from "@/components/ui/button";
@@ -15,19 +16,19 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { OwnerContext } from "@/context/OwnerContext";
+import { useOwnerCompanyQuery } from "@/queries/owners/company/useOwnerCompanyQuery";
 import { RootState } from "@/redux/store/appStore";
 
 import { ownerEditCompanyDetails } from "../api/owner.api";
 import companyDetailsSchema from "../validation/owner.validation";
 
 export const EditCompanyDetailsModal = () => {
-  const { company, updateCompany } = useContext(OwnerContext);
   const owner = useSelector((state: RootState) => state.owner);
+  const queryClient = useQueryClient();
   const [open, setOpen] = useState(false);
-
+  const { data: Company } = useOwnerCompanyQuery("" + owner._id);
   const handleSubmit = async (
-    values: typeof company,
+    values: typeof Company,
     { setSubmitting }: { setSubmitting: (data: boolean) => void }
   ) => {
     const response = await ownerEditCompanyDetails({
@@ -36,7 +37,9 @@ export const EditCompanyDetailsModal = () => {
     });
 
     if (response.success) {
-      updateCompany(response.data);
+      queryClient.invalidateQueries({
+        queryKey: ["owner", "company", "" + owner._id],
+      });
       enqueueSnackbar("Successfully edited company details");
       setOpen(false);
     } else {
@@ -59,7 +62,7 @@ export const EditCompanyDetailsModal = () => {
         </DialogHeader>
 
         <Formik
-          initialValues={company}
+          initialValues={Company!}
           validationSchema={companyDetailsSchema}
           onSubmit={handleSubmit}
         >

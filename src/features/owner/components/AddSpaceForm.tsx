@@ -1,3 +1,4 @@
+import { useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import { Formik, Form, Field, ErrorMessage, FormikHelpers } from "formik";
 import { X } from "lucide-react";
@@ -56,6 +57,7 @@ const initialValues: SpaceFormValues = {
 };
 
 export const AddSpaceForm: React.FC<Prop> = ({ ownerId }) => {
+  const queryClient = useQueryClient();
   const [tags, setTags] = useState<string[]>([]);
   const [tagInput, setTagInput] = useState("");
   const [loadingManagerError, setLoadingManagerError] = useState("");
@@ -107,6 +109,9 @@ export const AddSpaceForm: React.FC<Prop> = ({ ownerId }) => {
     };
     const res = await ownerAddSpace("" + owner._id, formData);
     if (res.success) {
+      queryClient.invalidateQueries({
+        queryKey: ["owner", "spaces", "" + owner._id],
+      });
       enqueueSnackbar("Space added succesfully", { variant: "success" });
     } else {
       console.error(res.message);

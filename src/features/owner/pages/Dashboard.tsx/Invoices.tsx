@@ -1,5 +1,5 @@
 import { PDFDownloadLink } from "@react-pdf/renderer";
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { useSelector } from "react-redux";
 
 import {
@@ -10,40 +10,23 @@ import {
   TableBody,
   TableCell,
 } from "@/components/ui/table";
+import { useInvoicesQuery } from "@/queries/owners/invoices/useInvoiceQuery";
 import { RootState } from "@/redux/store/appStore";
 
-import { ownerFetchInvoices } from "../../api/owner.api";
 import InvoicePDF from "../../components/invoicePdf";
-
-type Invoice = {
-  total: number;
-  currency: string;
-  hosted_invoice_url: string;
-  invoice_pdf: string;
-  customer_email: string;
-  name: string;
-  subscription_id: string;
-  created: string;
-  id: string;
-};
 
 const Invoices: React.FC = () => {
   const Owner = useSelector((state: RootState) => state.owner);
-  const [invoices, setInvoices] = useState<Invoice[]>([]);
 
-  useEffect(() => {
-    async function fetchInvoicesRunner() {
-      const response = await ownerFetchInvoices(Owner._id!);
-      if (response.success) {
-        console.log(response.data.data);
-        setInvoices(response.data.data);
-      } else {
-        return console.warn("No invoices for owner");
-      }
-    }
-    fetchInvoicesRunner();
-  }, []);
-
+  const {
+    data: invoices,
+    isError: hasInvoiceError,
+    error: invoiceError,
+    isLoading: isInvoiceLoading,
+  } = useInvoicesQuery("" + Owner._id);
+  if (invoiceError) {
+    console.error(invoiceError);
+  }
   return (
     <div className="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
       <h2 className="text-2xl font-semibold text-white mb-6">Invoices</h2>
@@ -62,12 +45,14 @@ const Invoices: React.FC = () => {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {invoices.length === 0 ? (
+              {isInvoiceLoading && <p>Loading ...</p>}
+              {!hasInvoiceError && invoices?.length === 0 ? (
                 <p className="text-gray-500 dark:text-gray-400 text-sm p-5">
                   No invoice data found
                 </p>
               ) : (
-                invoices.map((invoice) => (
+                !hasInvoiceError &&
+                invoices?.map((invoice) => (
                   <TableRow key={invoice.created}>
                     <TableCell>{invoice.id}</TableCell>
                     <TableCell>{invoice.customer_email}</TableCell>

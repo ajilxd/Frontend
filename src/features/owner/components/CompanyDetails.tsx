@@ -1,4 +1,5 @@
 import { ExternalLink, Building2, Globe, FileText } from "lucide-react";
+
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -9,16 +10,12 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
+import { CompanyType } from "@/types";
+
 import { EditCompanyDetailsModal } from "./EditCompanyDetails";
 
 interface CompanyDetailsProps {
-  companyData: {
-    companyName: string;
-    websiteURL: string;
-    description: string;
-    industry: string[];
-    ownerId: string;
-  };
+  companyData: CompanyType;
 }
 
 const CompanyDetails: React.FC<CompanyDetailsProps> = ({ companyData }) => {

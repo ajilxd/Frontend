@@ -1,6 +1,8 @@
 import { Page, Text, View, Document, StyleSheet } from "@react-pdf/renderer";
 import React from "react";
 
+import { InvoiceType } from "@/types";
+
 // Styles
 const styles = StyleSheet.create({
   page: {
@@ -101,17 +103,7 @@ const styles = StyleSheet.create({
 });
 
 type InvoiceProps = {
-  invoice: {
-    total: number;
-    currency: string;
-    hosted_invoice_url: string;
-    invoice_pdf: string;
-    customer_email: string;
-    name: string;
-    created: number;
-    id: string;
-    subscription_id: string;
-  };
+  invoice: InvoiceType;
 };
 
 const InvoicePDF: React.FC<InvoiceProps> = ({ invoice }) => {
@@ -122,7 +114,7 @@ const InvoicePDF: React.FC<InvoiceProps> = ({ invoice }) => {
       day: "numeric",
     });
 
-  const date = formatDate(invoice.created);
+  const date = formatDate(+invoice.created);
 
   return (
     <Document>

@@ -126,22 +126,17 @@ export async function ownerFetchSubscriptions() {
   try {
     const response = await ownerApi.get(`${baseUrl}/owner/subscriptions`);
     if (response.status === 200) {
-      return {
-        success: true,
-        data: response.data,
-        message: "subscription fetching went succesfull",
-      };
+      return response.data.data;
     }
     throw new Error("unxpected response from server");
   } catch (error) {
-    return catchResponse(error);
+    throw catchResponse(error);
   }
 }
 
 export async function ownerPaymentCheckoutService(
   value: CheckoutPayment<string>
 ) {
-  console.log("input for subscription", value);
   try {
     const response = await ownerApi.post(
       `${baseUrl}/payment/create-checkout-session`,
@@ -150,8 +145,7 @@ export async function ownerPaymentCheckoutService(
     if (response.status == 200) {
       return {
         success: true,
-        data: response.data,
-        message: "Payment session got created succesfull",
+        data: response.data.data,
       };
     }
     throw new Error("unexpected response from server");
@@ -167,15 +161,11 @@ export async function ownerFetchOwnSubscription(ownerId: string) {
     );
 
     if (response.status === 200) {
-      return {
-        success: true,
-        data: response.data,
-        message: "owner subscription is fetched",
-      };
+      return response.data.data;
     }
     throw new Error("unexpected response from server");
   } catch (err) {
-    return catchResponse(err);
+    throw catchResponse(err);
   }
 }
 
@@ -202,33 +192,25 @@ export async function ownerFetchInvoices(id: string) {
   try {
     const response = await ownerApi.get(`${baseUrl}/owner/invoices/${id}`);
     if (response.status === 200) {
-      return {
-        success: true,
-        data: response.data,
-        message: "Data fetched succesfully - owner invoices",
-      };
+      return response.data.data;
     }
     throw new Error("unexpected response from server");
   } catch (error) {
-    return catchResponse(error);
+    throw catchResponse(error);
   }
 }
 
 // Owner api for handling company ops
 
-export async function ownerFetchCompanyDetails(ownerId: string) {
+export async function ownerFetchCompany(ownerId: string) {
   try {
     const response = await ownerApi.get(`${baseUrl}/owner/company/${ownerId}`);
     if (response.status === 200) {
-      return {
-        success: true,
-        data: response.data,
-        message: response.data.message,
-      };
+      return response.data.data;
     }
     throw new Error("unexpected response from server");
   } catch (error) {
-    return catchResponse(error);
+    throw catchResponse(error);
   }
 }
 
@@ -239,7 +221,6 @@ export async function ownerEditCompanyDetails(data: CompanyDataType) {
       return {
         success: true,
         data: response.data.data,
-        message: response.data.message,
       };
     }
     throw new Error("unexpected response from server");

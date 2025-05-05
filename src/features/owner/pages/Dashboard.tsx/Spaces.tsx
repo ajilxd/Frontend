@@ -108,7 +108,7 @@ const Spaces = () => {
         >
           <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-6">
             <TabsList className="bg-gray-100 dark:bg-gray-800">
-              <TabsTrigger value="projects">Projects</TabsTrigger>
+              <TabsTrigger value="projects">Spaces</TabsTrigger>
               <TabsTrigger value="add-space">Add Space</TabsTrigger>
             </TabsList>
 
@@ -131,7 +131,7 @@ const Spaces = () => {
             <Card className="bg-white dark:bg-gray-900 shadow-md transition-colors">
               <CardHeader className="pb-4">
                 <CardTitle className="text-xl font-bold text-gray-900 dark:text-white">
-                  Projects
+                  Spaces
                 </CardTitle>
                 <CardDescription className="text-gray-500 dark:text-gray-400">
                   Manage all your workspace projects

@@ -1,5 +1,7 @@
 import { Formik, Form } from "formik";
+import { enqueueSnackbar } from "notistack";
 import { FC } from "react";
+import { useSelector } from "react-redux";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -20,12 +22,10 @@ import {
 } from "@/components/ui/select";
 import { useManagersQuery } from "@/queries/owners/managers/useManagersQuery";
 import { useSpaceBySpaceIdQuery } from "@/queries/owners/spaces/useSpaceBySpaceIdQuery";
-
-import { editSpaceValidationSchema } from "../validation/owner.validation";
-import { ownerUpdateSpace } from "../api/owner.api";
-import { useSelector } from "react-redux";
 import { RootState } from "@/redux/store/appStore";
-import { enqueueSnackbar } from "notistack";
+
+import { ownerUpdateSpace } from "../api/owner.api";
+import { editSpaceValidationSchema } from "../validation/owner.validation";
 
 type EditSpaceDialogProps = {
   ownerId: string;

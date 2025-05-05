@@ -82,3 +82,53 @@ export type ManagerType = {
   refreshToken?: string;
   companyId: string;
 };
+
+export type SubscriptionType = {
+  _id: string;
+  billingCycle: string;
+  amount: string;
+  name: string;
+  stripe_product_id?: string;
+  stripe_price_id?: string;
+  isActive: string;
+  description: string;
+  features: Array<string>;
+};
+
+export type OwnerSubscriptionType = {
+  name?: string;
+  status?: string;
+  billingCycle?: string;
+  stripe_subscription_id?: string;
+  subscription_id?: string;
+  next_invoice?: string;
+  cancel_at?: string;
+  canceled_at?: string;
+  created?: string;
+  features?: Array<string>;
+  amount?: string;
+  expires_at?: string;
+  invoice?: string;
+  cancel_at_period_end?: boolean;
+};
+
+export type InvoiceType = {
+  total: number;
+  currency: string;
+  hosted_invoice_url: string;
+  invoice_pdf: string;
+  customer_email: string;
+  name: string;
+  subscription_id: string;
+  created: string;
+  id: string;
+};
+
+export type CompanyType = {
+  companyName: string;
+  websiteURL: string;
+  description: string;
+  industry: string[];
+  ownerId: string;
+  _id: string;
+};

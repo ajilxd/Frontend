@@ -1,31 +1,28 @@
 import { CheckIcon } from "lucide-react";
-import { useSelector } from "react-redux";
 
-import { RootState } from "@/redux/store/appStore";
-
-// Define the Plan interface
 interface Plan {
   name: string;
   amount: string;
-  features?: string[]; // Added to support feature list
+  features?: string[];
 }
 
-// Props interface
 interface PlanCardProps extends Plan {
   onKnowMore?: () => void;
   onSubscribe?: () => void;
   onCancel?: () => void;
+  alreadySubscribed?: boolean;
 }
 
 export const PlanCard: React.FC<PlanCardProps> = ({
   name,
   amount,
-  features = [], // Default to empty array if no features provided
-
+  features = [],
+  alreadySubscribed,
   onSubscribe,
 }) => {
-  const data = useSelector((state: RootState) => state.owner.subscription);
-
+  if (alreadySubscribed) {
+    console.warn("Already have an active subscription");
+  }
   return (
     <div className="bg-white shadow-sm rounded-lg p-6 transition-shadow hover:shadow-md">
       <div className="flex justify-between items-start mb-4">
@@ -53,7 +50,7 @@ export const PlanCard: React.FC<PlanCardProps> = ({
       <div className="flex gap-3">
         <button
           onClick={onSubscribe}
-          disabled={data ? true : false}
+          disabled={alreadySubscribed}
           className={`px-4 py-2 ${"bg-blue-600 hover:bg-blue-700"} text-white text-sm font-medium rounded-md transition-colors flex-1`}
         >
           Subscribe

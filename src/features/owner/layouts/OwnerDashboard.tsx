@@ -6,17 +6,18 @@ import {
   Text,
   Plus,
 } from "lucide-react";
-import { useContext, useState } from "react";
+import { useState } from "react";
 import { useSelector } from "react-redux";
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
 
-import { OwnerContext } from "@/context/OwnerContext";
 import { RootState } from "@/redux/store/appStore";
 import { SignOutModal } from "@/shared/components/signoutModal";
 import { SubscriptionPaywall } from "@/shared/components/SubscriptionPaywall";
 
 import { CompanyNotRegisteredAlert } from "../components/CompanyNotRegisteredAlert";
 import SidebarItem from "../components/SIdebarItem";
+import { useOwnerSubscriptionQuery } from "@/queries/owners/subscriptions/useOwnerSubscriptionQuery";
+import { useOwnerCompanyQuery } from "@/queries/owners/company/useOwnerCompanyQuery";
 
 const sidebarsArray: { icon: React.ElementType; label: string }[] = [
   { icon: LayoutDashboard, label: "Dashboard" },
@@ -28,18 +29,13 @@ const sidebarsArray: { icon: React.ElementType; label: string }[] = [
 ];
 
 export default function OwnerDashboard() {
+  const owner = useSelector((state: RootState) => state.owner);
   const [activeItem, setActiveItem] = useState<string>("Dashboard");
   const navigate = useNavigate();
-  const hasSubscriptionFromRedux = useSelector(
-    (state: RootState) => state.owner.subscription
-  );
 
-  const { company } = useContext(OwnerContext);
-  const { activeSubscription: hasSubscriptionFromContext } =
-    useContext(OwnerContext);
-  const hasSubscription =
-    hasSubscriptionFromContext || hasSubscriptionFromRedux;
-  // console.log("has subscription", hasSubscription);
+  const { data: OwnerSubscription } = useOwnerSubscriptionQuery("" + owner._id);
+  const { data: OwnerCompany } = useOwnerCompanyQuery("" + owner._id);
+
   const location = useLocation();
   const canShowCompanyRegistrationAlert =
     location.pathname !== "/owner/dashboard/company";
@@ -79,12 +75,12 @@ export default function OwnerDashboard() {
 
       {/* Main content */}
       <main className="flex-1 p-8 space-y-6">
-        {!hasSubscription.name && canShowSubscripitionPaywall && (
+        {!OwnerSubscription && canShowSubscripitionPaywall && (
           <SubscriptionPaywall />
         )}
-        {hasSubscription.name &&
-          canShowCompanyRegistrationAlert &&
-          !company.id && <CompanyNotRegisteredAlert />}
+        {!OwnerCompany && canShowCompanyRegistrationAlert && (
+          <CompanyNotRegisteredAlert />
+        )}
         <Outlet />
       </main>
     </div>

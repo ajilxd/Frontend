@@ -1,32 +1,18 @@
 import { useNavigate } from "react-router-dom";
 
+import { OwnerSubscriptionType } from "@/types";
+
 import { ActivePlanDialog } from "./Modal/ActivePlanDialog";
 import { CancelSubscriptionDialog } from "./Modal/CancelSubscripitionModel";
 
-export type OwnerSubscriptionDetailsType = {
-  name?: string;
-  status?: string;
-  billingCycle?: string;
-  stripe_subscription_id?: string;
-  subscription_id?: string;
-  next_invoice?: string;
-  cancel_at?: string;
-  canceled_at?: string;
-  created?: string;
-  features?: Array<string>;
-  amount?: string;
-  expires_at?: string;
-  invoice?: string;
-  cancel_at_period_end?: boolean;
-};
-
 interface ActiveSubscriptionProps {
-  activePlan?: OwnerSubscriptionDetailsType;
+  activePlan?: OwnerSubscriptionType;
 }
 
 export const ActiveSubscription: React.FC<ActiveSubscriptionProps> = ({
   activePlan,
 }) => {
+  console.log("active plan", activePlan);
   const navigate = useNavigate();
   if (!activePlan) {
     return (
