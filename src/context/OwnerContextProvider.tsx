@@ -1,7 +1,11 @@
 import { ReactNode, useCallback, useState } from "react";
 
-import { companyDataType, OwnerContext } from "./OwnerContext";
-import { activeSubscriptionType } from "./OwnerContext";
+import {
+  ActiveSubscriptionType,
+  CompanyDataType,
+} from "@/features/owner/types/types.ownercontext";
+
+import { OwnerContext } from "./OwnerContext";
 
 type Props = {
   children: ReactNode;
@@ -9,17 +13,19 @@ type Props = {
 
 export const OwnerContextProvider: React.FC<Props> = ({ children }) => {
   const [activeSubscription, setActiveSubscription] =
-    useState<activeSubscriptionType>({});
-  const [company, setCompany] = useState<companyDataType>({});
+    useState<ActiveSubscriptionType>({});
+
+  const [company, setCompany] = useState<CompanyDataType>({});
+
   const memoisedUpdateActiveSubscription = useCallback(
-    async function updateActiveSubscription(data: activeSubscriptionType) {
+    async function updateActiveSubscription(data: ActiveSubscriptionType) {
       setActiveSubscription(data);
     },
     []
   );
 
   const memoisedUpdateCompany = useCallback(async function updateCompany(
-    data: companyDataType
+    data: CompanyDataType
   ) {
     setCompany(data);
   },

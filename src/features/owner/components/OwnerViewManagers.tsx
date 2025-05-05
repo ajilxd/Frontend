@@ -1,6 +1,6 @@
 import { MoreHorizontal, Search } from "lucide-react";
 import { enqueueSnackbar } from "notistack";
-import { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
 
 import { Button } from "@/components/ui/button";
@@ -19,21 +19,12 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { useManagersQuery } from "@/queries/owners/managers/useManagersQuery";
 import { RootState } from "@/redux/store/appStore";
+import { ChaseSpinner } from "@/shared/components/ChaseSpinner";
+import { ManagerType } from "@/types";
 
-import {
-  ownerFetchAllManagers,
-  ownerToggleManagerStatus,
-} from "../api/owner.api";
-
-type ManagerType = {
-  name: string;
-  email: string;
-  status: string;
-  profile: string;
-  isBlocked: boolean;
-  _id: string;
-};
+import { ownerToggleManagerStatus } from "../api/owner.api";
 
 export function OwnerViewManagers() {
   const [managers, setManagers] = useState<ManagerType[]>([]);
@@ -58,20 +49,18 @@ export function OwnerViewManagers() {
     }
   };
 
+  const {
+    data: Managers,
+    error,
+    isError,
+    isLoading,
+  } = useManagersQuery(owner._id!);
+
   useEffect(() => {
-    if (!owner._id) return;
-
-    async function getManagers(id: string) {
-      const response = await ownerFetchAllManagers(id);
-      if (response.success) {
-        setManagers(response.data.data);
-      } else {
-        console.warn(response.message);
-      }
+    if (Managers?.length) {
+      setManagers(Managers);
     }
-
-    getManagers(owner._id);
-  }, [owner._id]);
+  }, [Managers]);
 
   const filteredManagers = managers.filter(
     (manager) =>
@@ -115,75 +104,91 @@ export function OwnerViewManagers() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {filteredManagers.length > 0 ? (
-              filteredManagers.map((manager, index) => (
-                <TableRow
-                  key={manager._id}
-                  className="border-b border-slate-100 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/50"
-                >
-                  <TableCell className="font-medium text-slate-900 dark:text-slate-200">
-                    {index + 1}
-                  </TableCell>
-                  <TableCell className="font-medium text-slate-900 dark:text-slate-200">
-                    {manager.name}
-                  </TableCell>
-                  <TableCell className="text-slate-600 dark:text-slate-400 hidden md:table-cell">
-                    {manager.email}
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          className="h-8 w-8 p-0"
-                        >
-                          <MoreHorizontal className="h-4 w-4" />
-                          <span className="sr-only">Open menu</span>
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent
-                        align="end"
-                        className="bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700"
-                      >
-                        <DropdownMenuItem
-                          onClick={() => handleToggleStatus(manager._id)}
-                          className={`cursor-pointer ${
-                            manager.isBlocked
-                              ? "text-green-600 dark:text-green-400"
-                              : "text-red-600 dark:text-red-400"
-                          }`}
-                        >
-                          {manager.isBlocked ? "Unblock" : "Block"}
-                        </DropdownMenuItem>
-                        <DropdownMenuItem
-                          className="cursor-pointer text-slate-700 dark:text-slate-300"
-                          onClick={() => {
-                            enqueueSnackbar(
-                              `Viewing details for ${manager.name}`,
-                              { variant: "info" }
-                            );
-                          }}
-                        >
-                          View Details
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </TableCell>
-                </TableRow>
-              ))
-            ) : (
+            {isError && (
               <TableRow>
-                <TableCell
-                  colSpan={4}
-                  className="h-24 text-center text-slate-500 dark:text-slate-400"
-                >
-                  {searchQuery
-                    ? "No managers found matching your search"
-                    : "No managers found"}
+                <TableCell colSpan={4} className="text-center text-red-500">
+                  {error.message}
                 </TableCell>
               </TableRow>
             )}
+            {isLoading && (
+              <TableRow>
+                <TableCell colSpan={4} className="h-24 text-center">
+                  <div className="flex justify-center items-center h-full">
+                    <ChaseSpinner />
+                  </div>
+                </TableCell>
+              </TableRow>
+            )}
+            {!isLoading && filteredManagers.length > 0
+              ? filteredManagers.map((manager, index) => (
+                  <TableRow
+                    key={manager._id}
+                    className="border-b border-slate-100 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/50"
+                  >
+                    <TableCell className="font-medium text-slate-900 dark:text-slate-200">
+                      {index + 1}
+                    </TableCell>
+                    <TableCell className="font-medium text-slate-900 dark:text-slate-200">
+                      {manager.name}
+                    </TableCell>
+                    <TableCell className="text-slate-600 dark:text-slate-400 hidden md:table-cell">
+                      {manager.email}
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="h-8 w-8 p-0"
+                          >
+                            <MoreHorizontal className="h-4 w-4" />
+                            <span className="sr-only">Open menu</span>
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent
+                          align="end"
+                          className="bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700"
+                        >
+                          <DropdownMenuItem
+                            onClick={() => handleToggleStatus(manager._id)}
+                            className={`cursor-pointer ${
+                              manager.isBlocked
+                                ? "text-green-600 dark:text-green-400"
+                                : "text-red-600 dark:text-red-400"
+                            }`}
+                          >
+                            {manager.isBlocked ? "Unblock" : "Block"}
+                          </DropdownMenuItem>
+                          <DropdownMenuItem
+                            className="cursor-pointer text-slate-700 dark:text-slate-300"
+                            onClick={() => {
+                              enqueueSnackbar(
+                                `Viewing details for ${manager.name}`,
+                                { variant: "info" }
+                              );
+                            }}
+                          >
+                            View Details
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </TableCell>
+                  </TableRow>
+                ))
+              : !isLoading && (
+                  <TableRow>
+                    <TableCell
+                      colSpan={4}
+                      className="h-24 text-center text-slate-500 dark:text-slate-400"
+                    >
+                      {searchQuery
+                        ? "No managers found matching your search"
+                        : "No managers found"}
+                    </TableCell>
+                  </TableRow>
+                )}
           </TableBody>
         </Table>
       </div>

@@ -16,6 +16,7 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
+import { SpaceType } from "@/context/OwnerContext";
 import { SignOutModal } from "@/shared/components/signoutModal";
 
 type SidebarPropsType = {
@@ -24,17 +25,8 @@ type SidebarPropsType = {
   toggleSpaces: VoidFunction;
   openProjects: Record<string, boolean>;
   toggleProject: (id: string) => void;
+  spaces: SpaceType[];
 };
-
-type projectItemType = {
-  id: string;
-  name: string;
-  color?: string;
-  members?: string;
-  tasks?: string;
-};
-
-type ProjectsType = projectItemType[];
 
 export const Sidebar: React.FC<SidebarPropsType> = ({
   toggleSidebar,
@@ -42,24 +34,8 @@ export const Sidebar: React.FC<SidebarPropsType> = ({
   toggleSpaces,
   openProjects,
   toggleProject,
+  spaces,
 }) => {
-  const projects: ProjectsType = [
-    {
-      id: "project-alpha",
-      name: "Project Alpha",
-      color: "bg-blue-500",
-      members: "8",
-      tasks: "15",
-    },
-    {
-      id: "project-beta",
-      name: "Project Beta",
-      color: "bg-green-500",
-      members: "5",
-      tasks: "10",
-    },
-  ];
-
   return (
     <>
       <div className="p-4 flex items-center justify-between border-b dark:border-gray-800">
@@ -110,9 +86,9 @@ export const Sidebar: React.FC<SidebarPropsType> = ({
               </CollapsibleTrigger>
               <CollapsibleContent>
                 <div className="mt-2 space-y-1 pl-2">
-                  {projects.map((project) => (
+                  {spaces.map((space) => (
                     <Collapsible
-                      key={project.id}
+                      key={space}
                       open={openProjects[project.id]}
                       onOpenChange={() => toggleProject(project.id)}
                     >

@@ -20,23 +20,16 @@ import {
 } from "@/components/ui/collapsible";
 import { SignOutModal } from "@/shared/components/signoutModal";
 
+import { SpaceType } from "../api/manager.api";
+
 type SidebarPropsType = {
   toggleSidebar: VoidFunction;
   isSpacesOpen: boolean;
   toggleSpaces: VoidFunction;
   openProjects: Record<string, boolean>;
   toggleProject: (id: string) => void;
+  spaces: SpaceType[];
 };
-
-type projectItemType = {
-  id: string;
-  name: string;
-  color?: string;
-  members?: string;
-  tasks?: string;
-};
-
-type ProjectsType = projectItemType[];
 
 export const Sidebar: React.FC<SidebarPropsType> = ({
   toggleSidebar,
@@ -44,31 +37,16 @@ export const Sidebar: React.FC<SidebarPropsType> = ({
   toggleSpaces,
   openProjects,
   toggleProject,
+  spaces,
 }) => {
   const navigate = useNavigate();
-
-  const projects: ProjectsType = [
-    {
-      id: "project-alpha",
-      name: "Project Alpha",
-      color: "bg-blue-500",
-      members: "8",
-      tasks: "15",
-    },
-    {
-      id: "project-beta",
-      name: "Project Beta",
-      color: "bg-green-500",
-      members: "5",
-      tasks: "10",
-    },
-  ];
+  console.log(JSON.stringify(spaces));
 
   return (
     <>
       <div className="p-4 flex items-center justify-between border-b dark:border-gray-800">
         <h2 className="text-lg font-semibold text-blue-600 dark:text-blue-400">
-          Manager Hub
+          Fluenta Work / Managers
         </h2>
         <Button
           variant="ghost"
@@ -94,7 +72,11 @@ export const Sidebar: React.FC<SidebarPropsType> = ({
               <Users className="h-5 w-5 mr-3" />
               <span>Add Users</span>
             </Button>
-            <Button variant="ghost" className="w-full justify-start">
+            <Button
+              variant="ghost"
+              className="w-full justify-start"
+              onClick={() => navigate("/manager/dashboard/spaces")}
+            >
               <FolderPlus className="h-5 w-5 mr-3" />
               <span>Add Space</span>
             </Button>
@@ -125,11 +107,11 @@ export const Sidebar: React.FC<SidebarPropsType> = ({
               </CollapsibleTrigger>
               <CollapsibleContent>
                 <div className="mt-2 space-y-1 pl-2">
-                  {projects.map((project) => (
+                  {spaces.map((space) => (
                     <Collapsible
-                      key={project.id}
-                      open={openProjects[project.id]}
-                      onOpenChange={() => toggleProject(project.id)}
+                      key={space._id}
+                      open={openProjects[space._id]}
+                      onOpenChange={() => toggleProject(space._id)}
                     >
                       <CollapsibleTrigger asChild>
                         <Button
@@ -137,14 +119,11 @@ export const Sidebar: React.FC<SidebarPropsType> = ({
                           className="w-full justify-between text-sm"
                         >
                           <div className="flex items-center">
-                            <span
-                              className={`w-2 h-2 ${project.color} rounded-full mr-3`}
-                            ></span>
-                            <span>{project.name}</span>
+                            <span>{space.name}</span>
                           </div>
                           <ChevronRight
                             className={`h-4 w-4 transition-transform ${
-                              openProjects[project.id] ? "rotate-90" : ""
+                              openProjects[space._id] ? "rotate-90" : ""
                             }`}
                           />
                         </Button>

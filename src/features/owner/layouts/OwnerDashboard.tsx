@@ -1,14 +1,22 @@
-import { User, LayoutDashboard, Building2, Wallet, Text } from "lucide-react";
+import {
+  User,
+  LayoutDashboard,
+  Building2,
+  Wallet,
+  Text,
+  Plus,
+} from "lucide-react";
 import { useContext, useState } from "react";
+import { useSelector } from "react-redux";
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
 
-import { SignOutModal } from "@/shared/components/signoutModal";
-
-import SidebarItem from "../components/SIdebarItem";
-import { useSelector } from "react-redux";
-import { RootState } from "@/redux/store/appStore";
-import { SubscriptionPaywall } from "@/shared/components/SubscriptionPaywall";
 import { OwnerContext } from "@/context/OwnerContext";
+import { RootState } from "@/redux/store/appStore";
+import { SignOutModal } from "@/shared/components/signoutModal";
+import { SubscriptionPaywall } from "@/shared/components/SubscriptionPaywall";
+
+import { CompanyNotRegisteredAlert } from "../components/CompanyNotRegisteredAlert";
+import SidebarItem from "../components/SIdebarItem";
 
 const sidebarsArray: { icon: React.ElementType; label: string }[] = [
   { icon: LayoutDashboard, label: "Dashboard" },
@@ -16,6 +24,7 @@ const sidebarsArray: { icon: React.ElementType; label: string }[] = [
   { icon: Wallet, label: "Subscriptions" },
   { icon: Building2, label: "Company" },
   { icon: Text, label: "Invoices" },
+  { icon: Plus, label: "Spaces" },
 ];
 
 export default function OwnerDashboard() {
@@ -24,14 +33,19 @@ export default function OwnerDashboard() {
   const hasSubscriptionFromRedux = useSelector(
     (state: RootState) => state.owner.subscription
   );
+
+  const { company } = useContext(OwnerContext);
   const { activeSubscription: hasSubscriptionFromContext } =
     useContext(OwnerContext);
   const hasSubscription =
     hasSubscriptionFromContext || hasSubscriptionFromRedux;
+  // console.log("has subscription", hasSubscription);
   const location = useLocation();
+  const canShowCompanyRegistrationAlert =
+    location.pathname !== "/owner/dashboard/company";
   const canShowSubscripitionPaywall =
     location.pathname !== "/owner/dashboard/subscriptions";
-  console.log(location.pathname);
+  // console.log(location.pathname);
   return (
     <div className="min-h-screen flex bg-black text-white">
       {/* Sidebar */}
@@ -65,9 +79,12 @@ export default function OwnerDashboard() {
 
       {/* Main content */}
       <main className="flex-1 p-8 space-y-6">
-        {!hasSubscription && canShowSubscripitionPaywall && (
+        {!hasSubscription.name && canShowSubscripitionPaywall && (
           <SubscriptionPaywall />
         )}
+        {hasSubscription.name &&
+          canShowCompanyRegistrationAlert &&
+          !company.id && <CompanyNotRegisteredAlert />}
         <Outlet />
       </main>
     </div>

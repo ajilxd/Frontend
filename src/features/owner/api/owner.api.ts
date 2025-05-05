@@ -1,23 +1,15 @@
 import { ownerApi } from "@/axios";
 import { baseUrl } from "@/constants/app";
-import { companyDataType } from "@/context/OwnerContext";
 import { catchResponse } from "@/errors/catchResponse";
-import { OwnerLoginResponseType, ServerResponseType } from "@/types";
+import {
+  ManagerType,
+  OwnerLoginResponseType,
+  ServerResponseType,
+  SpaceType,
+} from "@/types";
 
-type CompanyDetailsType = {
-  companyName: string;
-  websiteURL: string;
-  description: string;
-  industry: string[];
-  ownerId: string;
-};
-
-type checkoutPayment<T> = {
-  planId: T;
-  ownerId: T;
-  stripeCustomerId: T;
-  subscriptionId: T;
-};
+import { CheckoutPayment, CompanyDetailsType } from "../types";
+import { CompanyDataType } from "../types/types.ownercontext";
 
 export async function ownerSigninService(formData: {
   email: string;
@@ -128,6 +120,8 @@ export async function ownerLogoutService() {
   }
 }
 
+// Owner api for handling subscriptions and payment
+
 export async function ownerFetchSubscriptions() {
   try {
     const response = await ownerApi.get(`${baseUrl}/owner/subscriptions`);
@@ -145,7 +139,7 @@ export async function ownerFetchSubscriptions() {
 }
 
 export async function ownerPaymentCheckoutService(
-  value: checkoutPayment<string>
+  value: CheckoutPayment<string>
 ) {
   console.log("input for subscription", value);
   try {
@@ -202,6 +196,8 @@ export async function ownerCancelSubscriptionService(id: string) {
   }
 }
 
+// Owner api for handling invoice ops
+
 export async function ownerFetchInvoices(id: string) {
   try {
     const response = await ownerApi.get(`${baseUrl}/owner/invoices/${id}`);
@@ -217,6 +213,8 @@ export async function ownerFetchInvoices(id: string) {
     return catchResponse(error);
   }
 }
+
+// Owner api for handling company ops
 
 export async function ownerFetchCompanyDetails(ownerId: string) {
   try {
@@ -234,7 +232,7 @@ export async function ownerFetchCompanyDetails(ownerId: string) {
   }
 }
 
-export async function ownerEditCompanyDetails(data: companyDataType) {
+export async function ownerEditCompanyDetails(data: CompanyDataType) {
   try {
     const response = await ownerApi.put(`${baseUrl}/owner/company`, data);
     if (response.status === 200) {
@@ -267,27 +265,21 @@ export async function ownerAddCompanyDetails(data: CompanyDetailsType) {
   }
 }
 
+// Owner api for handling Managers ops
+
 export async function ownerFetchAllManagers(id: string) {
   try {
     const response = await ownerApi.get(`${baseUrl}/owner/managers/${id}`);
     if (response.status === 200) {
-      return {
-        success: true,
-        data: response.data,
-        message: "fetching owners went succesfull",
-      };
+      return response.data.data;
     }
 
     if (response.status === 204) {
-      return {
-        success: true,
-        data: [],
-        message: "No managers for owner",
-      };
+      throw new Error("No managers for owner");
     }
     throw new Error("unexpected response from server");
   } catch (err) {
-    return catchResponse(err);
+    throw catchResponse(err);
   }
 }
 
@@ -315,13 +307,8 @@ export async function ownerToggleManagerStatus(
   }
 }
 
-export async function ownerCreateManager(managerData: {
-  email: string;
-  name: string;
-  ownerId: string;
-}) {
+export async function ownerCreateManager(managerData: Partial<ManagerType>) {
   try {
-    console.log("gsdfgdsfg", managerData);
     const response = await ownerApi.post(
       `${baseUrl}/owner/managers`,
       managerData
@@ -338,3 +325,79 @@ export async function ownerCreateManager(managerData: {
     return catchResponse(err);
   }
 }
+
+// Owner api for handling Space ops
+
+export const ownerFetchSpaceBySpaceId = async (spaceId: string) => {
+  try {
+    const response = await ownerApi.get(
+      `${baseUrl}/space?field=_id&&value=${spaceId}`
+    );
+    if (response.status === 200) {
+      return response.data.data[0];
+    }
+    throw new Error("unexpected response from server");
+  } catch (error) {
+    return catchResponse(error);
+  }
+};
+
+export const ownerUpdateSpace = async (
+  ownerId: string,
+  spaceId: string,
+  updateData: Partial<SpaceType>
+) => {
+  try {
+    const response = await ownerApi.put(`${baseUrl}/space`, {
+      ...updateData,
+      spaceId,
+      ownerId,
+    });
+    if (response.status === 200) {
+      return {
+        success: true,
+        data: response.data.data,
+        message: response.data.message,
+      };
+    }
+    throw new Error("unexpected response from server");
+  } catch (error) {
+    return catchResponse(error);
+  }
+};
+
+export const ownerAddSpace = async (
+  ownerId: string,
+  data: Partial<SpaceType>
+) => {
+  try {
+    const response = await ownerApi.post(`${baseUrl}/space`, {
+      ...data,
+      ownerId,
+    });
+    if (response.status === 201) {
+      return {
+        success: true,
+        data: response.data.data,
+        message: response.data.message,
+      };
+    }
+    throw new Error("Unexpected response from server");
+  } catch (error) {
+    return catchResponse(error);
+  }
+};
+
+export const ownerFetchSpace = async (ownerId: string) => {
+  try {
+    const response = await ownerApi.get(
+      `${baseUrl}/space?field=owner&&value=${ownerId}`
+    );
+    if (response.status === 200) {
+      return response.data.data;
+    }
+    throw new Error("unexpected response from server");
+  } catch (error) {
+    throw catchResponse(error);
+  }
+};

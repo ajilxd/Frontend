@@ -20,12 +20,12 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { Textarea } from "@/components/ui/textarea";
+import { OwnerContext } from "@/context/OwnerContext";
 import { cn } from "@/lib/utils";
 import { RootState } from "@/redux/store/appStore";
 
 import { ownerAddCompanyDetails } from "../api/owner.api";
 import companyDetailsSchema from "../validation/owner.validation";
-import { OwnerContext } from "@/context/OwnerContext";
 
 interface Industry {
   value: string;
@@ -46,7 +46,7 @@ export function AddCompanyDetailsForm() {
   const [open, setOpen] = useState(false);
   const [newIndustry, setNewIndustry] = useState("");
   const owner = useSelector((state: RootState) => state.owner);
-  const { updateCompany } = useContext(OwnerContext);
+  const { updateCompany, activeSubscription } = useContext(OwnerContext);
 
   const formik = useFormik({
     initialValues: {
@@ -67,7 +67,7 @@ export function AddCompanyDetailsForm() {
         enqueueSnackbar("Company details added succesfully", {
           variant: "success",
         });
-        updateCompany(res.data.data);
+        updateCompany({ ...res.data.data, id: res.data.data._id });
         formik.resetForm();
       } else {
         enqueueSnackbar(res.message, {
@@ -267,6 +267,7 @@ export function AddCompanyDetailsForm() {
         <div className="pt-2">
           <Button
             type="submit"
+            disabled={!activeSubscription.name}
             className="w-full h-9 text-sm bg-blue-500 hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700 text-white font-medium rounded-md"
           >
             Register Company

@@ -71,7 +71,11 @@ export const SignOutModal: React.FC<SignoutModalProps> = ({ user }) => {
 
   return (
     <>
-      <Button variant="destructive" onClick={() => setOpen(true)}>
+      <Button
+        variant="destructive"
+        onClick={() => setOpen(true)}
+        className="m-4"
+      >
         Sign Out
       </Button>
 

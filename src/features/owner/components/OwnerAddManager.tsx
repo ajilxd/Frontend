@@ -1,7 +1,7 @@
 import { useFormik } from "formik";
 import { UserPlus } from "lucide-react";
 import { enqueueSnackbar } from "notistack";
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { useSelector } from "react-redux";
 import * as Yup from "yup";
 
@@ -16,6 +16,7 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { OwnerContext } from "@/context/OwnerContext";
 import { RootState } from "@/redux/store/appStore";
 
 import { ownerCreateManager } from "../api/owner.api";
@@ -23,6 +24,7 @@ import { ownerCreateManager } from "../api/owner.api";
 export function OwnerAddManagers() {
   const [loading, setLoading] = useState(false);
   const owner = useSelector((state: RootState) => state.owner);
+  const { company } = useContext(OwnerContext);
 
   const validationSchema = Yup.object().shape({
     email: Yup.string()
@@ -33,10 +35,18 @@ export function OwnerAddManagers() {
 
   const handleFormSubmit = async (values: { email: string; name: string }) => {
     try {
+      console.log("company", !company, company);
+      if (!company || !company.id) {
+        enqueueSnackbar("Add company details before Adding Managers");
+        console.warn("Add company details before adding users");
+        return;
+      }
+      console.log("you lost");
       setLoading(true);
       const response = await ownerCreateManager({
         ...values,
         ownerId: "" + owner._id,
+        companyId: company.id!,
       });
 
       if (response.success) {
