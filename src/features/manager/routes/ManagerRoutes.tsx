@@ -19,8 +19,9 @@ const ManagerRoutes: React.FC = () => {
           >
             <Route index element={<DefaultDashboard />}></Route>
             <Route path="users" element={<UsersDashboard />}></Route>
-
-            <Route path="members" element={<Members />}></Route>
+            <Route path="spaces/:spaceid">
+              <Route path="members" element={<Members />}></Route>
+            </Route>
           </Route>
         </Routes>
       </ManagerContextProvider>

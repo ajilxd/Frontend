@@ -1,36 +1,15 @@
-// src/layouts/Dashboard.jsx
-import { useState, useEffect, useContext } from "react";
-import { useSelector } from "react-redux";
+import { useState, useEffect } from "react";
 import { Outlet } from "react-router-dom";
-
-import { ManagerContext } from "@/context/ManagerContext";
-import { RootState } from "@/redux/store/appStore";
 
 import { Navbar } from "./Navbar";
 import { Sidebar } from "./Sidebar";
-import { managerFetchSpace } from "../api/manager.api";
 
 const Dashboard = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [isSpacesOpen, setIsSpacesOpen] = useState(true);
-  const manager = useSelector((state: RootState) => state.manager);
-  const { spaces, updateSpaces } = useContext(ManagerContext);
-  const [openProjects, setOpenProjects] = useState<Record<string, boolean>>({
-    "project-alpha": false,
-    "project-beta": false,
-  });
 
-  useEffect(() => {
-    const fetchSpaces = async (managerId: string) => {
-      const response = await managerFetchSpace(managerId);
-      if (response.success) {
-        console.log(response.data);
-        updateSpaces(response.data);
-      }
-    };
-    fetchSpaces(manager.id);
-  }, []);
+  const [openProjects, setOpenProjects] = useState<Record<string, boolean>>({});
 
   const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
   const toggleSpaces = () => setIsSpacesOpen(!isSpacesOpen);
@@ -60,7 +39,6 @@ const Dashboard = () => {
 
   return (
     <div className="flex min-h-screen bg-gray-50 dark:bg-gray-950">
-      {/* Sidebar Overlay */}
       {isSidebarOpen && (
         <div
           className="fixed inset-0 bg-black/20 z-40 md:hidden"
@@ -80,7 +58,6 @@ const Dashboard = () => {
           toggleSpaces={toggleSpaces}
           openProjects={openProjects}
           toggleProject={toggleProject}
-          spaces={spaces}
         />
       </aside>
 

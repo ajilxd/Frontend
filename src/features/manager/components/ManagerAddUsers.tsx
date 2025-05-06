@@ -1,8 +1,8 @@
+import { useQueryClient } from "@tanstack/react-query";
 import { useFormik } from "formik";
 import { UserPlus } from "lucide-react";
 import { enqueueSnackbar } from "notistack";
 import { useSelector } from "react-redux";
-import * as Yup from "yup";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -25,40 +25,32 @@ import {
 import { RootState } from "@/redux/store/appStore";
 
 import { managerAddUser } from "../api/manager.api";
+import { addUservalidationSchema } from "../validation";
 
 export function ManagerAddUsers() {
   const manager = useSelector((state: RootState) => state.manager);
-
-  const validationSchema = Yup.object().shape({
-    email: Yup.string()
-      .email("Invalid email address")
-      .required("Email is required"),
-    name: Yup.string().required("Name is required"),
-    role: Yup.string().required("Role is required"),
-  });
+  const queryClient = useQueryClient();
 
   const handleFormSubmit = async (values: {
     email: string;
     name: string;
     role: string;
   }) => {
-    try {
-      const response = await managerAddUser({
-        ...values,
-        managerId: "" + manager.id,
-      });
+    const response = await managerAddUser({
+      ...values,
+      managerId: "" + manager.id,
+    });
 
-      if (response.success) {
-        enqueueSnackbar(response.message, { variant: "success" });
-        formik.resetForm();
-      } else {
-        enqueueSnackbar(response.message || "Something went wrong", {
-          variant: "error",
-        });
-      }
-    } catch (error) {
-      enqueueSnackbar("Failed to create user", { variant: "error" });
-      console.error("Error creating user:", error);
+    if (response.success) {
+      queryClient.invalidateQueries({
+        queryKey: ["owner", "users", manager.id],
+      });
+      enqueueSnackbar(response.message, { variant: "success" });
+      formik.resetForm();
+    } else {
+      enqueueSnackbar(response.message || "Something went wrong", {
+        variant: "error",
+      });
     }
   };
 
@@ -68,7 +60,7 @@ export function ManagerAddUsers() {
       name: "",
       role: "",
     },
-    validationSchema,
+    validationSchema: addUservalidationSchema,
     onSubmit: (values) => {
       handleFormSubmit(values);
     },

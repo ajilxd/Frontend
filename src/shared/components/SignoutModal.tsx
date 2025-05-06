@@ -30,6 +30,7 @@ export const SignOutModal: React.FC<SignoutModalProps> = ({ user }) => {
   const dispatch = useDispatch();
 
   const handleSignOut = async () => {
+    console.log("logging out", user);
     if (user === "owner") {
       const res = await ownerLogoutService();
       if (res.success) {
@@ -49,6 +50,7 @@ export const SignOutModal: React.FC<SignoutModalProps> = ({ user }) => {
         console.error(res.message);
       }
     } else if (user === "manager") {
+      console.log("im manager from the signout model");
       const res = await managerLogout();
       if (res.success) {
         localStorage.removeItem("managerAccessToken");

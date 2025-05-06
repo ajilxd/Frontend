@@ -36,6 +36,7 @@ const AdminLogin: React.FC = () => {
         console.warn("subscription data fetching didnt worked well");
       }
       dispatch(adminLoginSuccess({ accessToken: res.data.accessToken }));
+      localStorage.setItem("activeRole", "admin");
       localStorage.setItem("adminAccessToken", res.data.accessToken);
       dispatch(setActiveRole({ activeRole: "admin" }));
       enqueueSnackbar(res.message, { variant: "success" });

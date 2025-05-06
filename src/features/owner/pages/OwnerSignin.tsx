@@ -45,7 +45,7 @@ const OwnerSignin: React.FC = () => {
           email,
         })
       );
-
+      localStorage.setItem("activeRole", "owner");
       localStorage.setItem("ownerAccessToken", accessToken);
       setIsSubmitting(true);
       setLoading(false);

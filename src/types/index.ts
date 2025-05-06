@@ -1,3 +1,5 @@
+import { TeamMemberType } from "@/features/manager/types";
+
 type ServerResponseSuccess<T> = {
   success: true;
   message: string;
@@ -49,7 +51,7 @@ export type SpaceType = {
   name: string;
   description: string;
   team: {
-    members: string[];
+    members: TeamMemberType[];
   };
   createdBy: string;
   spaceOwner: string;
@@ -131,4 +133,18 @@ export type CompanyType = {
   industry: string[];
   ownerId: string;
   _id: string;
+};
+
+export type UserType = {
+  _id: string;
+  name: string;
+  email: string;
+  isAvailable?: boolean;
+  isBlocked?: boolean;
+  role?: string;
+  managerId: string;
+  refreshToken?: string;
+  image?: string;
+  ownerId?: string;
+  spaces?: string[];
 };

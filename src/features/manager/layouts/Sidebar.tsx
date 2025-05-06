@@ -10,6 +10,7 @@ import {
   Trello,
   User,
 } from "lucide-react";
+import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 
 import { Button } from "@/components/ui/button";
@@ -18,9 +19,9 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
+import { useManagerSpacesQuery } from "@/queries/managers/spaces/useManagerSpacesQuery";
+import { RootState } from "@/redux/store/appStore";
 import { SignOutModal } from "@/shared/components/signoutModal";
-
-import { SpaceType } from "../api/manager.api";
 
 type SidebarPropsType = {
   toggleSidebar: VoidFunction;
@@ -28,7 +29,6 @@ type SidebarPropsType = {
   toggleSpaces: VoidFunction;
   openProjects: Record<string, boolean>;
   toggleProject: (id: string) => void;
-  spaces: SpaceType[];
 };
 
 export const Sidebar: React.FC<SidebarPropsType> = ({
@@ -37,11 +37,11 @@ export const Sidebar: React.FC<SidebarPropsType> = ({
   toggleSpaces,
   openProjects,
   toggleProject,
-  spaces,
 }) => {
   const navigate = useNavigate();
-  console.log(JSON.stringify(spaces));
-
+  const manager = useSelector((state: RootState) => state.manager);
+  const { data: spaces } = useManagerSpacesQuery(manager.id);
+  console.log({ spaces });
   return (
     <>
       <div className="p-4 flex items-center justify-between border-b dark:border-gray-800">
@@ -107,7 +107,7 @@ export const Sidebar: React.FC<SidebarPropsType> = ({
               </CollapsibleTrigger>
               <CollapsibleContent>
                 <div className="mt-2 space-y-1 pl-2">
-                  {spaces.map((space) => (
+                  {spaces?.map((space) => (
                     <Collapsible
                       key={space._id}
                       open={openProjects[space._id]}
@@ -150,6 +150,11 @@ export const Sidebar: React.FC<SidebarPropsType> = ({
                             variant="ghost"
                             size="sm"
                             className="w-full justify-start text-xs pl-3"
+                            onClick={() =>
+                              navigate(
+                                `/manager/dashboard/spaces/${space._id}/members`
+                              )
+                            }
                           >
                             <Users className="h-3.5 w-3.5 mr-2" />
                             Members

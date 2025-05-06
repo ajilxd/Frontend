@@ -59,11 +59,16 @@ export const setupInterceptors = ({
         originalRequest._retry = true;
 
         try {
-          console.log("hey im response intercepter");
           const res = await axios.post(
             `${baseUrl}/refresh-token`,
             {},
-            { withCredentials: true }
+            {
+              withCredentials: true,
+              headers: {
+                "Content-Type": "application/json",
+                "X-User-Role": role,
+              },
+            }
           );
           console.log(res.data.data);
 

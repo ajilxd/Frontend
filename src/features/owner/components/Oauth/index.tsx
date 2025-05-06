@@ -32,6 +32,7 @@ function OAuth() {
       if (!accessToken) {
         throw new Error("No access token found on response");
       }
+      localStorage.setItem("activeRole", "owner");
       localStorage.setItem("ownerAccessToken", accessToken);
       dispatch(ownerLoginSuccess(res.data.data));
       navigate("/owner/dashboard");

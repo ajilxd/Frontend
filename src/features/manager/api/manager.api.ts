@@ -1,57 +1,23 @@
 import { managerApi } from "@/axios";
 import { baseUrl } from "@/constants/app";
 import { catchResponse } from "@/errors/catchResponse";
+import { SpaceType, UserType } from "@/types";
 
-import {
-  SpaceStatusType,
-  SpaceVisibilityType,
-} from "../pages/Dashboard/Spaces";
-
-export type UserType = {
-  name: string;
-  email: string;
-  isAvailable?: boolean;
-  isBlocked?: boolean;
-  role?: string;
-  managerId: string;
-  refreshToken?: string;
-  image?: string;
-  ownerId?: string;
-};
-
-export type SpaceType = {
-  name: string;
-  description: string;
-  visibility: SpaceVisibilityType;
-  status: SpaceStatusType;
-  tags: string[];
-  companyId: string;
-  owner: string;
-  spaceOwner: string;
-  createdBy: string;
-  team?: object;
-  _id: string;
-};
-
-export const managerFetchUser = async (managerId: string) => {
+export const managerFetchUsers = async (managerId: string) => {
   try {
     const response = await managerApi.get(
       `${baseUrl}/manager/users/${managerId}`
     );
     if (response.status === 200) {
-      return {
-        success: true,
-        data: response.data,
-        message: "users fetched succesfully",
-      };
+      return response.data.data;
     }
     throw new Error("unexpected response from server");
   } catch (error) {
-    return catchResponse(error);
+    throw catchResponse(error);
   }
 };
 
-export const managerAddUser = async (data: UserType) => {
+export const managerAddUser = async (data: Partial<UserType>) => {
   try {
     const response = await managerApi.post(`${baseUrl}/manager/users`, data);
     if (response.status == 200) {
@@ -105,37 +71,17 @@ export const managerLogout = async () => {
   }
 };
 
-export const managerAddSpace = async (data: SpaceType) => {
-  try {
-    const response = await managerApi.post(`${baseUrl}/space`, data);
-    if (response.status === 201) {
-      return {
-        success: true,
-        data: response.data.data,
-        message: response.data.message,
-      };
-    }
-    throw new Error("Unexpected response from server");
-  } catch (error) {
-    return catchResponse(error);
-  }
-};
-
 export const managerFetchSpace = async (managerId: string) => {
   try {
     const response = await managerApi.get(
       `${baseUrl}/space?field=managers&&value=${managerId}`
     );
     if (response.status === 200) {
-      return {
-        success: true,
-        data: response.data.data,
-        message: response.data.message,
-      };
+      return response.data.data;
     }
     throw new Error("unexpected response from server");
   } catch (error) {
-    return catchResponse(error);
+    throw catchResponse(error);
   }
 };
 
@@ -145,20 +91,16 @@ export const managerFetchSpaceBySpaceId = async (spaceId: string) => {
       `${baseUrl}/space?field=_id&&value=${spaceId}`
     );
     if (response.status === 200) {
-      return {
-        success: true,
-        data: response.data.data,
-        message: response.data.message,
-      };
+      return response.data.data;
     }
     throw new Error("unexpected response from server");
   } catch (error) {
-    return catchResponse(error);
+    throw catchResponse(error);
   }
 };
 
 export const managerUpdateSpace = async (
-  managerId: string,
+  ownerId: string,
   spaceId: string,
   updateData: Partial<SpaceType>
 ) => {
@@ -166,13 +108,12 @@ export const managerUpdateSpace = async (
     const response = await managerApi.put(`${baseUrl}/space`, {
       ...updateData,
       spaceId,
-      managerId,
+      ownerId,
     });
     if (response.status === 200) {
       return {
         success: true,
         data: response.data.data,
-        message: response.data.message,
       };
     }
     throw new Error("unexpected response from server");

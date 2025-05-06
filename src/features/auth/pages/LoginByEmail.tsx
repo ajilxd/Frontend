@@ -14,9 +14,9 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { managerLoginSuccess } from "@/redux/slices/managerSlice";
+import { userLoginSuccess } from "@/redux/slices/userSlice";
 
 import { authlogin, authSendOtp } from "../api/auth.api";
-import { userLoginSuccess } from "@/redux/slices/userSlice";
 
 const LoginByEmail: React.FC = () => {
   const [email, setEmail] = useState<string>("");
@@ -70,6 +70,7 @@ const LoginByEmail: React.FC = () => {
               },
             })
           );
+          localStorage.setItem("activeRole", "manager");
           localStorage.setItem("managerAccessToken", managerAccessToken);
           setTimeout(() => navigate("/manager/dashboard"), 1500);
         }
@@ -103,7 +104,7 @@ const LoginByEmail: React.FC = () => {
               },
             })
           );
-
+          localStorage.setItem("activeRole", "user");
           localStorage.setItem("userAccessToken", userAccessToken);
           setTimeout(() => navigate("/user/dashboard"), 1500);
         }

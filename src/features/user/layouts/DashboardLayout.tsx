@@ -1,11 +1,5 @@
-// src/layouts/Dashboard.jsx
-import { useState, useEffect, useContext } from "react";
-import { useSelector } from "react-redux";
+import { useState, useEffect } from "react";
 import { Outlet } from "react-router-dom";
-
-import { OwnerContext } from "@/context/OwnerContext";
-import { managerFetchSpace } from "@/features/manager/api/manager.api";
-import { RootState } from "@/redux/store/appStore";
 
 import { Navbar } from "./Navbar";
 import { Sidebar } from "./Sidebar";
@@ -14,23 +8,8 @@ const Dashboard = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [isSpacesOpen, setIsSpacesOpen] = useState(true);
-  const [openProjects, setOpenProjects] = useState<Record<string, boolean>>({
-    "project-alpha": false,
-    "project-beta": false,
-  });
-  const manager = useSelector((state: RootState) => state.manager);
-  const { updateSpaces, spaces } = useContext(OwnerContext);
-  useEffect(() => {
-    const fetchSpaces = async (managerId: string) => {
-      const response = await managerFetchSpace(managerId);
-      if (response.success) {
-        updateSpaces(response.data.data);
-      } else {
-        console.warn("couldnt fetch the spaces");
-      }
-    };
-    fetchSpaces(manager.id);
-  }, []);
+  const [openProjects, setOpenProjects] = useState<Record<string, boolean>>({});
+
   const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
   const toggleSpaces = () => setIsSpacesOpen(!isSpacesOpen);
 
@@ -79,7 +58,6 @@ const Dashboard = () => {
           toggleSpaces={toggleSpaces}
           openProjects={openProjects}
           toggleProject={toggleProject}
-          spaces={spaces}
         />
       </aside>
 

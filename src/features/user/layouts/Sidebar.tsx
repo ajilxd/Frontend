@@ -9,6 +9,7 @@ import {
   Trello,
   User,
 } from "lucide-react";
+import { useSelector } from "react-redux";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -16,7 +17,8 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
-import { SpaceType } from "@/context/OwnerContext";
+import { useSpacesQuery } from "@/queries/users/spaces/useSpacesQuery";
+import { RootState } from "@/redux/store/appStore";
 import { SignOutModal } from "@/shared/components/signoutModal";
 
 type SidebarPropsType = {
@@ -25,7 +27,6 @@ type SidebarPropsType = {
   toggleSpaces: VoidFunction;
   openProjects: Record<string, boolean>;
   toggleProject: (id: string) => void;
-  spaces: SpaceType[];
 };
 
 export const Sidebar: React.FC<SidebarPropsType> = ({
@@ -34,8 +35,9 @@ export const Sidebar: React.FC<SidebarPropsType> = ({
   toggleSpaces,
   openProjects,
   toggleProject,
-  spaces,
 }) => {
+  const user = useSelector((state: RootState) => state.user);
+  const { data: spaces } = useSpacesQuery(user.id);
   return (
     <>
       <div className="p-4 flex items-center justify-between border-b dark:border-gray-800">
@@ -86,11 +88,11 @@ export const Sidebar: React.FC<SidebarPropsType> = ({
               </CollapsibleTrigger>
               <CollapsibleContent>
                 <div className="mt-2 space-y-1 pl-2">
-                  {spaces.map((space) => (
+                  {spaces?.map((space) => (
                     <Collapsible
-                      key={space}
-                      open={openProjects[project.id]}
-                      onOpenChange={() => toggleProject(project.id)}
+                      key={space._id}
+                      open={openProjects[space._id]}
+                      onOpenChange={() => toggleProject(space._id)}
                     >
                       <CollapsibleTrigger asChild>
                         <Button
@@ -98,14 +100,11 @@ export const Sidebar: React.FC<SidebarPropsType> = ({
                           className="w-full justify-between text-sm"
                         >
                           <div className="flex items-center">
-                            <span
-                              className={`w-2 h-2 ${project.color} rounded-full mr-3`}
-                            ></span>
-                            <span>{project.name}</span>
+                            <span>{space.name}</span>
                           </div>
                           <ChevronRight
                             className={`h-4 w-4 transition-transform ${
-                              openProjects[project.id] ? "rotate-90" : ""
+                              openProjects[space._id] ? "rotate-90" : ""
                             }`}
                           />
                         </Button>

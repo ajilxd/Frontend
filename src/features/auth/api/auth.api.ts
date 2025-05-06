@@ -27,10 +27,14 @@ export async function authlogin(data: {
 }) {
   const { email, otp, role } = data;
   try {
-    const response = await axios.post(`${baseUrl}/auth/login?role=${role}`, {
-      email,
-      otp,
-    });
+    const response = await axios.post(
+      `${baseUrl}/auth/login?role=${role}`,
+      {
+        email,
+        otp,
+      },
+      { withCredentials: true }
+    );
     if (response.status === 200) {
       return {
         success: true,
