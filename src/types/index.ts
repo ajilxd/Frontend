@@ -148,3 +148,90 @@ export type UserType = {
   ownerId?: string;
   spaces?: string[];
 };
+
+// Types for tasks
+
+export type TaskFile = {
+  type: string;
+  url: string;
+  uploadeeId: string;
+  uploadeeName: string;
+  size: number;
+  s3key: string;
+};
+
+export type TaskStatusType =
+  | "todo"
+  | "in_progress"
+  | "review"
+  | "done"
+  | "cancelled";
+
+export const TaskStatus = [
+  "todo",
+  "in_progress",
+  "review",
+  "done",
+  "cancelled",
+];
+
+export type TaskAssigneeType = {
+  id: string;
+  name: string;
+  email: string;
+  avatarUrl?: string;
+};
+
+export const TaskPriority = ["low", "medium", "high"];
+
+export type TaskPriorityType = "low" | "medium" | "high";
+
+export type TaskType = {
+  _id: string;
+
+  spaceId: string;
+  spaceName: string;
+  creatorId: string;
+  creatorName: string;
+
+  name: string;
+  description: string;
+  assignee?: TaskAssigneeType[];
+  priority: string;
+  status: string;
+  tags?: string[];
+  completed?: boolean;
+  completedAt?: string;
+
+  files?: File[];
+
+  archived: boolean;
+  dueDate?: string;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type AddTaskType = {
+  _id: string;
+
+  spaceId: string;
+  spaceName: string;
+  creatorId: string;
+  creatorName: string;
+
+  name: string;
+  description: string;
+  assignees: string[];
+  priority: string;
+  status: string;
+  tags?: string[];
+  completed?: boolean;
+  completedAt?: string;
+
+  files?: File[];
+
+  archived: boolean;
+  dueDate?: string;
+  createdAt: string;
+  updatedAt: string;
+};

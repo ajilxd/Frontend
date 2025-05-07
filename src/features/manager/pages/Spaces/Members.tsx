@@ -26,7 +26,6 @@ export default function Members() {
   const toggleMemberSelection = (memberId: string) => {
     if (selectedMembers.includes(memberId)) {
       setSelectedMembers(selectedMembers.filter((id) => id !== memberId));
-      console.log(selectedMembers);
     } else {
       setSelectedMembers([...selectedMembers, memberId]);
     }

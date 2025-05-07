@@ -7,6 +7,7 @@ import Dashboard from "../layouts/DashboardLayout";
 import DefaultDashboard from "../pages/Dashboard";
 import UsersDashboard from "../pages/Dashboard/Users";
 import Members from "../pages/Spaces/Members";
+import Tasks from "../pages/Spaces/Tasks";
 
 const ManagerRoutes: React.FC = () => {
   return (
@@ -21,6 +22,7 @@ const ManagerRoutes: React.FC = () => {
             <Route path="users" element={<UsersDashboard />}></Route>
             <Route path="spaces/:spaceid">
               <Route path="members" element={<Members />}></Route>
+              <Route path="tasks" element={<Tasks />}></Route>
             </Route>
           </Route>
         </Routes>

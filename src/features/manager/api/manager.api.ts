@@ -1,7 +1,7 @@
 import { managerApi } from "@/axios";
 import { baseUrl } from "@/constants/app";
 import { catchResponse } from "@/errors/catchResponse";
-import { SpaceType, UserType } from "@/types";
+import { SpaceType, TaskType, UserType } from "@/types";
 
 export const managerFetchUsers = async (managerId: string) => {
   try {
@@ -117,6 +117,87 @@ export const managerUpdateSpace = async (
       };
     }
     throw new Error("unexpected response from server");
+  } catch (error) {
+    return catchResponse(error);
+  }
+};
+
+// #Task management
+
+export const managerAddTask = async (data: Partial<TaskType>) => {
+  try {
+    const response = await managerApi.post(`${baseUrl}/task`, data);
+    if (response.status === 201) {
+      return {
+        success: true,
+        data: response.data.data,
+      };
+    }
+    throw new Error("Unexpected response from server");
+  } catch (error) {
+    return catchResponse(error);
+  }
+};
+
+export const managerGetTasksByManagerId = async (managerId: string) => {
+  try {
+    const response = await managerApi.get(
+      `${baseUrl}/task?field=creatorId&&value=${managerId}`
+    );
+    if (response.status === 200) {
+      return response.data.data;
+    }
+    throw new Error("Unexpected response from server");
+  } catch (error) {
+    return catchResponse(error);
+  }
+};
+
+export const managerGetTasksByTaskId = async (taskId: string) => {
+  try {
+    const response = await managerApi.get(
+      `${baseUrl}/task?field=taskId&&value=${taskId}`
+    );
+    if (response.status === 200) {
+      return response.data.data;
+    }
+    throw new Error("Unexpected response from server");
+  } catch (error) {
+    return catchResponse(error);
+  }
+};
+
+export const managerGetTasksBySpaceId = async (spaceId: string) => {
+  try {
+    const response = await managerApi.get(
+      `${baseUrl}/task?field=spaceId&&value=${spaceId}`
+    );
+    if (response.status === 200) {
+      return response.data.data;
+    }
+    throw new Error("Unexpected response from server");
+  } catch (error) {
+    return catchResponse(error);
+  }
+};
+
+export const managerUpdateTask = async (
+  taskId: string,
+  data: Partial<TaskType>
+) => {
+  try {
+    const response = await managerApi.put(`${baseUrl}/task`, {
+      taskId,
+      ...data,
+    });
+
+    if (response.status === 200) {
+      return {
+        success: true,
+        data: response.data.data,
+      };
+    }
+    throw new Error("Unexpected response from server");
   } catch (error) {
     return catchResponse(error);
   }
