@@ -10,10 +10,7 @@ import { LOGIN_IMAGE_ADMIN_URL } from "@/constants/images";
 import { adminLoginSuccess } from "@/redux/slices/adminSlice";
 import { setActiveRole } from "@/redux/slices/globalSlice";
 
-import {
-  adminFetchSubscriptionsService,
-  adminSignInService,
-} from "../api/admin.api";
+import { adminSignInService } from "../api/admin.api";
 import { adminSigninValidationSchema } from "../validation/admin.validation";
 
 const AdminLogin: React.FC = () => {
@@ -29,12 +26,6 @@ const AdminLogin: React.FC = () => {
   async function handleAdminSignInSubmit(values: typeof initialValues) {
     const res = await adminSignInService(values);
     if (res.success) {
-      const fetchRes = await adminFetchSubscriptionsService();
-      if (fetchRes?.success) {
-        localStorage.setItem("subscriptions", JSON.stringify(fetchRes.data));
-      } else {
-        console.warn("subscription data fetching didnt worked well");
-      }
       dispatch(adminLoginSuccess({ accessToken: res.data.accessToken }));
       localStorage.setItem("activeRole", "admin");
       localStorage.setItem("adminAccessToken", res.data.accessToken);

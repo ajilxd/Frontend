@@ -4,7 +4,6 @@ import {
   Plus,
   Calendar,
   Users,
-  FolderPlus,
   FileText,
   MessageSquare,
   Trello,
@@ -72,14 +71,7 @@ export const Sidebar: React.FC<SidebarPropsType> = ({
               <Users className="h-5 w-5 mr-3" />
               <span>Add Users</span>
             </Button>
-            <Button
-              variant="ghost"
-              className="w-full justify-start"
-              onClick={() => navigate("/manager/dashboard/spaces")}
-            >
-              <FolderPlus className="h-5 w-5 mr-3" />
-              <span>Add Space</span>
-            </Button>
+
             <Button variant="ghost" className="w-full justify-start">
               <Calendar className="h-5 w-5 mr-3" />
               <span>Calendar</span>
@@ -134,6 +126,11 @@ export const Sidebar: React.FC<SidebarPropsType> = ({
                             variant="ghost"
                             size="sm"
                             className="w-full justify-start text-xs pl-3"
+                            onClick={() =>
+                              navigate(
+                                `/manager/dashboard/spaces/${space._id}/chat`
+                              )
+                            }
                           >
                             <MessageSquare className="h-3.5 w-3.5 mr-2" />
                             Chat
@@ -142,6 +139,11 @@ export const Sidebar: React.FC<SidebarPropsType> = ({
                             variant="ghost"
                             size="sm"
                             className="w-full justify-start text-xs pl-3"
+                            onClick={() =>
+                              navigate(
+                                `/manager/dashboard/spaces/${space._id}/docs`
+                              )
+                            }
                           >
                             <FileText className="h-3.5 w-3.5 mr-2" />
                             Docs
@@ -163,6 +165,11 @@ export const Sidebar: React.FC<SidebarPropsType> = ({
                             variant="ghost"
                             size="sm"
                             className="w-full justify-start text-xs pl-3"
+                            onClick={() =>
+                              navigate(
+                                `/manager/dashboard/spaces/${space._id}/tasks`
+                              )
+                            }
                           >
                             <ChevronRight className="h-3.5 w-3.5 mr-2" />
                             Tasks

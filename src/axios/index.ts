@@ -70,9 +70,11 @@ export const setupInterceptors = ({
               },
             }
           );
-          console.log(res.data.data);
 
           const newAccessToken = res.data.data.accessToken;
+          if (!newAccessToken) {
+            throw new Error("No valid token found");
+          }
           localStorage.setItem(`${role}AccessToken`, newAccessToken);
 
           if (originalRequest.headers) {

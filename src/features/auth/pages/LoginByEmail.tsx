@@ -13,6 +13,7 @@ import {
   CardDescription,
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { useSocket } from "@/hooks/useSocket";
 import { managerLoginSuccess } from "@/redux/slices/managerSlice";
 import { userLoginSuccess } from "@/redux/slices/userSlice";
 
@@ -27,6 +28,7 @@ const LoginByEmail: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const { connectSocket } = useSocket();
 
   const handleLogin = async () => {
     if (!role) {
@@ -72,6 +74,7 @@ const LoginByEmail: React.FC = () => {
           );
           localStorage.setItem("activeRole", "manager");
           localStorage.setItem("managerAccessToken", managerAccessToken);
+          connectSocket({ userId: managerData.id });
           setTimeout(() => navigate("/manager/dashboard"), 1500);
         }
       } else if (role === "user") {
@@ -106,6 +109,7 @@ const LoginByEmail: React.FC = () => {
           );
           localStorage.setItem("activeRole", "user");
           localStorage.setItem("userAccessToken", userAccessToken);
+          connectSocket({ userId: userData.id });
           setTimeout(() => navigate("/user/dashboard"), 1500);
         }
       }

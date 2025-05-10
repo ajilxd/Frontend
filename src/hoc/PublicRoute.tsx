@@ -11,8 +11,7 @@ interface PrivateRouteProps {
 const PublicRoute: React.FC<PrivateRouteProps> = ({ Component, role }) => {
   const ownerData = useSelector((state: RootState) => state.owner);
   const adminData = useSelector((state: RootState) => state.admin);
-  console.log(role);
-  console.log(ownerData);
+
   switch (role) {
     case "owner":
       return ownerData.isAuthenticated ? (

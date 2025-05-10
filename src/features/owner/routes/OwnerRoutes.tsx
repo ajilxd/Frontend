@@ -10,7 +10,6 @@ if (import.meta.env.VITE_STRIPE_PUBLIC_KEY) {
 
 import { OwnerContextProvider } from "@/context/OwnerContextProvider.tsx";
 import PrivateRoute from "@/hoc/PrivateRoute.tsx";
-import PublicRoute from "@/hoc/PublicRoute.tsx";
 
 import OwnerDashboard from "../layouts/OwnerDashboard";
 import DefaultDashboard from "../pages/Dashboard.tsx";
@@ -30,10 +29,7 @@ export const OwnerRoutes = () => {
     <OwnerContextProvider>
       <Elements stripe={stripePromise || null}>
         <Routes>
-          <Route
-            path="/signin"
-            element={<PublicRoute Component={OwnerSignin} role="owner" />}
-          ></Route>
+          <Route path="/signin" element={<OwnerSignin />}></Route>
           <Route path="/signup" element={<OwnerSignUp />}></Route>
           <Route path="/forget-password" element={<ForgetPassword />}></Route>
           <Route path="resetpassword/:token" element={<ResetPassword />} />

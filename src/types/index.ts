@@ -235,3 +235,14 @@ export type AddTaskType = {
   createdAt: string;
   updatedAt: string;
 };
+
+export type DocType = {
+  _id?: string;
+  spaceid?: string;
+  title: string;
+  content: string;
+  author: string;
+  comments?: Record<string, string>;
+  createdAt?: Date;
+  updatedAt?: Date;
+};

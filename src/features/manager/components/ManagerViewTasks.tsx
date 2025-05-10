@@ -8,6 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { TaskType } from "@/types";
 
 import { EditTaskDialog } from "./EditTaskDialogue";
+import { getStatusConfig } from "../constants/StatusConfig";
 type Props = { tasks: TaskType[] };
 
 export const ManagerViewTasks: React.FC<Props> = ({ tasks }) => {
@@ -87,11 +88,19 @@ export const ManagerViewTasks: React.FC<Props> = ({ tasks }) => {
                       {task.priority}
                     </span>
                   </div>
+                  <div
+                    className={`${
+                      getStatusConfig(task.status).classes
+                    } flex items-center rounded border px-2 py-1 text-xs font-medium`}
+                  >
+                    {getStatusConfig(task.status).icon}
+                    {getStatusConfig(task.status).label}
+                  </div>
                   {task.dueDate && (
                     <div className="flex items-center">
                       <Calendar className="h-4 w-4 mr-1 text-muted-foreground" />
                       <span className="text-xs text-muted-foreground">
-                        {task.dueDate}
+                        {new Date(task.dueDate).toLocaleDateString()}
                       </span>
                     </div>
                   )}

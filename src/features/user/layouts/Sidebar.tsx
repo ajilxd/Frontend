@@ -10,6 +10,7 @@ import {
   User,
 } from "lucide-react";
 import { useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -37,12 +38,13 @@ export const Sidebar: React.FC<SidebarPropsType> = ({
   toggleProject,
 }) => {
   const user = useSelector((state: RootState) => state.user);
+  const navigate = useNavigate();
   const { data: spaces } = useSpacesQuery(user.id);
   return (
     <>
       <div className="p-4 flex items-center justify-between border-b dark:border-gray-800">
         <h2 className="text-lg font-semibold text-blue-600 dark:text-blue-400">
-          user Hub
+          Fluentawork / users
         </h2>
         <Button
           variant="ghost"
@@ -56,7 +58,11 @@ export const Sidebar: React.FC<SidebarPropsType> = ({
       <div className="flex-1 overflow-y-auto">
         <nav className="p-2">
           <div className="space-y-1">
-            <Button variant="ghost" className="w-full justify-start">
+            <Button
+              variant="ghost"
+              className="w-full justify-start"
+              onClick={() => navigate("/user/dashboard/profile")}
+            >
               <User className="h-5 w-5 mr-3" />
               <span>Profile</span>
             </Button>
@@ -115,6 +121,11 @@ export const Sidebar: React.FC<SidebarPropsType> = ({
                             variant="ghost"
                             size="sm"
                             className="w-full justify-start text-xs pl-3"
+                            onClick={() =>
+                              navigate(
+                                `/user/dashboard/spaces/${space._id}/chat`
+                              )
+                            }
                           >
                             <MessageSquare className="h-3.5 w-3.5 mr-2" />
                             Chat
@@ -123,6 +134,11 @@ export const Sidebar: React.FC<SidebarPropsType> = ({
                             variant="ghost"
                             size="sm"
                             className="w-full justify-start text-xs pl-3"
+                            onClick={() =>
+                              navigate(
+                                `/user/dashboard/spaces/${space._id}/docs`
+                              )
+                            }
                           >
                             <FileText className="h-3.5 w-3.5 mr-2" />
                             Docs
@@ -131,6 +147,11 @@ export const Sidebar: React.FC<SidebarPropsType> = ({
                             variant="ghost"
                             size="sm"
                             className="w-full justify-start text-xs pl-3"
+                            onClick={() =>
+                              navigate(
+                                `/user/dashboard/spaces/${space._id}/members`
+                              )
+                            }
                           >
                             <Users className="h-3.5 w-3.5 mr-2" />
                             Members
@@ -139,6 +160,11 @@ export const Sidebar: React.FC<SidebarPropsType> = ({
                             variant="ghost"
                             size="sm"
                             className="w-full justify-start text-xs pl-3"
+                            onClick={() =>
+                              navigate(
+                                `/user/dashboard/spaces/${space._id}/tasks`
+                              )
+                            }
                           >
                             <ChevronRight className="h-3.5 w-3.5 mr-2" />
                             Tasks
