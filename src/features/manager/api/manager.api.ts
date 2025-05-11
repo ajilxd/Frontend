@@ -1,7 +1,7 @@
 import { managerApi } from "@/axios";
 import { baseUrl } from "@/constants/app";
 import { catchResponse } from "@/errors/catchResponse";
-import { SpaceType, TaskType, UserType } from "@/types";
+import { DocType, SpaceType, TaskType, UserType } from "@/types";
 
 export const managerFetchUsers = async (managerId: string) => {
   try {
@@ -200,5 +200,73 @@ export const managerUpdateTask = async (
     throw new Error("Unexpected response from server");
   } catch (error) {
     return catchResponse(error);
+  }
+};
+
+export const managerCreateDocument = async (
+  spaceId: string,
+  author: string,
+  title: string,
+  data: Partial<DocType>
+) => {
+  try {
+    const response = await managerApi.post(`${baseUrl}/document`, {
+      spaceId,
+      author,
+      title,
+      ...data,
+    });
+
+    if (response.status === 201) {
+      return { success: true, data: response.data.data };
+    }
+    throw new Error("Unexpected response from server");
+  } catch (error) {
+    return catchResponse(error);
+  }
+};
+
+export const managerGetDocuments = async (spaceId: string) => {
+  try {
+    const response = await managerApi.get(
+      `${baseUrl}/document?spaceId=${spaceId}`
+    );
+    console.log("docs", response.data.data);
+    if (response.status == 200) {
+      return response.data.data;
+    }
+  } catch (error) {
+    throw catchResponse(error);
+  }
+};
+
+export const mangerDeleteDocument = async (docId: string) => {
+  try {
+    const response = await managerApi.delete(`${baseUrl}/document?${docId}`);
+    if (response.status === 200) {
+      return {
+        success: true,
+        data: response.data.data,
+      };
+    }
+    throw new Error("Unexpected response from server");
+  } catch (error) {
+    throw catchResponse(error);
+  }
+};
+
+export const managerUpdateDocument = async (
+  docId: string,
+  data: Partial<DocType>
+) => {
+  try {
+    const response = await managerApi.put(`${baseUrl}/document/${docId}`, data);
+    console.log(response);
+    if (response.status === 200) {
+      return { data: response.data.data, success: true };
+    }
+    throw new Error("Unexpected response from server");
+  } catch (error) {
+    throw catchResponse(error);
   }
 };

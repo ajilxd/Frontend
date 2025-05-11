@@ -1,52 +1,50 @@
 import { FilePlus, Edit2 } from "lucide-react";
-import { useState } from "react";
+import { enqueueSnackbar } from "notistack";
+import { useState, useEffect } from "react";
+import { useSelector } from "react-redux";
+import { useParams } from "react-router-dom";
 
 import { Button } from "@/components/ui/button";
+import { useUserDocumentsQuery } from "@/queries/users/documents/useUserDocumentsQuery";
+import { RootState } from "@/redux/store/appStore";
 import { DocumentItem } from "@/shared/components/DocumentItem";
 import { EmptyDocState } from "@/shared/components/EmptyDocState";
 import { QuillEditor } from "@/shared/components/QuillEditor";
 import { DocType } from "@/types";
-import { useQueryClient } from "@tanstack/react-query";
 
-const formatDate = (date: Date) => {
+import {
+  managerCreateDocument,
+  managerUpdateDocument,
+} from "../../api/manager.api";
+
+const formatDate = (date: Date | string) => {
+  const parsedDate = new Date(date);
   const options: Intl.DateTimeFormatOptions = {
     month: "short",
     day: "numeric",
     year: "numeric",
   };
-  return new Date(date).toLocaleDateString("en-US", options);
+  return parsedDate.toLocaleDateString("en-US", options);
 };
 
-const initialDocs = [
-  {
-    _id: "1",
-    title: "Welcome Document",
-    content:
-      "<h1>Welcome to the Document Editor!</h1><p>Start creating your documents here.</p>",
-    createdAt: new Date("2025-05-01"),
-  },
-  {
-    _id: "2",
-    title: "Project Ideas",
-    content:
-      "<h1>Project Ideas</h1><p>List of potential projects to work on:</p><ul><li>Document management system</li><li>Task tracker</li></ul>",
-    createdAt: new Date("2025-05-03"),
-  },
-  {
-    _id: "3",
-    title: "Meeting Notes",
-    content:
-      "<h1>Meeting Notes - May 5</h1><p>Key points discussed:</p><ul><li>Project deadlines</li><li>Resource allocation</li></ul>",
-    createdAt: new Date("2025-05-05"),
-  },
-];
+export default function DocumentApp() {
+  const manager = useSelector((state: RootState) => state.manager);
+  const { spaceid } = useParams();
 
-export default function Docs() {
-  const queryClient = useQueryClient();
-  const [documents, setDocuments] = useState(initialDocs);
+  if (!spaceid) {
+    console.warn("space id is missing...");
+    throw new Error("Something went wrong. Try logging in again.");
+  }
+
+  const { data: docs = [], refetch } = useUserDocumentsQuery(spaceid);
+
+  const [documents, setDocuments] = useState<Partial<DocType>[]>([]);
   const [selectedDoc, setSelectedDoc] = useState<Partial<DocType> | null>(null);
   const [activeDocId, setActiveDocId] = useState<string | null>(null);
-  const [newDocument, setNewDocument] = useState<Partial<DocType> | null>(null);
+
+  useEffect(() => {
+    setDocuments(docs);
+  }, [docs]);
 
   const handleSelectDocument = (doc: Partial<DocType>) => {
     setSelectedDoc(doc);
@@ -54,45 +52,78 @@ export default function Docs() {
   };
 
   const handleContentChange = (newContent: string) => {
-    if (selectedDoc) {
-      const updatedDocs = documents.map((doc) =>
-        doc._id === selectedDoc._id ? { ...doc, content: newContent } : doc
-      );
+    if (!selectedDoc) return;
+    const updatedDoc = { ...selectedDoc, content: newContent };
+    const updatedDocs = documents.map((doc) =>
+      doc._id === selectedDoc._id ? updatedDoc : doc
+    );
+    setDocuments(updatedDocs);
+    setSelectedDoc(updatedDoc);
+  };
 
-      const newDocument = {
-        content: newContent,
-      };
+  const handleTitleChange = (newTitle: string) => {
+    if (!selectedDoc) return;
+    const updatedDoc = { ...selectedDoc, title: newTitle };
+    const updatedDocs = documents.map((doc) =>
+      doc._id === selectedDoc._id ? updatedDoc : doc
+    );
 
-      setNewDocument(newDocument);
-      setDocuments(updatedDocs);
-      setSelectedDoc({ ...selectedDoc, content: newContent });
-    }
+    setDocuments(updatedDocs);
+    setSelectedDoc(updatedDoc);
   };
 
   const handleCreateDocument = () => {
-    const newDoc = {
-      _id: String(documents.length + 1),
-      title: `New Document ${documents.length + 1}`,
+    const newDoc: Partial<DocType> = {
+      title: selectedDoc?.title,
       content: "<h1>New Document</h1><p>Start writing here...</p>",
       createdAt: new Date(),
+      author: manager.id,
     };
-
     setDocuments([newDoc, ...documents]);
     setSelectedDoc(newDoc);
-    setActiveDocId(newDoc._id);
+    setActiveDocId(null); // no _id yet
   };
 
-  const sortedDocuments = [...documents].sort(
-    (a, b) => b.createdAt.getTime() - a.createdAt.getTime()
-  );
+  const handleSubmit = async () => {
+    if (!selectedDoc?.title) {
+      enqueueSnackbar("Title is required.", { variant: "warning" });
+      return;
+    }
+
+    try {
+      if (selectedDoc._id) {
+        const res = await managerUpdateDocument(selectedDoc._id, selectedDoc);
+        if (res.success) {
+          enqueueSnackbar("Document updated successfully.");
+          await refetch();
+        } else {
+          enqueueSnackbar("Failed to update document.", { variant: "error" });
+        }
+      } else {
+        const res = await managerCreateDocument(
+          spaceid,
+          manager.id,
+          selectedDoc.title,
+          selectedDoc
+        );
+        if (res.success) {
+          enqueueSnackbar("Document created successfully.");
+          await refetch();
+        } else {
+          enqueueSnackbar("Failed to create document.", { variant: "error" });
+        }
+      }
+    } catch (err) {
+      console.error(err);
+      enqueueSnackbar("Something went wrong.", { variant: "error" });
+    }
+  };
 
   return (
     <div className="flex h-screen bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100">
-      {/* Sidebar */}
       <div className="w-64 border-r border-gray-200 dark:border-gray-800 flex flex-col">
         <div className="p-4 border-b border-gray-200 dark:border-gray-800 flex justify-between items-center">
           <h2 className="font-bold text-lg">Documents</h2>
-
           <Button
             onClick={handleCreateDocument}
             size="sm"
@@ -102,11 +133,10 @@ export default function Docs() {
           </Button>
         </div>
 
-        {/* Document List */}
         <div className="flex-1 overflow-y-auto p-3">
-          {sortedDocuments.map((doc) => (
+          {documents.map((doc) => (
             <DocumentItem
-              key={doc._id}
+              key={doc._id ?? doc.title}
               doc={doc}
               isActive={activeDocId === doc._id}
               onClick={handleSelectDocument}
@@ -115,7 +145,6 @@ export default function Docs() {
         </div>
       </div>
 
-      {/* Main Content */}
       <div className="flex-1 flex flex-col">
         {selectedDoc ? (
           <>
@@ -124,30 +153,27 @@ export default function Docs() {
                 <input
                   type="text"
                   value={selectedDoc.title}
-                  onChange={(e) => {
-                    const updatedDocs = documents.map((doc) =>
-                      doc._id === selectedDoc._id
-                        ? { ...doc, title: e.target.value }
-                        : doc
-                    );
-                    setDocuments(updatedDocs);
-                    setSelectedDoc({ ...selectedDoc, title: e.target.value });
-                  }}
+                  onChange={(e) => handleTitleChange(e.target.value)}
                   className="bg-transparent font-semibold text-lg md:text-xl outline-none w-full"
                 />
                 <Edit2 className="text-gray-500 dark:text-gray-400 w-4 h-4" />
               </div>
-
               <span className="text-xs md:text-sm text-gray-500 dark:text-gray-400 whitespace-nowrap">
-                {formatDate(selectedDoc.createdAt!)}
+                {selectedDoc.createdAt ? formatDate(selectedDoc.createdAt) : ""}
               </span>
             </div>
 
             <div className="flex-1 p-4 overflow-auto">
               <QuillEditor
-                content={selectedDoc.content!}
+                content={selectedDoc.content || ""}
                 onContentChange={handleContentChange}
               />
+            </div>
+
+            <div className="flex justify-center my-3">
+              <Button className="w-2xl" onClick={handleSubmit}>
+                Save
+              </Button>
             </div>
           </>
         ) : (
