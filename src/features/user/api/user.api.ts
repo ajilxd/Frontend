@@ -35,7 +35,7 @@ export const userFetchSpaces = async (userId: string) => {
 export const userFetchSpaceBySpaceId = async (spaceId: string) => {
   try {
     const response = await userApi.get(
-      `${baseUrl}/space?field=_id&&value=${spaceId}`
+      `${baseUrl}/space?field=_id&value=${spaceId}`
     );
     if (response.status === 200) {
       return response.data.data[0];
@@ -49,7 +49,7 @@ export const userFetchSpaceBySpaceId = async (spaceId: string) => {
 export const userFetchUsersBySpaceId = async (spaceId: string) => {
   try {
     const response = await userApi.get(
-      `${baseUrl}/user?field=spaces&&value=${spaceId}`
+      `${baseUrl}/user?field=spaces&value=${spaceId}`
     );
     if (response.status === 200) {
       return response.data.data;
@@ -63,7 +63,7 @@ export const userFetchUsersBySpaceId = async (spaceId: string) => {
 export const userFetchOwnTasks = async (userId: string) => {
   try {
     const response = await userApi.get(
-      `${baseUrl}/task?field=userId&&value=${userId}`
+      `${baseUrl}/task?field=userId&value=${userId}`
     );
     if (response.status === 200) {
       return response.data.data;
@@ -77,7 +77,7 @@ export const userFetchOwnTasks = async (userId: string) => {
 export const userFetchTasksBySpaceId = async (spaceId: string) => {
   try {
     const response = await userApi.get(
-      `${baseUrl}/task?field=spaceId&&value=${spaceId}`
+      `${baseUrl}/task?field=spaceId&value=${spaceId}`
     );
     if (response.status === 200) {
       return response.data.data;
@@ -169,6 +169,19 @@ export const userUpdateDocument = async (
 ) => {
   try {
     const response = await userApi.put(`${baseUrl}/document?${docId}`, data);
+    if (response.status === 200) {
+      return response.data.data;
+    }
+    throw new Error("Unexpected response from server");
+  } catch (error) {
+    throw catchResponse(error);
+  }
+};
+
+export const userFetchChatsByRoom = async (room: string) => {
+  try {
+    const response = await userApi.get(`${baseUrl}/chat/${room}`);
+
     if (response.status === 200) {
       return response.data.data;
     }

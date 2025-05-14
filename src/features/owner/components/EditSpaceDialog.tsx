@@ -21,7 +21,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useManagersQuery } from "@/queries/owners/managers/useManagersQuery";
-import { useSpaceBySpaceIdQuery } from "@/queries/owners/spaces/useSpaceBySpaceIdQuery";
+import { useOwnerSpaceBySpaceIdQuery } from "@/queries/owners/spaces/useOwnerSpaceBySpaceIdQuery";
 import { RootState } from "@/redux/store/appStore";
 
 import { ownerUpdateSpace } from "../api/owner.api";
@@ -50,7 +50,7 @@ export const EditSpaceDialog: FC<EditSpaceDialogProps> = ({
     data: space,
     isError: isSpaceError,
     error: spaceError,
-  } = useSpaceBySpaceIdQuery(spaceId);
+  } = useOwnerSpaceBySpaceIdQuery(spaceId);
   console.log({ managers, space });
 
   const ManagerIds = space?.managers?.map(

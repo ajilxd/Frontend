@@ -18,7 +18,7 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
-import { useSpacesQuery } from "@/queries/users/spaces/useSpacesQuery";
+import { useUserSpacesQuery } from "@/queries/users/spaces/useSpacesQuery";
 import { RootState } from "@/redux/store/appStore";
 import { SignOutModal } from "@/shared/components/signoutModal";
 
@@ -39,7 +39,7 @@ export const Sidebar: React.FC<SidebarPropsType> = ({
 }) => {
   const user = useSelector((state: RootState) => state.user);
   const navigate = useNavigate();
-  const { data: spaces } = useSpacesQuery(user.id);
+  const { data: spaces } = useUserSpacesQuery(user.id);
   return (
     <>
       <div className="p-4 flex items-center justify-between border-b dark:border-gray-800">

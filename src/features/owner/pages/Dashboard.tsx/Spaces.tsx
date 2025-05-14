@@ -27,7 +27,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useSpacesQuery } from "@/queries/owners/spaces/useSpacesQuery";
+import { useSpacesQuery } from "@/queries/owners/spaces/useOwnerSpacesQuery";
 import { RootState } from "@/redux/store/appStore";
 
 import { AddSpaceForm } from "../../components/AddSpaceForm";

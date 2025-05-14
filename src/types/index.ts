@@ -246,3 +246,14 @@ export type DocType = {
   createdAt?: Date;
   updatedAt?: Date;
 };
+
+export type ChatType = {
+  _id: string;
+  senderId: string;
+  senderName: string;
+  senderImageUrl: string;
+  room: string;
+  content: string;
+  createdAt: Date;
+  updatedAt: Date;
+};

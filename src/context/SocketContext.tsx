@@ -4,13 +4,14 @@ import socket from "@/socket";
 
 export type MessageType = {
   room?: string;
-  sender?: string;
+  senderName?: string;
+  senderId?: string;
+  senderImageUrl?: string;
   message?: string;
   timestamp?: string;
-  userId?: string;
   content?: string;
-  avatar?: string;
   id?: string;
+  userId?: string;
 };
 
 export type SocketContextType = {

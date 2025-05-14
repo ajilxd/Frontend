@@ -15,8 +15,9 @@ export const userSpacesQueryOptions = (
 });
 
 export const userGetSpaceByIdQueryOptions = (
+  userId: string,
   spaceId: string
 ): UseQueryOptions<SpaceType, Error> => ({
-  queryKey: ["owner", "spaces", spaceId],
+  queryKey: ["user", "spaces", userId, spaceId],
   queryFn: () => userFetchSpaceBySpaceId(spaceId),
 });

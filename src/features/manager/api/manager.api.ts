@@ -74,7 +74,7 @@ export const managerLogout = async () => {
 export const managerFetchSpace = async (managerId: string) => {
   try {
     const response = await managerApi.get(
-      `${baseUrl}/space?field=managers&&value=${managerId}`
+      `${baseUrl}/space?field=managers&value=${managerId}`
     );
     if (response.status === 200) {
       return response.data.data;
@@ -88,10 +88,10 @@ export const managerFetchSpace = async (managerId: string) => {
 export const managerFetchSpaceBySpaceId = async (spaceId: string) => {
   try {
     const response = await managerApi.get(
-      `${baseUrl}/space?field=_id&&value=${spaceId}`
+      `${baseUrl}/space?field=_id&value=${spaceId}`
     );
     if (response.status === 200) {
-      return response.data.data;
+      return response.data.data[0];
     }
     throw new Error("unexpected response from server");
   } catch (error) {
@@ -142,7 +142,7 @@ export const managerAddTask = async (data: Partial<TaskType>) => {
 export const managerGetTasksByManagerId = async (managerId: string) => {
   try {
     const response = await managerApi.get(
-      `${baseUrl}/task?field=creatorId&&value=${managerId}`
+      `${baseUrl}/task?field=creatorId&value=${managerId}`
     );
     if (response.status === 200) {
       return response.data.data;
@@ -156,7 +156,7 @@ export const managerGetTasksByManagerId = async (managerId: string) => {
 export const managerGetTasksByTaskId = async (taskId: string) => {
   try {
     const response = await managerApi.get(
-      `${baseUrl}/task?field=taskId&&value=${taskId}`
+      `${baseUrl}/task?field=taskId&value=${taskId}`
     );
     if (response.status === 200) {
       return response.data.data;
@@ -170,7 +170,7 @@ export const managerGetTasksByTaskId = async (taskId: string) => {
 export const managerGetTasksBySpaceId = async (spaceId: string) => {
   try {
     const response = await managerApi.get(
-      `${baseUrl}/task?field=spaceId&&value=${spaceId}`
+      `${baseUrl}/task?field=spaceId&value=${spaceId}`
     );
     if (response.status === 200) {
       return response.data.data;
@@ -264,6 +264,21 @@ export const managerUpdateDocument = async (
     console.log(response);
     if (response.status === 200) {
       return { data: response.data.data, success: true };
+    }
+    throw new Error("Unexpected response from server");
+  } catch (error) {
+    return catchResponse(error);
+  }
+};
+
+// chats
+
+export const managerFetchChatsByRoom = async (room: string) => {
+  try {
+    const response = await managerApi.get(`${baseUrl}/chat/${room}`);
+
+    if (response.status === 200) {
+      return response.data.data;
     }
     throw new Error("Unexpected response from server");
   } catch (error) {

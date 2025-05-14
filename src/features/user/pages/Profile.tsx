@@ -47,7 +47,8 @@ const SimpleProfileEdit = () => {
       console.log("Uploaded to:", publicUrl);
       setAvatarUrl(publicUrl);
     } else {
-      console.error("Upload failed");
+      const errorDetails = await uploadRes.text(); // Get error details from AWS
+      console.error("Upload failed:", errorDetails);
     }
   };
 

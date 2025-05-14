@@ -3,7 +3,7 @@ import axios, { AxiosInstance } from "axios";
 import { baseUrl } from "@/constants/app";
 
 const createApi = (role: string): AxiosInstance => {
-  console.log("inside interceptor...");
+  // console.log("inside interceptor...");
 
   return axios.create({
     baseURL: baseUrl,
@@ -31,7 +31,7 @@ export const setupInterceptors = ({
 }) => {
   apiInstance.interceptors.request.use((config) => {
     const accessToken = localStorage.getItem(`${role}AccessToken`);
-    console.log("access token from axios request", accessToken);
+    // console.log("access token from axios request", accessToken);
     const excludeUrls = ["/owner/login", "/owner/register"];
 
     if (excludeUrls.some((url) => config.url && config.url.includes(url))) {

@@ -4,6 +4,7 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 type Profile = {
   name?: string;
   image?: string;
+  email?: string;
 };
 
 type Company = {
@@ -68,6 +69,7 @@ const initialState: UserState = {
   profile: {
     name: "",
     image: "",
+    email: "",
   },
 };
 
@@ -88,6 +90,9 @@ const userSlice = createSlice({
           managerName: string;
           ownerIsSubscribed: boolean;
           ownerSubscribedPlan: string;
+          name: string;
+          image: string;
+          email: string;
         };
       }>
     ) {
@@ -103,6 +108,9 @@ const userSlice = createSlice({
       state.owner.ownerIsSubscribed = action.payload.data.ownerIsSubscribed;
       state.owner.ownerSubscribedPlan = action.payload.data.ownerSubscribedPlan;
       state.owner.ownerId = action.payload.data.ownerId;
+      state.profile.name = action.payload.data.name;
+      state.profile.image = action.payload.data.image;
+      state.profile.email = action.payload.data.email;
     },
     userLogOutSuccess(state) {
       state.isAuthenticated = true;
@@ -116,6 +124,9 @@ const userSlice = createSlice({
       state.owner.name = "";
       state.owner.ownerIsSubscribed = false;
       state.owner.ownerSubscribedPlan = "";
+      state.profile.name = "";
+      state.profile.image = "";
+      state.profile.email = "";
     },
   },
 });
