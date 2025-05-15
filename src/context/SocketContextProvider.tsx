@@ -30,6 +30,12 @@ export const SocketProvider = ({ children }: Props) => {
     socket.emit("user-connected", data);
   };
 
+  const disconnectSocket = (data: MessageType) => {
+    socket.emit("user-disconnected", data);
+    socket.disconnect();
+    socket.off();
+  };
+
   const joinRoom = (data: MessageType) => {
     socket.emit("join-room", data);
   };
@@ -72,6 +78,7 @@ export const SocketProvider = ({ children }: Props) => {
         sendMessage,
         receiveMessage,
         activeUsers,
+        disconnectSocket,
       }}
     >
       {children}

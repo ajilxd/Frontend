@@ -50,14 +50,14 @@ const Chat: React.FC<Props> = ({ useChatQuery, user, useSpaceQuery }) => {
   useEffect(() => {
     if (!connected || !spaceid) return;
 
-    joinRoom({ room: spaceid });
+    joinRoom({ room: spaceid, userId: user.id });
 
     const unsubscribe = receiveMessage((msg: MessageType) => {
       setMessages((prev) => [...prev, msg]);
     });
 
     const onlineUsers = activeUsers((data) => {
-      //   console.log("data of online users", data);
+      console.log("data of online users", data);
       setOnlineUsers(data);
     });
 
@@ -67,14 +67,12 @@ const Chat: React.FC<Props> = ({ useChatQuery, user, useSpaceQuery }) => {
     };
   }, [connected, spaceid, receiveMessage, joinRoom, activeUsers]);
 
-  //   participants and current chat creation
-
   const participants = [];
   let currentChat;
 
   if (space && space.team && spaceid) {
     console.log("online user", onlineUsers);
-    console.log("heyyy");
+
     currentChat = {
       id: spaceid,
       name: space.name,
@@ -83,14 +81,15 @@ const Chat: React.FC<Props> = ({ useChatQuery, user, useSpaceQuery }) => {
     const { members } = space.team;
     for (const i of members) {
       const id = i.userId;
-      const isOnline = onlineUsers.find((i) => i.userId === id);
+      const isOnline =
+        onlineUsers.find((i) => i.userId === id) || id === user.id;
       const lastSeen = onlineUsers.find((i) => i.userId === id)?.lastSeen;
       const name = i.memberName;
       const status = isOnline ? "online" : "offline";
       const image = i.image;
       participants.push({ status, id, name, lastSeen, image });
     }
-    console.log("pariticipants", participants);
+    // console.log("pariticipants", participants);
   }
 
   const handleSendMessage = () => {

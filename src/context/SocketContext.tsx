@@ -22,6 +22,7 @@ export type SocketContextType = {
   sendMessage: (data: MessageType) => void;
   receiveMessage: (fn: (data: MessageType) => void) => void;
   activeUsers: (fn: (data: string[]) => void) => void;
+  disconnectSocket: (data: MessageType) => void;
 };
 
 export const SocketContext = createContext<SocketContextType | null>(null);

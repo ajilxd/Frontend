@@ -10,10 +10,11 @@ import Chat from "@/shared/components/Chat";
 import Dashboard from "../layouts/DashboardLayout";
 import DefaultDashboard from "../pages/Dashboard";
 import Profile from "../pages/Profile";
+import ProfilePage from "../pages/ProfilePage";
 import Docs from "../pages/Spaces/Docs";
 import { Members } from "../pages/Spaces/Members";
 import { Tasks } from "../pages/Spaces/Tasks";
-import ProfilePage from "../pages/ProfilePage";
+import VideoChat from "../pages/Spaces/VideoChat";
 
 const UserRoutes: React.FC = () => {
   const user = useSelector((state: RootState) => state.user);
@@ -39,6 +40,7 @@ const UserRoutes: React.FC = () => {
                 />
               }
             ></Route>
+            <Route path="video" Component={VideoChat}></Route>
           </Route>
           <Route path="profile" Component={Profile}></Route>
           <Route path="profiles" Component={ProfilePage}></Route>

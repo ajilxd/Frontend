@@ -1,6 +1,6 @@
 // components/SignOutButton.tsx
 import { useState } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 
 import { Button } from "@/components/ui/button";
@@ -15,10 +15,12 @@ import { adminLogOutService } from "@/features/admin/api/admin.api";
 import { managerLogout } from "@/features/manager/api/manager.api";
 import { ownerLogoutService } from "@/features/owner/api/owner.api";
 import { userLogout } from "@/features/user/api/user.api";
+import { useSocket } from "@/hooks/useSocket";
 import { adminLogOutSuccess } from "@/redux/slices/adminSlice";
 import { managerLogOutSuccess } from "@/redux/slices/managerSlice";
 import { ownerLogOutSuccess } from "@/redux/slices/ownerSlice";
 import { userLogOutSuccess } from "@/redux/slices/userSlice";
+import { RootState } from "@/redux/store/appStore";
 
 type SignoutModalProps = {
   user: string;
@@ -26,8 +28,11 @@ type SignoutModalProps = {
 
 export const SignOutModal: React.FC<SignoutModalProps> = ({ user }) => {
   const [open, setOpen] = useState(false);
+  const { disconnectSocket } = useSocket();
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const managerId = useSelector((state: RootState) => state.manager.id);
+  const userId = useSelector((state: RootState) => state.user.id);
 
   const handleSignOut = async () => {
     console.log("logging out", user);
@@ -55,6 +60,7 @@ export const SignOutModal: React.FC<SignoutModalProps> = ({ user }) => {
       if (res.success) {
         localStorage.removeItem("managerAccessToken");
         dispatch(managerLogOutSuccess());
+        disconnectSocket({ userId: managerId });
         navigate("/auth/login-email");
       } else {
         console.error(res.message);
@@ -64,6 +70,7 @@ export const SignOutModal: React.FC<SignoutModalProps> = ({ user }) => {
       if (res.success) {
         localStorage.removeItem("userAccessToken");
         dispatch(userLogOutSuccess());
+        disconnectSocket({ userId: userId });
         navigate("/auth/login-email");
       } else {
         console.error(res.message);
