@@ -1,6 +1,6 @@
 import { UseQueryResult } from "@tanstack/react-query";
 import { Menu, ChevronLeft } from "lucide-react";
-import { useState, useRef, useEffect, useCallback } from "react";
+import { useState, useRef, useEffect, useMemo } from "react";
 import { useParams } from "react-router-dom";
 
 import { Button } from "@/components/ui/button";
@@ -10,7 +10,7 @@ import {
   ChatBubbleAvatar,
 } from "@/components/ui/chat/chat-bubble";
 import { ChatMessageList } from "@/components/ui/chat/chat-message-list";
-import { MessageType } from "@/context/SocketContext";
+import { MessageType, TypingDataType } from "@/context/SocketContext";
 import { useSocket } from "@/hooks/useSocket";
 import { ChatType, SpaceType } from "@/types";
 
@@ -18,28 +18,54 @@ import { ChatHeader } from "./ChatHeader";
 import { ChatInputComponent } from "./ChatInput";
 import { ChatSidebar as Sidebar } from "./ChatSidebar";
 
+type Participant = {
+  id: string;
+  name: string;
+  image?: string;
+  status: string;
+  lastSeen?: string;
+};
+
 type Props = {
   useSpaceQuery: (
     managerId: string,
     spaceId: string
   ) => UseQueryResult<SpaceType, Error>;
   useChatQuery: (room: string) => UseQueryResult<ChatType[], Error>;
-  user: { id: string; profile: { name?: string; image?: string } };
+  user: {
+    id: string;
+    profile: { name?: string; image?: string };
+    role: string;
+  };
 };
+
+// (Same imports…)
 
 const Chat: React.FC<Props> = ({ useChatQuery, user, useSpaceQuery }) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const { connected, joinRoom, sendMessage, receiveMessage, activeUsers } =
-    useSocket();
+  const [participants, setParticipants] = useState<Participant[]>([]);
+  const [typingMessages, setTypingMessages] = useState<TypingDataType | null>(
+    null
+  );
+  const [messages, setMessages] = useState<MessageType[]>([]);
   const [onlineUsers, setOnlineUsers] = useState<
     { userId: string; lastSeen: string }[]
   >([]);
+
   const { spaceid } = useParams();
-  const [messages, setMessages] = useState<MessageType[]>([]);
-  const [newMessage, setNewMessage] = useState("");
   const messagesEndRef = useRef<HTMLDivElement>(null);
+
   const { data: chats, isSuccess } = useChatQuery(spaceid!);
   const { data: space } = useSpaceQuery(user.id, spaceid!);
+
+  const {
+    connected,
+    joinRoom,
+    receiveMessage,
+    activeUsers,
+    getTyping,
+    getStopTyping,
+  } = useSocket();
 
   useEffect(() => {
     if (isSuccess) {
@@ -56,69 +82,106 @@ const Chat: React.FC<Props> = ({ useChatQuery, user, useSpaceQuery }) => {
       setMessages((prev) => [...prev, msg]);
     });
 
-    const onlineUsers = activeUsers((data) => {
-      console.log("data of online users", data);
+    const cleanupOnline = activeUsers((data) => {
       setOnlineUsers(data);
     });
 
     return () => {
       unsubscribe();
-      onlineUsers();
+      cleanupOnline();
     };
-  }, [connected, spaceid, receiveMessage, joinRoom, activeUsers]);
+  }, [connected, spaceid, joinRoom, receiveMessage, activeUsers, user.id]);
 
-  const participants = [];
-  let currentChat;
+  useEffect(() => {
+    if (!space) return;
 
-  if (space && space.team && spaceid) {
-    console.log("online user", onlineUsers);
+    const members = space.team?.members || [];
+    const managers = space.managers || [];
 
-    currentChat = {
-      id: spaceid,
-      name: space.name,
-      participants: participants.length,
+    const participantArray: Participant[] = [
+      ...members.map((member) => {
+        const isOnline = onlineUsers.some(
+          (u) => u.userId === member.userId || member.userId === user.id
+        );
+        const lastSeen = onlineUsers.find(
+          (u) => u.userId === member.userId
+        )?.lastSeen;
+        return {
+          id: member.userId,
+          name: member.memberName,
+          image: member.image,
+          status: isOnline ? "online" : "offline",
+          lastSeen,
+        };
+      }),
+      ...managers.map((manager) => {
+        const isOnline = onlineUsers.some(
+          (u) => u.userId === manager.managerId || manager.managerId === user.id
+        );
+        const lastSeen = onlineUsers.find(
+          (u) => u.userId === manager.managerId
+        )?.lastSeen;
+        return {
+          id: manager.managerId,
+          name: manager.managerName ?? "manager",
+          image: manager.managerImage,
+          status: isOnline ? "online" : "offline",
+          lastSeen,
+        };
+      }),
+    ];
+
+    setParticipants(participantArray);
+  }, [space, onlineUsers, user.id]);
+
+  useEffect(() => {
+    const unsubscribe = getTyping((data) => {
+      const result = data.map((i) => {
+        const sender = participants.find((p) => p.id === i.userId);
+        return sender
+          ? {
+              ...i,
+              senderName: sender.name,
+              senderImageUrl: sender.image,
+            }
+          : i;
+      });
+      setTypingMessages(result);
+    });
+
+    const unsubscribeStopTyping = getStopTyping((data) => {
+      console.log("from stop typing", data);
+      const result = data.map((i) => {
+        const sender = participants.find((p) => p.id === i.userId);
+        return sender
+          ? {
+              ...i,
+              senderName: sender.name,
+              senderImageUrl: sender.image,
+            }
+          : i;
+      });
+      setTypingMessages(result);
+    });
+
+    return () => {
+      unsubscribe();
+      unsubscribeStopTyping();
     };
-    const { members } = space.team;
-    for (const i of members) {
-      const id = i.userId;
-      const isOnline =
-        onlineUsers.find((i) => i.userId === id) || id === user.id;
-      const lastSeen = onlineUsers.find((i) => i.userId === id)?.lastSeen;
-      const name = i.memberName;
-      const status = isOnline ? "online" : "offline";
-      const image = i.image;
-      participants.push({ status, id, name, lastSeen, image });
-    }
-    // console.log("pariticipants", participants);
-  }
-
-  const handleSendMessage = () => {
-    if (newMessage.trim() === "") return;
-
-    const timestamp = new Date().toLocaleTimeString();
-
-    const message: MessageType = {
-      id: `${messages.length + 1}`,
-      content: newMessage,
-      senderImageUrl: user.profile.image ?? "",
-      room: spaceid!,
-      senderName: user.profile.name,
-      senderId: user.id,
-      timestamp,
-    };
-
-    sendMessage(message);
-    setMessages((prev) => [...prev, message]);
-    setNewMessage("");
-  };
-
-  const updateNewMessage = useCallback(function (data: string) {
-    setNewMessage(data);
-  }, []);
+  }, [getTyping, participants, getStopTyping]);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
+
+  const currentChat = useMemo(() => {
+    if (!space || !spaceid) return null;
+    return {
+      id: spaceid,
+      name: space.name,
+      participants: participants.length,
+    };
+  }, [space, spaceid, participants]);
 
   return (
     <div className="flex h-screen w-full mx-auto bg-background">
@@ -129,8 +192,7 @@ const Chat: React.FC<Props> = ({ useChatQuery, user, useSpaceQuery }) => {
       )}
 
       <div className="flex flex-col flex-1 h-full">
-        {/* Header */}
-        <div className="flex items-center px-4 py-2 ">
+        <div className="flex items-center px-4 py-2">
           <Button
             variant="ghost"
             size="icon"
@@ -144,20 +206,18 @@ const Chat: React.FC<Props> = ({ useChatQuery, user, useSpaceQuery }) => {
             )}
           </Button>
           <div className="flex-1">
-            <ChatHeader name="Furni" />
+            <ChatHeader name={currentChat?.name ?? "Chat"} />
           </div>
         </div>
 
-        {/* Chat messages */}
         <div className="flex-1 overflow-y-auto px-4 py-2">
           <ChatMessageList>
             {messages.map((message, index) => {
-              const imageUrl =
-                message.senderId === user.id
-                  ? user.profile.image
-                  : message.senderImageUrl;
-              const variant =
-                message.senderId === user.id ? "sent" : "received";
+              const isUser = message.senderId === user.id;
+              const avatarImage = isUser
+                ? user.profile.image
+                : message.senderImageUrl;
+              const variant = isUser ? "sent" : "received";
               return (
                 <ChatBubble
                   key={message.id ?? index}
@@ -166,7 +226,12 @@ const Chat: React.FC<Props> = ({ useChatQuery, user, useSpaceQuery }) => {
                 >
                   <div className="flex items-start">
                     <ChatBubbleAvatar
-                      fallback={imageUrl || message.senderName?.slice(0, 2)}
+                      fallback={
+                        avatarImage
+                          ? ""
+                          : message.senderName?.slice(0, 2) ?? "??"
+                      }
+                      src={avatarImage}
                     />
                     <div className="flex flex-col ml-2 flex-1">
                       <ChatBubbleMessage>{message.content}</ChatBubbleMessage>
@@ -175,15 +240,20 @@ const Chat: React.FC<Props> = ({ useChatQuery, user, useSpaceQuery }) => {
                 </ChatBubble>
               );
             })}
+            {typingMessages?.map((i, index) => (
+              <ChatBubble>
+                <ChatBubbleAvatar
+                  fallback={i.senderImageUrl ?? i.senderName.slice(0, 2)}
+                ></ChatBubbleAvatar>
+                <ChatBubbleMessage isLoading={true} key={"typing" + index} />
+              </ChatBubble>
+            ))}
+            <div ref={messagesEndRef} />
           </ChatMessageList>
         </div>
 
-        {/* Chat input */}
         <div className="px-4 py-2 border-t">
-          <ChatInputComponent
-            updateMessageHandler={updateNewMessage}
-            submitMessageHandler={handleSendMessage}
-          />
+          <ChatInputComponent user={user} chatsLength={chats?.length} />
         </div>
       </div>
     </div>

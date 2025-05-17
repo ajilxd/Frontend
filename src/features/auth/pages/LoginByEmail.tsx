@@ -74,7 +74,11 @@ const LoginByEmail: React.FC = () => {
           );
           localStorage.setItem("activeRole", "manager");
           localStorage.setItem("managerAccessToken", managerAccessToken);
-          connectSocket({ userId: managerData.id });
+          connectSocket({
+            userId: managerData.id,
+            senderImageUrl: managerData.image,
+            senderName: managerData.name,
+          });
           setTimeout(() => navigate("/manager/dashboard"), 1500);
         }
       } else if (role === "user") {
@@ -110,7 +114,11 @@ const LoginByEmail: React.FC = () => {
           );
           localStorage.setItem("activeRole", "user");
           localStorage.setItem("userAccessToken", userAccessToken);
-          connectSocket({ userId: userData.id });
+          connectSocket({
+            userId: userData.id,
+            senderName: userData.name,
+            senderImageUrl: userData.image,
+          });
           setTimeout(() => navigate("/user/dashboard"), 1500);
         }
       }

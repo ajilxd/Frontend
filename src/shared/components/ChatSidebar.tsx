@@ -23,7 +23,7 @@ interface SidebarProps {
 }
 
 export function ChatSidebar({ participants, currentChat }: SidebarProps) {
-  console.log("participants", participants);
+  // console.log("participants", participants);
   return (
     <div className="w-full h-full border-r border-border flex flex-col">
       {currentChat && (
@@ -33,7 +33,7 @@ export function ChatSidebar({ participants, currentChat }: SidebarProps) {
               <Users className="h-5 w-5" />
               Team chat
               <Badge variant="outline" className="ml-2">
-                {currentChat.participants} participants
+                {participants.length} participants
               </Badge>
             </CardTitle>
           </CardHeader>
@@ -70,16 +70,10 @@ export function ChatSidebar({ participants, currentChat }: SidebarProps) {
                       }`}
                     />
                   </div>
-                  {participant.role && (
-                    <p className="text-xs text-muted-foreground">
-                      {participant.role}
-                    </p>
-                  )}
-                  {participant.lastSeen && participant.status !== "online" && (
-                    <p className="text-xs text-muted-foreground">
-                      Last seen: {participant.lastSeen}
-                    </p>
-                  )}
+                  {participant.status !== "online" &&
+                    participant.lastSeen &&
+                    "last seen" +
+                      new Date(participant.lastSeen!).toLocaleTimeString()}
                 </div>
               </div>
             ))}

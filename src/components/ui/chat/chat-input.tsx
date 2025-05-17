@@ -6,16 +6,28 @@ import { cn } from "@/lib/utils";
 interface ChatInputProps
   extends React.TextareaHTMLAttributes<HTMLTextAreaElement> {
   updateMessageHandler?: (value: string) => void;
+
+  typingHandler: (data: boolean) => void;
+  textAreaRef: React.RefObject<HTMLTextAreaElement | null>;
 }
 
 export const ChatInput = React.forwardRef<HTMLTextAreaElement, ChatInputProps>(
-  ({ updateMessageHandler, className, ...props }, ref) => (
+  ({
+    typingHandler,
+    textAreaRef,
+    updateMessageHandler,
+    className,
+    ...props
+  }) => (
     <Textarea
       autoComplete="off"
-      ref={ref}
       name="message"
+      ref={textAreaRef}
       onChange={(e) => {
         props.onChange?.(e);
+
+        typingHandler(true);
+
         updateMessageHandler?.(e.target.value);
       }}
       className={cn(

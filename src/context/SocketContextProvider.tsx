@@ -68,6 +68,38 @@ export const SocketProvider = ({ children }: Props) => {
     };
   };
 
+  const getTyping = (callback: (data: string[]) => void): (() => void) => {
+    const handler = (data: string[]) => {
+      callback(data);
+    };
+    socket.on("typing", handler);
+
+    return () => {
+      socket.off("typing", handler);
+    };
+  };
+
+  const getStopTyping = (callback: (data: string[]) => void): (() => void) => {
+    const handler = (data: string[]) => {
+      callback(data);
+    };
+    socket.on("stop-typing", handler);
+
+    return () => {
+      socket.off("stop-typing", handler);
+    };
+  };
+
+  const sendTyping = (data: MessageType) => {
+    socket.emit("typing", data);
+  };
+
+  const sendStopTyping = (data: MessageType) => {
+    socket.emit("stop-typing", data);
+  };
+
+  // const getStopTyping =
+
   return (
     <SocketContext.Provider
       value={{
@@ -79,6 +111,10 @@ export const SocketProvider = ({ children }: Props) => {
         receiveMessage,
         activeUsers,
         disconnectSocket,
+        getStopTyping,
+        getTyping,
+        sendTyping,
+        sendStopTyping,
       }}
     >
       {children}

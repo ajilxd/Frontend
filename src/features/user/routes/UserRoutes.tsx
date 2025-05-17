@@ -6,6 +6,7 @@ import { useUserChatsQuery } from "@/queries/users/chats/useChatQuery";
 import { useUserSpaceBySpaceIdQuery } from "@/queries/users/spaces/useSpaceBySpaceIdQuery";
 import { RootState } from "@/redux/store/appStore";
 import Chat from "@/shared/components/Chat";
+import Meeting from "@/shared/components/Meeting";
 
 import Dashboard from "../layouts/DashboardLayout";
 import DefaultDashboard from "../pages/Dashboard";
@@ -14,7 +15,6 @@ import ProfilePage from "../pages/ProfilePage";
 import Docs from "../pages/Spaces/Docs";
 import { Members } from "../pages/Spaces/Members";
 import { Tasks } from "../pages/Spaces/Tasks";
-import VideoChat from "../pages/Spaces/VideoChat";
 
 const UserRoutes: React.FC = () => {
   const user = useSelector((state: RootState) => state.user);
@@ -34,13 +34,13 @@ const UserRoutes: React.FC = () => {
               path="chat"
               element={
                 <Chat
-                  user={user}
+                  user={{ ...user, role: "user" }}
                   useChatQuery={useUserChatsQuery}
                   useSpaceQuery={useUserSpaceBySpaceIdQuery}
                 />
               }
             ></Route>
-            <Route path="video" Component={VideoChat}></Route>
+            <Route path="meeting" Component={Meeting}></Route>
           </Route>
           <Route path="profile" Component={Profile}></Route>
           <Route path="profiles" Component={ProfilePage}></Route>
