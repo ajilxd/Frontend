@@ -6,7 +6,7 @@ import {
   Users,
   FileText,
   MessageSquare,
-  Trello,
+  PhoneCall,
   User,
 } from "lucide-react";
 import { useSelector } from "react-redux";
@@ -173,9 +173,14 @@ export const Sidebar: React.FC<SidebarPropsType> = ({
                             variant="ghost"
                             size="sm"
                             className="w-full justify-start text-xs pl-3"
+                            onClick={() =>
+                              navigate(
+                                `/user/dashboard/spaces/${space._id}/meeting`
+                              )
+                            }
                           >
-                            <Trello className="h-3.5 w-3.5 mr-2" />
-                            Kanban
+                            <PhoneCall className="h-3.5 w-3.5 mr-2" />
+                            Meeting
                           </Button>
                         </div>
                       </CollapsibleContent>

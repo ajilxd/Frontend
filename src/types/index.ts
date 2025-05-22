@@ -257,3 +257,14 @@ export type ChatType = {
   createdAt: Date;
   updatedAt: Date;
 };
+
+export type MeetingType = {
+  meetingId?: string;
+  hostId: string;
+  hostName: string;
+  spaceId: string;
+  isInstant: boolean;
+  scheduledDate?: Date | null;
+  status: string;
+  participants?: [];
+};

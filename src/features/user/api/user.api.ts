@@ -1,7 +1,7 @@
 import { userApi } from "@/axios";
 import { baseUrl } from "@/constants/app";
 import { catchResponse } from "@/errors/catchResponse";
-import { DocType, TaskType } from "@/types";
+import { DocType, MeetingType, TaskType } from "@/types";
 
 export const userLogout = async () => {
   try {
@@ -188,5 +188,83 @@ export const userFetchChatsByRoom = async (room: string) => {
     throw new Error("Unexpected response from server");
   } catch (error) {
     throw catchResponse(error);
+  }
+};
+
+export const userMakeCall = async (data: MeetingType) => {
+  try {
+    const response = await userApi.post(`${baseUrl}/meeting`, data);
+    if (response.status === 201) {
+      return { success: true, data: response.data.data };
+    }
+    throw new Error("Unexpected response from server");
+  } catch (error) {
+    return catchResponse(error);
+  }
+};
+
+export const userFetchMeetings = async (spaceId: string) => {
+  try {
+    const response = await userApi.get(`${baseUrl}/meeting/${spaceId}`);
+    if (response.status == 200) {
+      return response.data.data;
+    }
+    throw new Error("Unexpected response from server");
+  } catch (error) {
+    throw catchResponse(error);
+  }
+};
+
+export const userJoinMeeting = async (data: {
+  joineeId: string;
+  role: string;
+  meetingId: string;
+  spaceId: string;
+}) => {
+  try {
+    const response = await userApi.post(`${baseUrl}/meeting/join`, data);
+    if (response.status == 200) {
+      return { success: true, data: response.data.data };
+    }
+  } catch (error) {
+    return catchResponse(error);
+  }
+};
+
+export const userEndMeeting = async (data: {
+  role: string;
+  hostId: string;
+  meetingId: string;
+  spaceId: string;
+}) => {
+  try {
+    const response = await userApi.post(`${baseUrl}/meeting/end`, data);
+    if (response.status === 200) {
+      return {
+        success: true,
+        message: "Meeting ended succesfully",
+      };
+    }
+    throw new Error("unexpected response from server");
+  } catch (error) {
+    return catchResponse(error);
+  }
+};
+
+export const userLeaveMeeting = async (data: {
+  userId: string;
+  meetingId: string;
+  role: string;
+  spaceId: string;
+  name: string;
+}) => {
+  try {
+    const response = await userApi.post(`${baseUrl}/meeting/leave`, data);
+    if (response.status === 200) {
+      return { success: true };
+    }
+    throw new Error("unexpected response from server");
+  } catch (error) {
+    return catchResponse(error);
   }
 };

@@ -3,10 +3,12 @@ import { Route, Routes } from "react-router-dom";
 
 import PrivateRoute from "@/hoc/PrivateRoute";
 import { useUserChatsQuery } from "@/queries/users/chats/useChatQuery";
+import { useUserMeetingsQuery } from "@/queries/users/meetings/useUserMeetingQuery";
 import { useUserSpaceBySpaceIdQuery } from "@/queries/users/spaces/useSpaceBySpaceIdQuery";
 import { RootState } from "@/redux/store/appStore";
 import Chat from "@/shared/components/Chat";
 import Meeting from "@/shared/components/Meeting";
+import VideoCallConference from "@/shared/components/VideoCallConference";
 
 import Dashboard from "../layouts/DashboardLayout";
 import DefaultDashboard from "../pages/Dashboard";
@@ -40,7 +42,24 @@ const UserRoutes: React.FC = () => {
                 />
               }
             ></Route>
-            <Route path="meeting" Component={Meeting}></Route>
+            <Route
+              path="meeting"
+              element={
+                <Meeting
+                  user={{ ...user, role: "user" }}
+                  useMeetingsQuery={useUserMeetingsQuery}
+                />
+              }
+            ></Route>
+            <Route
+              path="call"
+              element={
+                <VideoCallConference
+                  user={{ ...user, role: "user" }}
+                  useMeetingsQuery={useUserMeetingsQuery}
+                />
+              }
+            ></Route>
           </Route>
           <Route path="profile" Component={Profile}></Route>
           <Route path="profiles" Component={ProfilePage}></Route>

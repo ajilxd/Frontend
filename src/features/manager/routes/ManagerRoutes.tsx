@@ -5,8 +5,11 @@ import { ManagerContextProvider } from "@/context/ManagerContextProvider";
 import PrivateRoute from "@/hoc/PrivateRoute";
 import { useManagerChatsQuery } from "@/queries/managers/chats/useChatQuery";
 import { useManagerSpacesByIdQuery } from "@/queries/managers/spaces/useManagerSpaceByIdQuery";
+import { useUserMeetingsQuery } from "@/queries/users/meetings/useUserMeetingQuery";
 import { RootState } from "@/redux/store/appStore";
 import Chat from "@/shared/components/Chat";
+import Meeting from "@/shared/components/Meeting";
+import VideoCallConference from "@/shared/components/VideoCallConference";
 
 import Dashboard from "../layouts/DashboardLayout";
 import DefaultDashboard from "../pages/Dashboard";
@@ -14,6 +17,7 @@ import UsersDashboard from "../pages/Dashboard/Users";
 import Docs from "../pages/Spaces/Docs";
 import Members from "../pages/Spaces/Members";
 import Tasks from "../pages/Spaces/Tasks";
+import { useManagerMeetingsQuery } from "@/queries/managers/meetings/useManagerMeetingQuery";
 
 const ManagerRoutes: React.FC = () => {
   const manager = useSelector((state: RootState) => state.manager);
@@ -41,6 +45,24 @@ const ManagerRoutes: React.FC = () => {
                 }
               ></Route>
               <Route path="docs" element={<Docs />}></Route>
+              <Route
+                path="meeting"
+                element={
+                  <Meeting
+                    user={{ ...manager, role: "manager" }}
+                    useMeetingsQuery={useManagerMeetingsQuery}
+                  />
+                }
+              ></Route>
+              <Route
+                path="call"
+                element={
+                  <VideoCallConference
+                    user={{ ...manager, role: "manager" }}
+                    useMeetingsQuery={useManagerMeetingsQuery}
+                  />
+                }
+              ></Route>
             </Route>
           </Route>
         </Routes>
