@@ -1,7 +1,48 @@
 import { managerApi } from "@/axios";
 import { baseUrl } from "@/constants/app";
 import { catchResponse } from "@/errors/catchResponse";
-import { DocType, MeetingType, SpaceType, TaskType, UserType } from "@/types";
+import {
+  DocType,
+  ManagerType,
+  MeetingType,
+  SpaceType,
+  TaskType,
+  UserType,
+} from "@/types";
+
+// manager data
+
+export const managerGetData = async (managerId: string) => {
+  try {
+    const response = await managerApi.get(
+      `${baseUrl}/manager?field=_id&value=${managerId}`
+    );
+    if (response.status === 200) {
+      return response.data.data[0];
+    }
+    throw new Error("unexpected response from server");
+  } catch (error) {
+    throw catchResponse(error);
+  }
+};
+
+// manager profile updation
+
+export const managerProfileUpdate = async (data: Partial<ManagerType>) => {
+  try {
+    const response = await managerApi.put(`${baseUrl}/manager/profile`, data);
+    if (response.status === 200) {
+      return {
+        data: response.data.data,
+        success: true,
+        message: "profile updation went succesfull",
+      };
+    }
+    throw new Error("unexpected response from server");
+  } catch (error) {
+    return catchResponse(error);
+  }
+};
 
 export const managerFetchUsers = async (managerId: string) => {
   try {

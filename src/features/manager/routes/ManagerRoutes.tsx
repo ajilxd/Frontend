@@ -18,6 +18,7 @@ import Docs from "../pages/Spaces/Docs";
 import Members from "../pages/Spaces/Members";
 import Tasks from "../pages/Spaces/Tasks";
 import { useManagerMeetingsQuery } from "@/queries/managers/meetings/useManagerMeetingQuery";
+import Profile from "@/shared/pages/Profile";
 
 const ManagerRoutes: React.FC = () => {
   const manager = useSelector((state: RootState) => state.manager);
@@ -64,6 +65,10 @@ const ManagerRoutes: React.FC = () => {
                 }
               ></Route>
             </Route>
+            <Route
+              path="profile"
+              element={<Profile id={manager.id} role="manager" />}
+            ></Route>
           </Route>
         </Routes>
       </ManagerContextProvider>

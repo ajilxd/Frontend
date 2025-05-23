@@ -1,6 +1,7 @@
 import { Elements } from "@stripe/react-stripe-js";
 import type { Stripe } from "@stripe/stripe-js";
 import { loadStripe } from "@stripe/stripe-js";
+import { useSelector } from "react-redux";
 import { Route, Routes } from "react-router-dom";
 let stripePromise: Promise<Stripe | null>;
 
@@ -10,6 +11,8 @@ if (import.meta.env.VITE_STRIPE_PUBLIC_KEY) {
 
 import { OwnerContextProvider } from "@/context/OwnerContextProvider.tsx";
 import PrivateRoute from "@/hoc/PrivateRoute.tsx";
+import { RootState } from "@/redux/store/appStore.ts";
+import Profile from "@/shared/pages/Profile.tsx";
 
 import OwnerDashboard from "../layouts/OwnerDashboard";
 import DefaultDashboard from "../pages/Dashboard.tsx";
@@ -25,6 +28,7 @@ import PaymentStatus from "../pages/PaymentStatus.tsx";
 import ResetPassword from "../pages/ResetPassword";
 
 export const OwnerRoutes = () => {
+  const owner = useSelector((state: RootState) => state.owner);
   return (
     <OwnerContextProvider>
       <Elements stripe={stripePromise || null}>
@@ -43,6 +47,10 @@ export const OwnerRoutes = () => {
             <Route path="company" element={<Company />}></Route>
             <Route path="managers" element={<Managers />}></Route>
             <Route path="spaces" element={<Spaces />}></Route>
+            <Route
+              path="profile"
+              element={<Profile role="owner" id={owner._id!} />}
+            ></Route>
           </Route>
           <Route path="payment" element={<PaymentStatus />}></Route>
         </Routes>

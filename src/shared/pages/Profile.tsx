@@ -1,7 +1,6 @@
 import { Edit2, Upload } from "lucide-react";
-import React, { useState, ChangeEvent } from "react";
-
-import { baseUrl } from "@/constants/app";
+import { enqueueSnackbar } from "notistack";
+import React, { useState, ChangeEvent, useEffect } from "react";
 
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -9,34 +8,69 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { baseUrl } from "@/constants/app";
+import {
+  managerGetData,
+  managerProfileUpdate,
+} from "@/features/manager/api/manager.api";
+import {
+  ownerGetData,
+  ownerProfileUpdate,
+} from "@/features/owner/api/owner.api";
+import { userGetData, userProfileUpdate } from "@/features/user/api/user.api";
 
-interface Profile {
+export interface Profile {
   image: string;
-  fullName: string;
+  name: string;
   bio: string;
-  invitedBy: string;
-  role: string;
-  joinedDate: string;
-  companyName: string;
+  createdAt?: string;
+  managerName?: string;
+  companyName?: string;
+  role?: string;
+  userId?: string;
+  managerId?: string;
+  ownerId?: string;
 }
 
-const ProfilePage: React.FC = () => {
+type Props = {
+  role: string;
+  id: string;
+};
+
+const Profile: React.FC<Props> = ({ role, id }) => {
   const [isEditing, setIsEditing] = useState(false);
+  const [avatarUrl, setAvatarUrl] = useState("");
+
   const [profile, setProfile] = useState<Profile>({
-    image: "https://via.placeholder.com/96",
-    fullName: "John Doe",
-    bio: "Software engineer passionate about building scalable web applications.",
-    invitedBy: "Jane Smith",
-    role: "Developer",
-    joinedDate: "January 15, 2023",
-    companyName: "Tech Corp",
+    image: "",
+    name: "",
+    bio: "",
   });
+
+  useEffect(() => {
+    if (role === "user") {
+      userGetData(id).then((data) => {
+        setProfile(data);
+        setAvatarUrl(data.image);
+      });
+    } else if (role === "manager") {
+      managerGetData(id).then((data) => {
+        setProfile(data);
+        setAvatarUrl(data.image);
+      });
+    } else if (role === "owner") {
+      ownerGetData(id).then((data) => {
+        setProfile(data);
+        setAvatarUrl(data.image);
+      });
+    }
+  }, []);
 
   const handleImageUpload = async (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    const filename = encodeURIComponent(file.name); // Optional: sanitize or append UUID
+    const filename = encodeURIComponent(file.name);
     const res = await fetch(`${baseUrl}/s3/presign?filename=${filename}`);
     const { url } = await res.json();
 
@@ -51,7 +85,7 @@ const ProfilePage: React.FC = () => {
       console.log("Uploaded to:", publicUrl);
       setAvatarUrl(publicUrl);
     } else {
-      const errorDetails = await uploadRes.text(); // Get error details from AWS
+      const errorDetails = await uploadRes.text();
       console.error("Upload failed:", errorDetails);
     }
   };
@@ -61,6 +95,51 @@ const ProfilePage: React.FC = () => {
   ) => {
     const { name, value } = e.target;
     setProfile({ ...profile, [name]: value });
+  };
+
+  const handleUserSubmission = async (data: Profile) => {
+    const response = await userProfileUpdate(data);
+    if (response.success) {
+      enqueueSnackbar("profile updation went succesfull", {
+        variant: "success",
+      });
+    } else {
+      console.warn("something went wrong", response.message);
+    }
+  };
+
+  const handleManagerSubmission = async (data: Profile) => {
+    const response = await managerProfileUpdate(data);
+    if (response.success) {
+      enqueueSnackbar("profile updation went succesfull", {
+        variant: "success",
+      });
+    } else {
+      console.warn("something went wrong", response.message);
+    }
+  };
+
+  const handleOwnerSubmission = async (data: Profile) => {
+    const response = await ownerProfileUpdate(data);
+    if (response.success) {
+      enqueueSnackbar("profile updation went succesfull", {
+        variant: "success",
+      });
+    } else {
+      console.warn("something went wrong", response.message);
+    }
+  };
+
+  const handleSubmission = (data: Profile) => {
+    if (role === "user") {
+      handleUserSubmission(data);
+    } else if (role === "manager") {
+      handleManagerSubmission(data);
+    } else if (role === "owner") {
+      handleOwnerSubmission(data);
+    } else {
+      throw new Error("Unexpected role");
+    }
   };
 
   return (
@@ -77,9 +156,9 @@ const ProfilePage: React.FC = () => {
             <div className="flex justify-center">
               <div className="relative">
                 <Avatar className="relative flex h-24 w-24 shrink-0 overflow-hidden rounded-full border-2 border-gray-200 dark:border-gray-700">
-                  <AvatarImage src={profile.image} alt="Profile" />
+                  <AvatarImage src={avatarUrl} alt="Profile" />
                   <AvatarFallback className="bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200">
-                    {profile.fullName
+                    {profile.name
                       .split(" ")
                       .map((n) => n[0])
                       .join("")}
@@ -114,15 +193,15 @@ const ProfilePage: React.FC = () => {
                 </Label>
                 {isEditing ? (
                   <Input
-                    id="fullName"
-                    name="fullName"
-                    value={profile.fullName}
+                    id="name"
+                    name="name"
+                    value={profile.name}
                     onChange={handleChange}
                     className="mt-1"
                   />
                 ) : (
                   <p className="mt-1 text-gray-900 dark:text-white">
-                    {profile.fullName}
+                    {profile.name}
                   </p>
                 )}
               </div>
@@ -153,20 +232,22 @@ const ProfilePage: React.FC = () => {
 
             {/* Non-editable Fields */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div>
-                <Label className="text-sm font-medium text-gray-700 dark:text-gray-200">
-                  Invited By
-                </Label>
-                <p className="mt-1 text-gray-900 dark:text-white">
-                  {profile.invitedBy}
-                </p>
-              </div>
+              {role === "user" && (
+                <div>
+                  <Label className="text-sm font-medium text-gray-700 dark:text-gray-200">
+                    Invited By
+                  </Label>
+                  <p className="mt-1 text-gray-900 dark:text-white">
+                    {profile?.managerName}
+                  </p>
+                </div>
+              )}
               <div>
                 <Label className="text-sm font-medium text-gray-700 dark:text-gray-200">
                   Role
                 </Label>
                 <p className="mt-1 text-gray-900 dark:text-white">
-                  {profile.role}
+                  {profile?.role}
                 </p>
               </div>
               <div>
@@ -174,7 +255,8 @@ const ProfilePage: React.FC = () => {
                   Joined Date
                 </Label>
                 <p className="mt-1 text-gray-900 dark:text-white">
-                  {profile.joinedDate}
+                  {profile?.createdAt &&
+                    new Date(profile.createdAt).toDateString()}
                 </p>
               </div>
               <div>
@@ -182,14 +264,26 @@ const ProfilePage: React.FC = () => {
                   Company Name
                 </Label>
                 <p className="mt-1 text-gray-900 dark:text-white">
-                  {profile.companyName}
+                  {profile?.companyName}
                 </p>
               </div>
             </div>
 
-            {/* Edit Button */}
             <div className="flex justify-end">
-              <Button onClick={() => setIsEditing(!isEditing)}>
+              <Button
+                onClick={() => {
+                  setIsEditing(!isEditing);
+                  if (isEditing) {
+                    handleSubmission({
+                      ...profile,
+                      image: avatarUrl,
+                      userId: id,
+                      managerId: id,
+                      ownerId: id,
+                    });
+                  }
+                }}
+              >
                 {isEditing ? "Save Profile" : "Edit Profile"}
                 {!isEditing && <Edit2 className="ml-2" size={16} />}
               </Button>
@@ -201,4 +295,4 @@ const ProfilePage: React.FC = () => {
   );
 };
 
-export default ProfilePage;
+export default Profile;

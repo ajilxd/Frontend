@@ -78,11 +78,13 @@ export type ManagerType = {
   spaces?: string[];
   ownerId: string;
   isBlocked?: boolean;
-  createdAt?: Date;
-  updatedAt?: Date;
+  createdAt?: any;
+  updatedAt?: any;
   role: string;
   refreshToken?: string;
   companyId: string;
+  bio?: string;
+  companyName?: string;
 };
 
 export type SubscriptionType = {
@@ -147,6 +149,10 @@ export type UserType = {
   image?: string;
   ownerId?: string;
   spaces?: string[];
+  companyName?: string;
+  managerName?: string;
+  bio?: string;
+  createdAt?: string;
 };
 
 // Types for tasks
@@ -267,4 +273,22 @@ export type MeetingType = {
   scheduledDate?: Date | null;
   status: string;
   participants?: [];
+};
+
+export type OwnerType = {
+  _id: string;
+  name: string;
+  email: string;
+  password: string;
+  subscriptionId?: string;
+  isVerified: boolean;
+  isBlocked: boolean;
+  owner?: string;
+  stripe_customer_id?: string;
+  refreshToken?: string;
+  role: string;
+  bio: string;
+  image: string;
+  invitedBy?: string;
+  createdAt: string;
 };

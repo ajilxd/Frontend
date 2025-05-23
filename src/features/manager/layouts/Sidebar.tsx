@@ -59,7 +59,11 @@ export const Sidebar: React.FC<SidebarPropsType> = ({
       <div className="flex-1 overflow-y-auto">
         <nav className="p-2">
           <div className="space-y-1">
-            <Button variant="ghost" className="w-full justify-start">
+            <Button
+              variant="ghost"
+              className="w-full justify-start"
+              onClick={() => navigate("/manager/dashboard/profile")}
+            >
               <User className="h-5 w-5 mr-3" />
               <span>Profile</span>
             </Button>

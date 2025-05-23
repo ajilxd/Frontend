@@ -1,7 +1,7 @@
 import { userApi } from "@/axios";
 import { baseUrl } from "@/constants/app";
 import { catchResponse } from "@/errors/catchResponse";
-import { DocType, MeetingType, TaskType } from "@/types";
+import { DocType, MeetingType, TaskType, UserType } from "@/types";
 
 export const userLogout = async () => {
   try {
@@ -10,6 +10,40 @@ export const userLogout = async () => {
       return {
         success: true,
         message: "logout went succesfull",
+      };
+    }
+    throw new Error("unexpected response from server");
+  } catch (error) {
+    return catchResponse(error);
+  }
+};
+
+//get user data
+
+export const userGetData = async (userId: string) => {
+  try {
+    console.log("hey im profile getter for user");
+    const response = await userApi.get(
+      `${baseUrl}/user?field=_id&value=${userId}`
+    );
+    console.log(response.data);
+    if (response.status === 200) {
+      return response.data.data[0];
+    }
+  } catch (error) {
+    throw catchResponse(error);
+  }
+};
+
+// profile updation
+
+export const userProfileUpdate = async (data: Partial<UserType>) => {
+  try {
+    const response = await userApi.put(`${baseUrl}/user`, data);
+    if (response.status === 200) {
+      return {
+        success: true,
+        message: "updation went succesfull",
       };
     }
     throw new Error("unexpected response from server");

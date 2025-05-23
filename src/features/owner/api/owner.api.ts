@@ -4,6 +4,7 @@ import { catchResponse } from "@/errors/catchResponse";
 import {
   ManagerType,
   OwnerLoginResponseType,
+  OwnerType,
   ServerResponseType,
   SpaceType,
 } from "@/types";
@@ -117,6 +118,36 @@ export async function ownerLogoutService() {
     return { success: true, message: "Logout went successfull" };
   } catch (err) {
     return catchResponse(err);
+  }
+}
+
+// owner own data
+
+export async function ownerGetData(ownerId: string) {
+  try {
+    const response = await ownerApi.get(
+      `${baseUrl}/owner?field=_id&value=${ownerId}`
+    );
+    if (response.status === 200) {
+      return response.data.data[0];
+    }
+    throw new Error("Unexpected responsef from server");
+  } catch (error) {
+    return catchResponse(error);
+  }
+}
+
+// owner profile update
+
+export async function ownerProfileUpdate(data: Partial<OwnerType>) {
+  try {
+    const response = await ownerApi.put(`${baseUrl}/owner/profile`, data);
+    if (response.status === 200) {
+      return response.data.data[0];
+    }
+    throw new Error("Unexpected response from server");
+  } catch (error) {
+    return catchResponse(error);
   }
 }
 

@@ -5,22 +5,24 @@ import {
   Wallet,
   Text,
   Plus,
+  Edit,
 } from "lucide-react";
 import { useState } from "react";
 import { useSelector } from "react-redux";
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
 
+import { useOwnerCompanyQuery } from "@/queries/owners/company/useOwnerCompanyQuery";
+import { useOwnerSubscriptionQuery } from "@/queries/owners/subscriptions/useOwnerSubscriptionQuery";
 import { RootState } from "@/redux/store/appStore";
 import { SignOutModal } from "@/shared/components/signoutModal";
 import { SubscriptionPaywall } from "@/shared/components/SubscriptionPaywall";
 
 import { CompanyNotRegisteredAlert } from "../components/CompanyNotRegisteredAlert";
 import SidebarItem from "../components/SIdebarItem";
-import { useOwnerSubscriptionQuery } from "@/queries/owners/subscriptions/useOwnerSubscriptionQuery";
-import { useOwnerCompanyQuery } from "@/queries/owners/company/useOwnerCompanyQuery";
 
 const sidebarsArray: { icon: React.ElementType; label: string }[] = [
   { icon: LayoutDashboard, label: "Dashboard" },
+  { icon: Edit, label: "Profile" },
   { icon: User, label: "Managers" },
   { icon: Wallet, label: "Subscriptions" },
   { icon: Building2, label: "Company" },

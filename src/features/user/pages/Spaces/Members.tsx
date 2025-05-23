@@ -46,10 +46,7 @@ export function Members() {
                   <TableCell>
                     <div className="flex items-center gap-3">
                       <Avatar className="h-8 w-8 bg-gray-700">
-                        <AvatarImage
-                          src={`/api/placeholder/40/40`}
-                          alt={member.name}
-                        />
+                        <AvatarImage src={member.image} alt={member.name} />
                         <AvatarFallback className="bg-gray-700 text-gray-200">
                           {member.name
                             .split(" ")
