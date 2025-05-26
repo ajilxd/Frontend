@@ -5,5 +5,5 @@ export type TeamMemberType = {
   invitedBy: string;
   status: string;
   memberName: string;
-  image: string;
+  image?: string;
 };

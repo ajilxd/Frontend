@@ -2,7 +2,7 @@ import { Formik, Form, Field, ErrorMessage } from "formik";
 import { useSnackbar } from "notistack";
 import React, { useState } from "react";
 import { useDispatch } from "react-redux";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 import { ownerLoginSuccess } from "@/redux/slices/ownerSlice";
 
@@ -11,6 +11,7 @@ import OAuth from "../components/Oauth";
 import { OwnerSigninValidationSchema } from "../validation/owner.validation";
 
 const OwnerSignin: React.FC = () => {
+  const navigate = useNavigate();
   const dispatch = useDispatch();
   const [, setError] = useState<string>("");
   const [, setLoading] = useState<boolean>(false);
@@ -50,15 +51,17 @@ const OwnerSignin: React.FC = () => {
       setIsSubmitting(true);
       setLoading(false);
       setError("");
+      navigate("/owner/dashboard");
     } else {
-      const { status, message } = response;
-      console.log(status, ":  ", message);
-      enqueueSnackbar(message, { variant: "error" });
-      setError(message);
+      if ("status" in response) {
+        if (response.status === 403) {
+          enqueueSnackbar("invalid credentials", { variant: "error" });
+        }
+        setError(response.message);
+      }
+      setLoading(false);
     }
-    setLoading(false);
   };
-
   return (
     <div className="bg-gradient-to-br from-gray-900 to-gray-800 text-white min-h-screen flex items-center justify-center">
       <div className="flex w-full max-w-4xl h-screen">
@@ -93,12 +96,10 @@ const OwnerSignin: React.FC = () => {
           </div>
         </div>
 
-        {/* Right Side: Form */}
         <div className="w-full md:w-1/2 bg-gray-800 bg-opacity-90 p-8 rounded-lg shadow-lg flex items-center justify-center">
           <div className="w-full max-w-md space-y-6">
             <h2 className="text-3xl font-semibold text-center">Sign In</h2>
 
-            {/* Google Sign-In */}
             <OAuth />
 
             <div className="flex items-center my-4">
@@ -107,7 +108,6 @@ const OwnerSignin: React.FC = () => {
               <hr className="flex-1 border-gray-600" />
             </div>
 
-            {/* Formik Form */}
             <Formik
               initialValues={initialValues}
               validationSchema={OwnerSigninValidationSchema}

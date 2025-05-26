@@ -5,7 +5,10 @@ import {
   DropdownMenuContent,
 } from "@/components/ui/dropdown-menu";
 
+import { useNotification } from "../hooks/useNotification";
+
 export const NotificationComponent = function () {
+  const { notifications, clearNotification } = useNotification();
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -14,34 +17,25 @@ export const NotificationComponent = function () {
       <DropdownMenuContent className="w-80 max-h-[400px] overflow-auto">
         <div className="grid gap-4 p-4">
           <h4 className="font-medium leading-none">Notifications</h4>
-          <div className="mb-4 grid grid-cols-[25px_1fr] items-start pb-4 last:mb-0 last:pb-0">
-            <span className="flex h-2 w-2 translate-y-1.5 rounded-full bg-blue-500" />
-            <div className="grid gap-1">
-              <p className="text-sm font-medium">New order received</p>
-              <p className="text-sm text-gray-500 dark:text-gray-400">
-                5 min ago
-              </p>
-            </div>
-          </div>
-          <div className="mb-4 grid grid-cols-[25px_1fr] items-start pb-4 last:mb-0 last:pb-0">
-            <span className="flex h-2 w-2 translate-y-1.5 rounded-full bg-blue-500" />
-            <div className="grid gap-1">
-              <p className="text-sm font-medium">Payment processed</p>
-              <p className="text-sm text-gray-500 dark:text-gray-400">
-                10 min ago
-              </p>
-            </div>
-          </div>
-          <div className="mb-4 grid grid-cols-[25px_1fr] items-start pb-4 last:mb-0 last:pb-0">
-            <span className="flex h-2 w-2 translate-y-1.5 rounded-full bg-blue-500" />
-            <div className="grid gap-1">
-              <p className="text-sm font-medium">Item shipped</p>
-              <p className="text-sm text-gray-500 dark:text-gray-400">
-                1 hour ago
-              </p>
-            </div>
-          </div>
-          <Button variant="outline" className="mt-4">
+          {notifications.map((i) => {
+            return (
+              <div className="mb-4 grid grid-cols-[25px_1fr] items-start pb-4 last:mb-0 last:pb-0">
+                <span className="flex h-2 w-2 translate-y-1.5 rounded-full bg-blue-500" />
+                <div className="grid gap-1">
+                  <p className="text-sm font-medium">{i.message}</p>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">
+                    {i.timestamp}
+                  </p>
+                </div>
+              </div>
+            );
+          })}
+
+          <Button
+            variant="outline"
+            className="mt-4"
+            onClick={clearNotification}
+          >
             Mark All as Read
           </Button>
         </div>

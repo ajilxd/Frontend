@@ -5,7 +5,6 @@ import PrivateRoute from "@/hoc/PrivateRoute";
 import { useUserChatsQuery } from "@/queries/users/chats/useChatQuery";
 import { useUserMeetingsQuery } from "@/queries/users/meetings/useUserMeetingQuery";
 import { useUserSpaceBySpaceIdQuery } from "@/queries/users/spaces/useSpaceBySpaceIdQuery";
-
 import { RootState } from "@/redux/store/appStore";
 import Chat from "@/shared/components/Chat";
 import Meeting from "@/shared/components/Meeting";
@@ -17,7 +16,6 @@ import DefaultDashboard from "../pages/Dashboard";
 import Docs from "../pages/Spaces/Docs";
 import { Members } from "../pages/Spaces/Members";
 import { Tasks } from "../pages/Spaces/Tasks";
-import { useUserProfileQuery } from "@/queries/users/profile/useUserProfileQuery";
 
 const UserRoutes: React.FC = () => {
   const user = useSelector((state: RootState) => state.user);

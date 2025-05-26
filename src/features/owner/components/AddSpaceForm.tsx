@@ -60,19 +60,19 @@ export const AddSpaceForm: React.FC<Prop> = ({ ownerId }) => {
   const queryClient = useQueryClient();
   const [tags, setTags] = useState<string[]>([]);
   const [tagInput, setTagInput] = useState("");
-  const [loadingManagerError, setLoadingManagerError] = useState("");
+
   const owner = useSelector((state: RootState) => state.owner);
 
   const { company } = useContext(OwnerContext);
-  const { data: managers, isError, error } = useManagersQuery(ownerId);
+  const { data: managers } = useManagersQuery(ownerId);
 
-  if (isError) {
-    if (axios.isAxiosError(error)) {
-      setLoadingManagerError(error?.response?.data?.message);
-    } else {
-      setLoadingManagerError(error.message);
-    }
-  }
+  // if (isError) {
+  //   if (axios.isAxiosError(error)) {
+  //     setLoadingManagerError(error?.response?.data?.message);
+  //   } else {
+  //     setLoadingManagerError(error.message);
+  //   }
+  // }
 
   const handleTagInput = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter" && tagInput.trim() !== "") {
@@ -292,7 +292,6 @@ export const AddSpaceForm: React.FC<Prop> = ({ ownerId }) => {
                   <Label htmlFor="managers">Managers</Label>
                   <div className="bg-gray-50 dark:bg-gray-800 rounded-md p-4 border border-gray-200 dark:border-gray-700">
                     <div className="grid grid-cols-2 gap-3 md:grid-cols-2">
-                      {loadingManagerError && <p>Loading managers failed</p>}
                       {managers &&
                         managers?.map((manager) => (
                           <div

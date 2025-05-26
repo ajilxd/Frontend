@@ -1,3 +1,4 @@
+import { useQueryClient } from "@tanstack/react-query";
 import { enqueueSnackbar } from "notistack";
 import { useSelector } from "react-redux";
 
@@ -16,7 +17,6 @@ import { RootState } from "@/redux/store/appStore";
 
 import { managerUpdateSpace } from "../api/manager.api";
 import { TeamMemberType } from "../types";
-import { useQueryClient } from "@tanstack/react-query";
 
 export function AddUserstoSpaceDialogue({
   open,
@@ -49,6 +49,8 @@ export function AddUserstoSpaceDialogue({
       status: "active",
       memberName: user.name!,
     }));
+
+    console.log("added members ", members);
 
     const team = { members };
 

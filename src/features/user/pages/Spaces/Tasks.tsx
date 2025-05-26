@@ -3,11 +3,11 @@ import { useState } from "react";
 import { useParams } from "react-router-dom";
 
 import { useUserTasksBySpaceIdQuery } from "@/queries/users/tasks/useUserTasksBySpaceIdQuery";
+import { TaskType } from "@/types";
 
 import { TaskDropdown } from "../../components/TaskDropDown";
-import { getStatusConfig } from "../../constants/StatusConfig";
 import { UpdateTaskModal } from "../../components/UpdateTaskModal";
-import { TaskType } from "@/types";
+import { getStatusConfig } from "../../constants/StatusConfig";
 
 export function Tasks() {
   const { spaceid } = useParams();

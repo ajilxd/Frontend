@@ -46,6 +46,7 @@ const VideoCallConference: React.FC<Props> = ({ user, useMeetingsQuery }) => {
     recvTransport,
     consumers,
     updateConsumer,
+    recvTransportConnected,
   } = useTransport();
   const {
     joinMeeting,
@@ -53,6 +54,7 @@ const VideoCallConference: React.FC<Props> = ({ user, useMeetingsQuery }) => {
     leaveMeeting,
     recentQuitter,
     resetRecentQuitter,
+    newParticipant,
   } = usePeerSocket();
   const navigate = useNavigate();
   const { spaceid } = useParams();
@@ -82,7 +84,6 @@ const VideoCallConference: React.FC<Props> = ({ user, useMeetingsQuery }) => {
     }
   }
 
-  // 🚀 Acquire local media stream
   useEffect(() => {
     const getMedia = async () => {
       try {
@@ -116,14 +117,12 @@ const VideoCallConference: React.FC<Props> = ({ user, useMeetingsQuery }) => {
     };
   }, [user]);
 
-  // 🔁 Ensure local stream is applied to the video ref
   useEffect(() => {
     if (localVideoRef.current && stream) {
       localVideoRef.current.srcObject = stream;
     }
   }, [stream]);
 
-  // 🎙️ Produce local audio/video
   useEffect(() => {
     const produceTracks = async () => {
       if (!stream || !sendTransport || hasProducedRef.current) return;
@@ -162,8 +161,8 @@ const VideoCallConference: React.FC<Props> = ({ user, useMeetingsQuery }) => {
     produceTracks();
   }, [stream, sendTransport, audioProducer, videoProducer]);
 
-  // 👀 Consume remote participants
   useEffect(() => {
+    console.log("hey im the consumer inititater");
     const consume = async () => {
       if (!device?.rtpCapabilities || !recvTransport) return;
 
@@ -210,6 +209,9 @@ const VideoCallConference: React.FC<Props> = ({ user, useMeetingsQuery }) => {
     producersForConsuming,
     user.id,
     consumeFromPeer,
+    newParticipant,
+    recvTransportConnected,
+    consumers,
   ]);
 
   useEffect(() => {
@@ -228,7 +230,6 @@ const VideoCallConference: React.FC<Props> = ({ user, useMeetingsQuery }) => {
     resetRecentQuitter();
   }, [recentQuitter]);
 
-  // 🎙️ Toggle microphone
   const toggleAudio = () => {
     if (!stream) return;
     const enabled = !audioEnabled;
@@ -237,7 +238,6 @@ const VideoCallConference: React.FC<Props> = ({ user, useMeetingsQuery }) => {
     setAudioEnabled(enabled);
   };
 
-  // 📷 Toggle camera
   const toggleVideo = () => {
     if (!stream) return;
     const enabled = !videoEnabled;
@@ -246,7 +246,6 @@ const VideoCallConference: React.FC<Props> = ({ user, useMeetingsQuery }) => {
     setVideoEnabled(enabled);
   };
 
-  // ❌ Leave meeting
   const endCall = () => {
     stream?.getTracks().forEach((track) => track.stop());
     audioProducer?.close();
@@ -256,7 +255,6 @@ const VideoCallConference: React.FC<Props> = ({ user, useMeetingsQuery }) => {
     setVideoProducer(null);
   };
 
-  // ☠️ Handle full meeting termination
   const handleEndCall = async () => {
     if (!meetingId) return;
     endCall();

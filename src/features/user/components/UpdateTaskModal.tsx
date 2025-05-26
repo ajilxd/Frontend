@@ -20,6 +20,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { RootState } from "@/redux/store/appStore";
+import { useNotification } from "@/shared/hooks/useNotification";
 import { TaskType } from "@/types";
 
 import { userUpdateTaskStatus } from "../api/user.api";
@@ -34,6 +35,7 @@ export function UpdateTaskModal({
   task: TaskType;
 }) {
   const { spaceid } = useParams();
+  const { sendNotification } = useNotification();
   const user = useSelector((state: RootState) => state.user);
   const queryClient = useQueryClient();
   const [status, setStatus] = useState(task?.status);
@@ -43,6 +45,11 @@ export function UpdateTaskModal({
     const response = await userUpdateTaskStatus(task._id, "status", { status });
     if (response.success) {
       enqueueSnackbar("Task updated successfully", { variant: "success" });
+      sendNotification(
+        spaceid!,
+        user.profile.name + " updated an task",
+        "info"
+      );
       queryClient.invalidateQueries({ queryKey: ["user", "tasks", spaceid] });
       queryClient.invalidateQueries({ queryKey: ["user", "tasks", user.id] });
     } else {

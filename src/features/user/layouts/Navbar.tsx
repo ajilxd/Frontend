@@ -1,14 +1,8 @@
-// src/components/dashboard/Navbar.jsx
-import { Bell, Menu, Moon, Search, Sun, User } from "lucide-react";
+import { Menu, Moon, Search, Sun } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
+import { NotificationComponent } from "@/shared/components/Notification";
 
 type NavbarPropsType = {
   toggleSidebar: VoidFunction;
@@ -48,22 +42,7 @@ export const Navbar: React.FC<NavbarPropsType> = ({
             <Moon className="h-5 w-5" />
           )}
         </Button>
-        <Button variant="ghost" size="icon" className="relative">
-          <Bell className="h-5 w-5" />
-          <span className="absolute -top-1 -right-1 w-2 h-2 bg-red-500 rounded-full"></span>
-        </Button>
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="icon">
-              <User className="h-5 w-5" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuItem>Profile</DropdownMenuItem>
-            <DropdownMenuItem>Settings</DropdownMenuItem>
-            <DropdownMenuItem>Logout</DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+        <NotificationComponent />
       </div>
     </>
   );

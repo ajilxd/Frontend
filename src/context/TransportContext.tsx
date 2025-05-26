@@ -37,6 +37,9 @@ export interface TransportContextType {
   consumers: Consumer<AppData>[];
 
   updateConsumer: (data: Consumer<AppData>[]) => void;
+
+  sendTransportConnected: boolean;
+  recvTransportConnected: boolean;
 }
 
 export const TransportContext = createContext<TransportContextType | undefined>(

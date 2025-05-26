@@ -19,6 +19,10 @@ export const TransportProvider = ({ children }: { children: ReactNode }) => {
   const [sendTransport, setSendTransport] = useState<Transport | null>(null);
   const [recvTransport, setRecvTransport] = useState<Transport | null>(null);
   const [consumers, setConsumers] = useState<Consumer[]>([]);
+  const [sendTransportConnected, setSendTransportConnected] =
+    useState<boolean>(false);
+  const [recvTransportConnected, setRecvTransportConnected] =
+    useState<boolean>(false);
 
   const loadDevice = useCallback(
     async (rtpCapabilities: RtpCapabilities): Promise<Device | null> => {
@@ -31,7 +35,7 @@ export const TransportProvider = ({ children }: { children: ReactNode }) => {
         setDevice(newDevice);
         return newDevice;
       } catch (err) {
-        console.error("❌ Failed to load device:", err);
+        console.error("failed to load device:", err);
         return null;
       }
     },
@@ -55,7 +59,7 @@ export const TransportProvider = ({ children }: { children: ReactNode }) => {
 
       transport.on("connect", async ({ dtlsParameters }, callback, errback) => {
         if (connectedTransports.current.has(transport.id)) {
-          console.log("🚫 Transport already connected, skipping connect call");
+          console.log(" Transport already connected, skipping connect call");
           callback();
           return;
         }
@@ -99,7 +103,10 @@ export const TransportProvider = ({ children }: { children: ReactNode }) => {
           state === "failed"
         ) {
           connectedTransports.current.delete(transport.id);
+          setSendTransportConnected(false);
           setSendTransport(null);
+        } else {
+          setSendTransportConnected(true);
         }
       });
 
@@ -145,6 +152,9 @@ export const TransportProvider = ({ children }: { children: ReactNode }) => {
           state === "failed"
         ) {
           setRecvTransport(null);
+          setRecvTransportConnected(false);
+        } else {
+          setRecvTransportConnected(true);
         }
       });
 
@@ -153,7 +163,6 @@ export const TransportProvider = ({ children }: { children: ReactNode }) => {
     [device, connectTransport]
   );
 
-  // 👇 Call this function once you get a producerId from another peer
   const consumeFromPeer = useCallback(
     async (
       producerId: string,
@@ -184,7 +193,6 @@ export const TransportProvider = ({ children }: { children: ReactNode }) => {
 
         setConsumers((prev) => [...prev, consumer]);
 
-        // 🔥 Convert the consumer track into a MediaStream
         const mediaStream = new MediaStream([consumer.track]);
 
         return mediaStream;
@@ -213,6 +221,8 @@ export const TransportProvider = ({ children }: { children: ReactNode }) => {
         consumeFromPeer,
         consumers,
         updateConsumer,
+        sendTransportConnected,
+        recvTransportConnected,
       }}
     >
       {children}

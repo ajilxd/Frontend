@@ -1,4 +1,5 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@radix-ui/react-avatar";
+import { useQueryClient } from "@tanstack/react-query";
 import { Field } from "formik";
 import { useField, Formik, Form } from "formik";
 import { enqueueSnackbar } from "notistack";
@@ -22,12 +23,12 @@ import { useManagerSpacesQuery } from "@/queries/managers/spaces/useManagerSpace
 import { useManagerUsersQuery } from "@/queries/managers/users/useManagerUsersQuery";
 import { RootState } from "@/redux/store/appStore";
 import { AnimatedSelect, OptionType } from "@/shared/components/AnimatedSelect";
+import { useNotification } from "@/shared/hooks/useNotification";
 import { AddTaskType } from "@/types";
 
 import { managerAddTask } from "../api/manager.api";
 import { TasksTagsOption } from "../constants";
 import { addTaskvalidationSchema } from "../validation";
-import { useQueryClient } from "@tanstack/react-query";
 
 const MyInput = ({ label, ...props }) => {
   const [field, meta] = useField(props);
@@ -111,6 +112,7 @@ const MyCheckbox = ({
 
 export const ManagerCreateTasks: React.FC = () => {
   const queryClient = useQueryClient();
+  const { sendNotification } = useNotification();
   const manager = useSelector((state: RootState) => state.manager);
   const [tags, setTags] = React.useState<string[]>([]);
   const { spaceid } = useParams();
@@ -160,6 +162,11 @@ export const ManagerCreateTasks: React.FC = () => {
 
     if (response.success) {
       enqueueSnackbar("Task added successfully", { variant: "success" });
+      sendNotification(
+        spaceid!,
+        manager.profile.name + " created a new task",
+        "info"
+      );
       queryClient.invalidateQueries({
         queryKey: ["manager", "tasks", spaceid],
       });

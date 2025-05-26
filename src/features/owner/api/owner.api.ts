@@ -1,13 +1,7 @@
 import { ownerApi } from "@/axios";
 import { baseUrl } from "@/constants/app";
 import { catchResponse } from "@/errors/catchResponse";
-import {
-  ManagerType,
-  OwnerLoginResponseType,
-  OwnerType,
-  ServerResponseType,
-  SpaceType,
-} from "@/types";
+import { ManagerType, OwnerType, SpaceType } from "@/types";
 
 import { CheckoutPayment, CompanyDetailsType } from "../types";
 import { CompanyDataType } from "../types/types.ownercontext";
@@ -15,10 +9,11 @@ import { CompanyDataType } from "../types/types.ownercontext";
 export async function ownerSigninService(formData: {
   email: string;
   password: string;
-}): Promise<ServerResponseType<OwnerLoginResponseType>> {
+}) {
   try {
     const response = await ownerApi.post(`${baseUrl}/owner/login`, formData);
 
+    console.log(response);
     if (response.status == 200) {
       return {
         success: true,

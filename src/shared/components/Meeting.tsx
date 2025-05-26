@@ -21,6 +21,7 @@ import { userJoinMeeting, userMakeCall } from "@/features/user/api/user.api";
 import { MeetingType } from "@/types";
 
 import { useTransport } from "../hooks/useTransport";
+import { useNotification } from "../hooks/useNotification";
 
 type Props = {
   user: {
@@ -44,6 +45,8 @@ const Meeting: React.FC<Props> = ({ user, useMeetingsQuery }) => {
     isError: hasMeetingFetchError,
     error: meetingFetchError,
   } = useMeetingsQuery(spaceid!);
+
+  const { sendNotification } = useNotification();
 
   const [showScheduleModal, setShowScheduleModal] = useState(false);
   const { loadDevice, createSendTransport, createRecvTransport } =
@@ -91,6 +94,11 @@ const Meeting: React.FC<Props> = ({ user, useMeetingsQuery }) => {
       }
       if (response && response.success) {
         console.log("Call initiated");
+        sendNotification(
+          spaceid,
+          user.profile.name + " has initiated the call",
+          "info"
+        );
         const rtpCapabilities = response.data.rtpCapabilities;
         const sendtransportOptions = response.data.sendtransportOptions;
         const recvTransportOptions = response.data.recvTransportOptions;
@@ -177,6 +185,11 @@ const Meeting: React.FC<Props> = ({ user, useMeetingsQuery }) => {
         `Meeting scheduled for ${scheduledDate.toLocaleString()}`,
         { variant: "success" }
       );
+      sendNotification(
+        spaceid,
+        user.profile.name + " has initiated the call",
+        "info"
+      );
       setShowScheduleModal(false);
       setScheduledDate(null);
     } else if (response && "status" in response && response.status === 403) {
@@ -217,6 +230,11 @@ const Meeting: React.FC<Props> = ({ user, useMeetingsQuery }) => {
       }
       if (response && response.success) {
         console.log("joining call");
+        sendNotification(
+          spaceid,
+          user.profile.name + " has joined  the call " + meetingId,
+          "info"
+        );
         const rtpCapabilities = response.data.rtpCapabilities;
         const sendtransportOptions = response.data.sendtransportOptions;
         const recvTransportOptions = response.data.recvTransportOptions;
@@ -255,7 +273,6 @@ const Meeting: React.FC<Props> = ({ user, useMeetingsQuery }) => {
 
   return (
     <div className="flex h-screen bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100">
-      {/* Sidebar */}
       <aside className="w-72 border-r border-gray-200 dark:border-gray-700 overflow-hidden flex flex-col">
         <div className="p-3 border-b border-gray-200 dark:border-gray-700">
           <h2 className="text-lg font-medium">Calls</h2>
@@ -355,7 +372,6 @@ const Meeting: React.FC<Props> = ({ user, useMeetingsQuery }) => {
         </div>
       </aside>
 
-      {/* Main Content */}
       <main className="flex-1 p-6 flex items-center justify-center">
         <div className="max-w-md w-full space-y-8">
           <div className="space-y-4">
@@ -378,7 +394,6 @@ const Meeting: React.FC<Props> = ({ user, useMeetingsQuery }) => {
         </div>
       </main>
 
-      {/* Schedule Call Modal */}
       {showScheduleModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg w-full max-w-sm">

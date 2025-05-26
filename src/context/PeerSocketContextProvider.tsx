@@ -14,18 +14,18 @@ type ProducersForConsumingType = {
   id: string;
   kind: MediaKind;
   userId: string;
-}[];
+};
 
 type JoinMeetingResponse = {
   error?: string;
-  producers?: ProducersForConsumingType;
+  producers?: ProducersForConsumingType[];
 };
 
 export const PeerSocketProvider = ({ children }: { children: ReactNode }) => {
   const [connected, setConnected] = useState(false);
   const [newParticipant, setNewParticipant] = useState<string | null>(null);
   const [producersForConsuming, setProducersForConsuming] = useState<
-    ProducersForConsumingType | []
+    ProducersForConsumingType[] | []
   >([]);
   const [recentQuitter, setRecentQuitter] = useState<{
     name: string;
@@ -35,12 +35,13 @@ export const PeerSocketProvider = ({ children }: { children: ReactNode }) => {
     const handleConnect = () => setConnected(true);
     const handleDisconnect = () => setConnected(false);
     const handleNewParticipant = (data: {
-      producers: ProducersForConsumingType;
+      producers: ProducersForConsumingType[];
       userId: string;
       socketId: string;
     }) => {
       console.log("we got a new joinee ", data.userId);
-      setProducersForConsuming(data.producers);
+      console.log("Producers", data.producers);
+      setProducersForConsuming((prev) => [...prev, ...data.producers]);
       setNewParticipant(data.userId);
     };
 
@@ -74,7 +75,6 @@ export const PeerSocketProvider = ({ children }: { children: ReactNode }) => {
     setRecentQuitter(null);
   }, []);
 
-  // 🚀 Connect the transport (DTLS negotiation)
   const connectTransport = (
     transportId: string,
     dtlsParameters: DtlsParameters,
@@ -93,7 +93,6 @@ export const PeerSocketProvider = ({ children }: { children: ReactNode }) => {
     });
   };
 
-  // 📡 Produce a media track
   const produceMedia = (
     transportId: string,
     kind: "audio" | "video",
