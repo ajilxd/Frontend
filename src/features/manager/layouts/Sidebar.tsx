@@ -20,7 +20,7 @@ import {
 } from "@/components/ui/collapsible";
 import { useManagerSpacesQuery } from "@/queries/managers/spaces/useManagerSpacesQuery";
 import { RootState } from "@/redux/store/appStore";
-import { SignOutModal } from "@/shared/components/signoutModal";
+import { SignOutModal } from "@/shared/components/SignoutModal";
 
 type SidebarPropsType = {
   toggleSidebar: VoidFunction;

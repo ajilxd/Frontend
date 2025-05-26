@@ -2,7 +2,7 @@ import { X, Users, ShoppingBag } from "lucide-react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-import { SignOutModal } from "@/shared/components/signoutModal";
+import { SignOutModal } from "@/shared/components/SignoutModal";
 
 import SidebarLink from "./Sidebarlink";
 

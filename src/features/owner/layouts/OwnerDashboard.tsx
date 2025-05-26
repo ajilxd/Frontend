@@ -14,7 +14,7 @@ import { Outlet, useLocation, useNavigate } from "react-router-dom";
 import { useOwnerCompanyQuery } from "@/queries/owners/company/useOwnerCompanyQuery";
 import { useOwnerSubscriptionQuery } from "@/queries/owners/subscriptions/useOwnerSubscriptionQuery";
 import { RootState } from "@/redux/store/appStore";
-import { SignOutModal } from "@/shared/components/signoutModal";
+import { SignOutModal } from "@/shared/components/SignoutModal";
 import { SubscriptionPaywall } from "@/shared/components/SubscriptionPaywall";
 
 import { CompanyNotRegisteredAlert } from "../components/CompanyNotRegisteredAlert";
