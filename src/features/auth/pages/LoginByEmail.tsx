@@ -44,6 +44,7 @@ const LoginByEmail: React.FC = () => {
       if (role === "manager") {
         const managerAccessToken = response.data.accessToken;
         const managerData = response.data.data;
+        console.log("managerData after login",managerData)
 
         if (!managerAccessToken) {
           return console.warn("No accesstoken found,Try login again");
@@ -60,7 +61,7 @@ const LoginByEmail: React.FC = () => {
                 id: managerData.id,
                 name: managerData.name,
                 email: managerData.email,
-                image: managerData.image || "",
+                image: managerData.image,
                 ownerId: managerData.ownerId,
                 ownerName: managerData.ownerName,
                 ownerIsSubscribed: managerData.ownerSubscription.name

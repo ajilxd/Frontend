@@ -27,10 +27,16 @@ export const PeerSocketProvider = ({ children }: { children: ReactNode }) => {
   const [producersForConsuming, setProducersForConsuming] = useState<
     ProducersForConsumingType[] | []
   >([]);
+  const [meetingIsTerminated,setMeetingIsTerminated] =useState(false)
   const [recentQuitter, setRecentQuitter] = useState<{
     name: string;
     userId: string;
   } | null>(null);
+const [refreshMeeting,setRefreshMeeting] =useState(false)
+
+
+
+
   useEffect(() => {
     const handleConnect = () => setConnected(true);
     const handleDisconnect = () => setConnected(false);
@@ -39,8 +45,7 @@ export const PeerSocketProvider = ({ children }: { children: ReactNode }) => {
       userId: string;
       socketId: string;
     }) => {
-      console.log("we got a new joinee ", data.userId);
-      console.log("Producers", data.producers);
+      console.log("we got a new joinee ", data.userId); 
       setProducersForConsuming((prev) => [...prev, ...data.producers]);
       setNewParticipant(data.userId);
     };
@@ -55,10 +60,22 @@ export const PeerSocketProvider = ({ children }: { children: ReactNode }) => {
       setRecentQuitter({ userId, name });
     };
 
+    const handleMeetingTermination =()=>{
+      setMeetingIsTerminated(true);
+    }
+
+    const handleRefreshMeeting =()=>{
+      console.log("here is refresh meeting")
+      setRefreshMeeting(true)
+    }
+
+   
     peerSocket.on("connect", handleConnect);
     peerSocket.on("disconnect", handleDisconnect);
     peerSocket.on("new-participant", handleNewParticipant);
     peerSocket.on("leave-meeting", handleLeaveMeeting);
+    peerSocket.on("terminate-meeting",handleMeetingTermination);
+    peerSocket.on("refresh-meeting",handleRefreshMeeting)
     peerSocket.connect();
 
     return () => {
@@ -74,6 +91,15 @@ export const PeerSocketProvider = ({ children }: { children: ReactNode }) => {
   const resetRecentQuitter = useCallback(() => {
     setRecentQuitter(null);
   }, []);
+
+  const resetMeetingTermination =useCallback(()=>{
+    setMeetingIsTerminated(false)
+  },[])
+
+   const resetRefreshMeeting =()=>{
+      setRefreshMeeting(false)
+    }
+
 
   const connectTransport = (
     transportId: string,
@@ -185,6 +211,13 @@ export const PeerSocketProvider = ({ children }: { children: ReactNode }) => {
     peerSocket.emit("leave-meeting", { userId, meetingId, name });
   };
 
+  const triggerRefreshMeeting =(meetingId:string)=>{
+    console.log("hey im the refresher")
+    peerSocket.emit("refresh-meeting",{meetingId})
+  }
+
+
+
   return (
     <PeerSocketContext.Provider
       value={{
@@ -201,6 +234,11 @@ export const PeerSocketProvider = ({ children }: { children: ReactNode }) => {
         leaveMeeting,
         recentQuitter,
         resetRecentQuitter,
+        meetingIsTerminated,
+        resetMeetingTermination,
+        refreshMeeting,
+        resetRefreshMeeting,
+        triggerRefreshMeeting
       }}
     >
       {children}

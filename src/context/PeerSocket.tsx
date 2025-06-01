@@ -64,6 +64,14 @@ type PeerSocketContextType = {
 
   recentQuitter: { name: string; userId: string } | null;
   resetRecentQuitter: () => void;
+
+  resetMeetingTermination: () => void;
+  meetingIsTerminated:boolean;
+
+  resetRefreshMeeting: () => void;
+  refreshMeeting:boolean
+
+  triggerRefreshMeeting: (spaceId: string) => void
 };
 
 export const PeerSocketContext = createContext<PeerSocketContextType | null>(

@@ -1,4 +1,4 @@
-import { UseQueryResult } from "@tanstack/react-query";
+import { UseQueryResult,useQueryClient } from "@tanstack/react-query";
 import {
   Search,
   Calendar,
@@ -22,6 +22,7 @@ import { MeetingType } from "@/types";
 
 import { useTransport } from "../hooks/useTransport";
 import { useNotification } from "../hooks/useNotification";
+import { usePeerSocket } from "../hooks/usePeerSocket";
 
 type Props = {
   user: {
@@ -40,10 +41,12 @@ const Meeting: React.FC<Props> = ({ user, useMeetingsQuery }) => {
   const [expandedMeetingId, setExpandedMeetingId] = useState<string | null>(
     null
   );
+  const {refreshMeeting,resetRefreshMeeting,triggerRefreshMeeting} = usePeerSocket()
   const {
     data: meetings,
     isError: hasMeetingFetchError,
     error: meetingFetchError,
+    refetch
   } = useMeetingsQuery(spaceid!);
 
   const { sendNotification } = useNotification();
@@ -54,7 +57,22 @@ const Meeting: React.FC<Props> = ({ user, useMeetingsQuery }) => {
 
   if (hasMeetingFetchError) {
     console.error("Error at fetching meetings", meetingFetchError);
+  };
+
+
+ React.useEffect(() => {
+  console.log('inside refresh meeting useEffect',refreshMeeting)
+  if (refreshMeeting) {
+    const refresh = async () => {
+      await refetch();
+      resetRefreshMeeting();
+      console.log("Meeting refreshed and flag reset.");
+    };
+    refresh();
   }
+}, [refreshMeeting]);
+
+
 
   const formatDate = (dateString: string) => {
     if (!dateString) return "N/A";
@@ -94,6 +112,7 @@ const Meeting: React.FC<Props> = ({ user, useMeetingsQuery }) => {
       }
       if (response && response.success) {
         console.log("Call initiated");
+         triggerRefreshMeeting(spaceid)
         sendNotification(
           spaceid,
           user.profile.name + " has initiated the call",
@@ -122,6 +141,7 @@ const Meeting: React.FC<Props> = ({ user, useMeetingsQuery }) => {
           meeting.meetingId
         );
 
+        
         if (user.role === "user") {
           navigate("/user/dashboard/spaces/" + spaceid + "/call");
         }

@@ -55,6 +55,9 @@ const VideoCallConference: React.FC<Props> = ({ user, useMeetingsQuery }) => {
     recentQuitter,
     resetRecentQuitter,
     newParticipant,
+    terminateMeeting,
+    meetingIsTerminated,
+    resetMeetingTermination
   } = usePeerSocket();
   const navigate = useNavigate();
   const { spaceid } = useParams();
@@ -247,6 +250,7 @@ const VideoCallConference: React.FC<Props> = ({ user, useMeetingsQuery }) => {
   };
 
   const endCall = () => {
+  
     stream?.getTracks().forEach((track) => track.stop());
     audioProducer?.close();
     videoProducer?.close();
@@ -269,6 +273,7 @@ const VideoCallConference: React.FC<Props> = ({ user, useMeetingsQuery }) => {
 
     if (res?.success) {
       enqueueSnackbar("Meeting ended", { variant: "success" });
+      terminateMeeting(user.id,meetingId)
 
       const path =
         user.role === "user"
@@ -299,6 +304,22 @@ const VideoCallConference: React.FC<Props> = ({ user, useMeetingsQuery }) => {
       setTimeout(() => navigate(path), 1500);
     }
   };
+
+
+
+  useEffect(()=>{
+    if(meetingIsTerminated){
+      endCall();
+      resetMeetingTermination()
+       const path =
+        user.role === "user"
+          ? `/user/dashboard/spaces/${spaceid}/meeting`
+          : `/manager/dashboard/spaces/${spaceid}/meeting`;
+
+      setTimeout(() => navigate(path), 1500);
+      console.log("meeting is terminated")
+    }
+  },[meetingIsTerminated])
 
   return (
     <div className="flex flex-col h-screen bg-gray-900 text-white">

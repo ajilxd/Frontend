@@ -44,7 +44,7 @@ export default function DocumentApp() {
 
   useEffect(() => {
     setDocuments(docs);
-  }, [docs]);
+  }, []);
 
   const handleSelectDocument = (doc: Partial<DocType>) => {
     setSelectedDoc(doc);

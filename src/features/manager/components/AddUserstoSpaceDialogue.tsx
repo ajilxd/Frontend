@@ -15,7 +15,7 @@ import {
 import { useManagerUsersQuery } from "@/queries/managers/users/useManagerUsersQuery";
 import { RootState } from "@/redux/store/appStore";
 
-import { managerUpdateSpace } from "../api/manager.api";
+import {  managerUpdateSpaceUsers } from "../api/manager.api";
 import { TeamMemberType } from "../types";
 
 export function AddUserstoSpaceDialogue({
@@ -54,8 +54,8 @@ export function AddUserstoSpaceDialogue({
 
     const team = { members };
 
-    const response = await managerUpdateSpace(
-      "" + manager.owner.ownerId,
+    const response = await managerUpdateSpaceUsers(
+      "" + manager.id,
       spaceId,
       {
         team,

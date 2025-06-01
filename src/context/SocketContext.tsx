@@ -19,7 +19,7 @@ export type TypingDataType = {
   userId: string;
   typing: string;
   senderName: string;
-  senderImageUrl: string;
+  senderImageUrl: string|undefined;
 }[];
 
 export type SocketContextType = {

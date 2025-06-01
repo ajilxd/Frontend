@@ -5,7 +5,6 @@ import { ManagerContextProvider } from "@/context/ManagerContextProvider";
 import PrivateRoute from "@/hoc/PrivateRoute";
 import { useManagerChatsQuery } from "@/queries/managers/chats/useChatQuery";
 import { useManagerSpacesByIdQuery } from "@/queries/managers/spaces/useManagerSpaceByIdQuery";
-import { useUserMeetingsQuery } from "@/queries/users/meetings/useUserMeetingQuery";
 import { RootState } from "@/redux/store/appStore";
 import Chat from "@/shared/components/Chat";
 import Meeting from "@/shared/components/Meeting";

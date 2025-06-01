@@ -112,6 +112,8 @@ export const managerLogout = async () => {
   }
 };
 
+// space management
+
 export const managerFetchSpace = async (managerId: string) => {
   try {
     const response = await managerApi.get(
@@ -150,6 +152,30 @@ export const managerUpdateSpace = async (
       ...updateData,
       spaceId,
       ownerId,
+    });
+    if (response.status === 200) {
+      return {
+        success: true,
+        data: response.data.data,
+      };
+    }
+    throw new Error("unexpected response from server");
+  } catch (error) {
+    return catchResponse(error);
+  }
+};
+
+
+export const managerUpdateSpaceUsers = async (
+  managerId: string,
+  spaceId: string,
+  updateData: Partial<SpaceType>
+) => {
+  try {
+    const response = await managerApi.post(`${baseUrl}/space/users`, {
+      ...updateData,
+      spaceId,
+     managerId,
     });
     if (response.status === 200) {
       return {
