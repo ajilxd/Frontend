@@ -16,6 +16,41 @@ type Notification = {
   type: string;
 };
 
+type TaskType = {
+  id: string;
+  name: string;
+  updatedTime: string;
+  spaceId: string;
+  updatedBy: {
+    id: string;
+    name: string;
+    imageUrl?: string;
+  };
+}
+
+
+export type EventType ={
+  companyId:string;
+  consumerId?:string;
+  consumerName?:string;
+  consumerImageUrl?:string;
+  consumerRole?:string;
+  consumerLastActive?:string;
+  consumerSpaces?:string[];
+  targetSpaceId?:string;
+  targetSpaceName?:string;
+  timestamp?:string;
+  producerName?:string;
+  producerId?:string;
+  producerImageUrl?:string;
+  type?:"notification"|"event"|"both";
+  isTaskUpdatedEvent?:boolean;
+  task?:TaskType;
+  notificationContent?:string
+  notificationType?:"warning"|"info"|"alert";
+  storeNotificationOnDb?:boolean
+}
+
 export const NotificationSocketProvider = ({ children }: Props) => {
   const [notifications, setNotifications] = useState<Notification[]>([
     {
@@ -38,6 +73,14 @@ export const NotificationSocketProvider = ({ children }: Props) => {
     };
   }, []);
 
+  const connectNotificationSocket =(data:EventType)=>{
+    const {companyId,consumerId,consumerImageUrl,consumerLastActive,consumerRole,consumerSpaces,consumerName} =data
+    const payload:EventType={
+      companyId,consumerId,consumerRole,consumerLastActive,consumerSpaces,consumerImageUrl,consumerName
+    }
+    notificationSocket.emit("user-connect",payload)
+  }
+
   const sendNotification = (roomId: string, message: string, type: string) => {
     const payload: Notification = {
       roomId,
@@ -58,6 +101,7 @@ export const NotificationSocketProvider = ({ children }: Props) => {
         sendNotification,
         clearNotification,
         notifications,
+        connectNotificationSocket
       }}
     >
       {children}

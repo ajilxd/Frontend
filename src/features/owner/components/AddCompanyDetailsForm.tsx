@@ -26,6 +26,7 @@ import { RootState } from "@/redux/store/appStore";
 
 import { ownerAddCompanyDetails } from "../api/owner.api";
 import companyDetailsSchema from "../validation/owner.validation";
+import { useQueryClient } from "@tanstack/react-query";
 
 interface Industry {
   value: string;
@@ -47,6 +48,7 @@ export function AddCompanyDetailsForm() {
   const [newIndustry, setNewIndustry] = useState("");
   const owner = useSelector((state: RootState) => state.owner);
   const { data: OwnerSubscription } = useOwnerSubscriptionQuery("" + owner._id);
+  const queryClient = useQueryClient()
 
   const formik = useFormik({
     initialValues: {
@@ -68,6 +70,7 @@ export function AddCompanyDetailsForm() {
         });
 
         formik.resetForm();
+        queryClient.invalidateQueries({queryKey:["owner", "company", owner._id]})
       } else {
         enqueueSnackbar(res.message, {
           variant: "error",

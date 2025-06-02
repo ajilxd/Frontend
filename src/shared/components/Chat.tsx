@@ -1,374 +1,263 @@
 import { UseQueryResult } from "@tanstack/react-query";
-import {
-  Mic,
-  MicOff,
-  Video,
-  VideoOff,
-  PhoneOff,
-  MoreHorizontal,
-  CircleX,
-} from "lucide-react";
-import { enqueueSnackbar } from "notistack";
-import React, { useState, useEffect, useRef } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { Menu, ChevronLeft } from "lucide-react";
+import { useState, useRef, useEffect, useMemo } from "react";
+import { useParams } from "react-router-dom";
 
+import { Button } from "@/components/ui/button";
 import {
-  managerEndMeeting,
-  managerLeaveMeeting,
-} from "@/features/manager/api/manager.api";
-import { userEndMeeting, userLeaveMeeting } from "@/features/user/api/user.api";
-import { MeetingType } from "@/types";
+  ChatBubble,
+  ChatBubbleMessage,
+  ChatBubbleAvatar,
+} from "@/components/ui/chat/chat-bubble";
+import { ChatMessageList } from "@/components/ui/chat/chat-message-list";
+import { MessageType, TypingDataType } from "@/context/SocketContext";
+import { useSocket } from "@/hooks/useSocket";
+import { ChatType, SpaceType } from "@/types";
 
-import { usePeerSocket } from "../hooks/usePeerSocket";
-import { useTransport } from "../hooks/useTransport";
+import { ChatHeader } from "./ChatHeader";
+import { ChatInputComponent } from "./ChatInput";
+import { ChatSidebar as Sidebar } from "./ChatSidebar";
+
+type Participant = {
+  id: string;
+  name: string;
+  image?: string;
+  status: string;
+  lastSeen?: string;
+};
 
 type Props = {
+  useSpaceQuery: (
+    managerId: string,
+    spaceId: string
+  ) => UseQueryResult<SpaceType, Error>;
+  useChatQuery: (room: string) => UseQueryResult<ChatType[], Error>;
   user: {
     id: string;
     profile: { name?: string; image?: string };
     role: string;
   };
-  useMeetingsQuery: (spaceId: string) => UseQueryResult<MeetingType[], Error>;
 };
 
-type Participant = {
-  id: string;
-  name: string;
-  stream: MediaStream;
-  isUser: boolean;
-};
+// (Same imports…)
 
-const VideoCallConference: React.FC<Props> = ({ user, useMeetingsQuery }) => {
-  const {
-    sendTransport,
-    consumeFromPeer,
-    device,
-    recvTransport,
-    consumers,
-    updateConsumer,
-    recvTransportConnected,
-  } = useTransport();
-  const {
-    joinMeeting,
-    producersForConsuming,
-    leaveMeeting,
-    recentQuitter,
-    resetRecentQuitter,
-    newParticipant,
-  } = usePeerSocket();
-  const navigate = useNavigate();
-  const { spaceid } = useParams();
-
-  const [stream, setStream] = useState<MediaStream | null>(null);
+const Chat: React.FC<Props> = ({ useChatQuery, user, useSpaceQuery }) => {
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   const [participants, setParticipants] = useState<Participant[]>([]);
+  const [typingMessages, setTypingMessages] = useState<TypingDataType | null>(
+    null
+  );
+  const [messages, setMessages] = useState<MessageType[]>([]);
+  const [onlineUsers, setOnlineUsers] = useState<
+    { userId: string; lastSeen: string }[]
+  >([]);
 
-  const [audioProducer, setAudioProducer] = useState<any>(null);
-  const [videoProducer, setVideoProducer] = useState<any>(null);
-  const [audioEnabled, setAudioEnabled] = useState(true);
-  const [videoEnabled, setVideoEnabled] = useState(true);
+  const { spaceid } = useParams();
+  const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  const localVideoRef = useRef<HTMLVideoElement>(null);
-  const hasProducedRef = useRef(false);
-  const consumedIdsRef = useRef<Set<string>>(new Set());
-  const meetingId = localStorage.getItem("meetingId");
-  if (!meetingId) throw new Error("no meeting id found,try joining again");
-  if (!spaceid) throw new Error("NO space id found");
-  const { data: meetings, isSuccess } = useMeetingsQuery(spaceid);
-  let isHost = true;
-  if (isSuccess) {
-    const currentMeeting = meetings.filter(
-      (entry) => entry.meetingId === meetingId
-    )[0];
-    if (currentMeeting && user.id !== currentMeeting?.hostId) {
-      isHost = false;
-    }
-  }
+  const { data: chats, isSuccess } = useChatQuery(spaceid!);
+  const { data: space } = useSpaceQuery(user.id, spaceid!);
+
+  const {
+    connected,
+    joinRoom,
+    receiveMessage,
+    activeUsers,
+    getTyping,
+    getStopTyping,
+  } = useSocket();
 
   useEffect(() => {
-    const getMedia = async () => {
-      try {
-        const media = await navigator.mediaDevices.getUserMedia({
-          video: true,
-          audio: true,
-        });
-        setStream(media);
-        setParticipants([
-          {
-            id: user.id,
-            name: user.profile.name || "You",
-            stream: media,
-            isUser: true,
-          },
-        ]);
+    if (isSuccess) {
+      setMessages(chats);
+    }
+  }, [chats, isSuccess]);
 
-        if (localVideoRef.current) {
-          localVideoRef.current.srcObject = media;
-        }
-      } catch (err) {
-        console.error("getUserMedia failed:", err);
-        enqueueSnackbar("Failed to access camera/mic", { variant: "error" });
-      }
-    };
+  useEffect(() => {
+    if (!connected || !spaceid) return;
 
-    getMedia();
+    joinRoom({ room: spaceid, userId: user.id });
+
+    const unsubscribe = receiveMessage((msg: MessageType) => {
+      setMessages((prev) => [...prev, msg]);
+    });
+
+    const cleanupOnline = activeUsers((data) => {
+      setOnlineUsers(data);
+    });
 
     return () => {
-      stream?.getTracks().forEach((t) => t.stop());
+      unsubscribe();
+      cleanupOnline();
     };
-  }, [user]);
+  }, [connected, spaceid, joinRoom, receiveMessage, activeUsers, user.id]);
 
   useEffect(() => {
-    if (localVideoRef.current && stream) {
-      localVideoRef.current.srcObject = stream;
-    }
-  }, [stream]);
+    if (!space) return;
 
-  useEffect(() => {
-    const produceTracks = async () => {
-      if (!stream || !sendTransport || hasProducedRef.current) return;
-      hasProducedRef.current = true;
+    const members = space.team?.members || [];
+    const managers = space.managers || [];
 
-      try {
-        const [audioTrack] = stream.getAudioTracks();
-        const [videoTrack] = stream.getVideoTracks();
-
-        if (videoTrack && !videoProducer) {
-          const vp = await sendTransport.produce({ track: videoTrack });
-          setVideoProducer(vp);
-        }
-        if (audioTrack && !audioProducer) {
-          const ap = await sendTransport.produce({ track: audioTrack });
-          setAudioProducer(ap);
-        }
-
-        if (!sendTransport) {
-          enqueueSnackbar("Meeting ID not found or transport missing", {
-            variant: "error",
-          });
-          throw new Error("no mid or sendTranport found");
-        }
-
-        const join = async () => {
-          await joinMeeting(user.id, meetingId);
-        };
-        join();
-      } catch (err) {
-        console.error("Failed to produce tracks:", err);
-        enqueueSnackbar("Error producing media", { variant: "error" });
-      }
-    };
-
-    produceTracks();
-  }, [stream, sendTransport, audioProducer, videoProducer]);
-
-  useEffect(() => {
-    console.log("hey im the consumer inititater");
-    const consume = async () => {
-      if (!device?.rtpCapabilities || !recvTransport) return;
-
-      try {
-        const others = producersForConsuming.filter(
-          (p) => p.userId !== user.id && !consumedIdsRef.current.has(p.userId)
+    const participantArray: Participant[] = [
+      ...members.map((member) => {
+        const isOnline = onlineUsers.some(
+          (u) => u.userId === member.userId || member.userId === user.id
         );
+        const lastSeen = onlineUsers.find(
+          (u) => u.userId === member.userId
+        )?.lastSeen;
+        return {
+          id: member.userId,
+          name: member.memberName,
+          image: member.image,
+          status: isOnline ? "online" : "offline",
+          lastSeen,
+        };
+      }),
+      ...managers.map((manager) => {
+        const isOnline = onlineUsers.some(
+          (u) => u.userId === manager.managerId || manager.managerId === user.id
+        );
+        const lastSeen = onlineUsers.find(
+          (u) => u.userId === manager.managerId
+        )?.lastSeen;
+        return {
+          id: manager.managerId,
+          name: manager.managerName ?? "manager",
+          image: manager.managerImage,
+          status: isOnline ? "online" : "offline",
+          lastSeen,
+        };
+      }),
+    ];
 
-        for (const p of others) {
-          const peerStream = await consumeFromPeer(
-            p.id,
-            device.rtpCapabilities,
-            user.id,
-            meetingId
-          );
-
-          if (peerStream) {
-            setParticipants((prev) =>
-              prev.some((x) => x.id === p.userId)
-                ? prev
-                : [
-                    ...prev,
-                    {
-                      id: p.userId,
-                      name: "Guest",
-                      stream: peerStream,
-                      isUser: false,
-                    },
-                  ]
-            );
-            consumedIdsRef.current.add(p.userId);
-          }
-        }
-      } catch (err) {
-        console.error("Error consuming remote stream:", err);
-      }
-    };
-
-    consume();
-  }, [
-    device?.rtpCapabilities,
-    recvTransport,
-    meetingId,
-    producersForConsuming,
-    user.id,
-    consumeFromPeer,
-    newParticipant,
-    recvTransportConnected,
-    consumers,
-  ]);
+    setParticipants(participantArray);
+  }, [space, onlineUsers, user.id]);
 
   useEffect(() => {
-    const userId = recentQuitter?.userId;
-    if (!userId) return;
-    setParticipants((prev) => prev.filter((entry) => entry.id !== userId));
-    for (const consumer of consumers) {
-      if (consumer.appData.userId === userId) {
-        consumer.close();
-      }
-    }
-    const newConsumer = consumers.filter(
-      (consumer) => consumer.appData.userId !== userId
-    );
-    updateConsumer(newConsumer);
-    resetRecentQuitter();
-  }, [recentQuitter]);
-
-  const toggleAudio = () => {
-    if (!stream) return;
-    const enabled = !audioEnabled;
-    stream.getAudioTracks().forEach((track) => (track.enabled = enabled));
-    audioProducer?.[enabled ? "resume" : "pause"]();
-    setAudioEnabled(enabled);
-  };
-
-  const toggleVideo = () => {
-    if (!stream) return;
-    const enabled = !videoEnabled;
-    stream.getVideoTracks().forEach((track) => (track.enabled = enabled));
-    videoProducer?.[enabled ? "resume" : "pause"]();
-    setVideoEnabled(enabled);
-  };
-
-  const endCall = () => {
-    stream?.getTracks().forEach((track) => track.stop());
-    audioProducer?.close();
-    videoProducer?.close();
-    setStream(null);
-    setAudioProducer(null);
-    setVideoProducer(null);
-  };
-
-  const handleEndCall = async () => {
-    if (!meetingId) return;
-    endCall();
-
-    const api = user.role === "user" ? userEndMeeting : managerEndMeeting;
-    const res = await api({
-      meetingId,
-      role: user.role,
-      hostId: user.id,
-      spaceId: spaceid!,
+    const unsubscribe = getTyping((data) => {
+      const result = data.map((i) => {
+        const sender = participants.find((p) => p.id === i.userId);
+        return sender
+          ? {
+              ...i,
+              senderName: sender.name,
+              senderImageUrl: sender.image,
+            }
+          : i;
+      });
+      setTypingMessages(result);
     });
 
-    if (res?.success) {
-      enqueueSnackbar("Meeting ended", { variant: "success" });
-
-      const path =
-        user.role === "user"
-          ? `/user/dashboard/spaces/${spaceid}/meeting`
-          : `/manager/dashboard/spaces/${spaceid}/meeting`;
-      setTimeout(() => navigate(path), 1500);
-    }
-  };
-
-  const handleLeaveMeeting = async () => {
-    if (!meetingId || !spaceid) return;
-    const api = user.role === "user" ? userLeaveMeeting : managerLeaveMeeting;
-    const res = await api({
-      meetingId,
-      role: user.role,
-      spaceId: spaceid,
-      userId: user.id,
-      name: user.profile.name!,
+    const unsubscribeStopTyping = getStopTyping((data) => {
+      console.log("from stop typing", data);
+      const result = data.map((i) => {
+        const sender = participants.find((p) => p.id === i.userId);
+        return sender
+          ? {
+              ...i,
+              senderName: sender.name,
+              senderImageUrl: sender.image,
+            }
+          : i;
+      });
+      setTypingMessages(result);
     });
-    if (res.success) {
-      leaveMeeting(user.id, meetingId, user.profile.name ?? "participant");
-      endCall();
-      const path =
-        user.role === "user"
-          ? `/user/dashboard/spaces/${spaceid}/meeting`
-          : `/manager/dashboard/spaces/${spaceid}/meeting`;
 
-      setTimeout(() => navigate(path), 1500);
-    }
-  };
+    return () => {
+      unsubscribe();
+      unsubscribeStopTyping();
+    };
+  }, [getTyping, participants, getStopTyping]);
+
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages]);
+
+  const currentChat = useMemo(() => {
+    if (!space || !spaceid) return null;
+    return {
+      id: spaceid,
+      name: space.name,
+      participants: participants.length,
+    };
+  }, [space, spaceid, participants]);
 
   return (
-    <div className="flex flex-col h-screen bg-gray-900 text-white">
-      <div className="flex-1 p-4 overflow-hidden">
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-4 h-full">
-          {participants.map((p) => (
-            <video
-              key={p.id}
-              ref={(el) => {
-                if (!el) return;
-                if (p.isUser) {
-                  localVideoRef.current = el;
-                  if (stream && el.srcObject !== stream) el.srcObject = stream;
-                } else {
-                  if (el.srcObject !== p.stream) el.srcObject = p.stream;
-                }
-              }}
-              autoPlay
-              muted={p.isUser}
-              playsInline
-              className="w-full h-full object-cover rounded-lg"
-            />
-          ))}
+    <div className="flex h-screen w-full mx-auto bg-background">
+      {sidebarOpen && (
+        <div className="w-96 shrink-0 border-r bg-background">
+          <Sidebar participants={participants} currentChat={currentChat} />
         </div>
-      </div>
+      )}
 
-      {/* Controls */}
-      <div className="bg-gray-800 px-4 py-3">
-        <div className="flex justify-center items-center space-x-4">
-          <button
-            onClick={toggleAudio}
-            className={`rounded-full p-3 ${
-              audioEnabled
-                ? "bg-gray-700 hover:bg-gray-600"
-                : "bg-red-600 hover:bg-red-700"
-            }`}
+      <div className="flex flex-col flex-1 h-full">
+        <div className="flex items-center px-4 py-2">
+          <Button
+            variant="ghost"
+            size="icon"
+            className="mr-2"
+            onClick={() => setSidebarOpen(!sidebarOpen)}
           >
-            {audioEnabled ? <Mic size={24} /> : <MicOff size={24} />}
-          </button>
-          <button
-            onClick={toggleVideo}
-            className={`rounded-full p-3 ${
-              videoEnabled
-                ? "bg-gray-700 hover:bg-gray-600"
-                : "bg-red-600 hover:bg-red-700"
-            }`}
-          >
-            {videoEnabled ? <Video size={24} /> : <VideoOff size={24} />}
-          </button>
-          <button
-            className="rounded-full p-3 bg-gray-700 hover:bg-gray-600"
-            onClick={handleLeaveMeeting}
-          >
-            <CircleX size={24} />
-          </button>
-          {isHost && (
-            <button
-              onClick={handleEndCall}
-              className="rounded-full p-3 bg-red-600 hover:bg-red-700"
-            >
-              <PhoneOff size={24} />
-            </button>
-          )}
-          <button className="rounded-full p-3 bg-gray-700 hover:bg-gray-600">
-            <MoreHorizontal size={24} />
-          </button>
+            {sidebarOpen ? (
+              <ChevronLeft className="h-5 w-5" />
+            ) : (
+              <Menu className="h-5 w-5" />
+            )}
+          </Button>
+          <div className="flex-1">
+            <ChatHeader name={currentChat?.name ?? "Chat"} />
+          </div>
+        </div>
+
+        <div className="flex-1 overflow-y-auto px-4 py-2">
+          <ChatMessageList>
+            {messages.map((message, index) => {
+              const isUser = message.senderId === user.id;
+              const avatarImage = isUser
+                ? user.profile.image
+                : message.senderImageUrl;
+              const variant = isUser ? "sent" : "received";
+              return (
+                <ChatBubble
+                  key={message.id ?? index}
+                  variant={variant}
+                  className="mb-4 last:mb-0"
+                >
+                  <div className="flex items-start">
+                    <ChatBubbleAvatar
+                      fallback={
+                        avatarImage
+                          ? ""
+                          : message.senderName?.slice(0, 2) ?? "??"
+                      }
+                      src={avatarImage}
+                    />
+                    <div className="flex flex-col ml-2 flex-1">
+                      <ChatBubbleMessage>{message.content}</ChatBubbleMessage>
+                    </div>
+                  </div>
+                </ChatBubble>
+              );
+            })}
+            {typingMessages?.map((i, index) => (
+              <ChatBubble>
+                <ChatBubbleAvatar
+                  fallback={i.senderImageUrl ?? i.senderName.slice(0, 2)}
+                ></ChatBubbleAvatar>
+                <ChatBubbleMessage isLoading={true} key={"typing" + index} />
+              </ChatBubble>
+            ))}
+            <div ref={messagesEndRef} />
+          </ChatMessageList>
+        </div>
+
+        <div className="px-4 py-2 border-t">
+          <ChatInputComponent user={user} chatsLength={chats?.length} />
         </div>
       </div>
     </div>
   );
 };
 
-export default VideoCallConference;
+export default Chat;
