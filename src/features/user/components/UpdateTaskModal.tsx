@@ -45,11 +45,11 @@ export function UpdateTaskModal({
     const response = await userUpdateTaskStatus(task._id, "status", { status });
     if (response.success) {
       enqueueSnackbar("Task updated successfully", { variant: "success" });
-      sendNotification(
-        spaceid!,
-        user.profile.name + " updated an task",
-        "info"
-      );
+      if(!user.company.id||!spaceid){
+        return console.warn("failed finding space id and company id")
+      }
+      const message =  user.profile.name + " updated an task";
+      sendNotification(user.company.id,spaceid,message,"info",true,user.id)
       queryClient.invalidateQueries({ queryKey: ["user", "tasks", spaceid] });
       queryClient.invalidateQueries({ queryKey: ["user", "tasks", user.id] });
     } else {

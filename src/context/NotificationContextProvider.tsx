@@ -8,13 +8,7 @@ type Props = {
   children: React.ReactNode;
 };
 
-type Notification = {
-  roomId?: string;
-  message: string;
-  from?: string;
-  timestamp?: string;
-  type: string;
-};
+
 
 type TaskType = {
   id: string;
@@ -30,12 +24,14 @@ type TaskType = {
 
 
 export type EventType ={
-  companyId:string;
+  companyId?:string;
+  companyName?:string;
   consumerId?:string;
   consumerName?:string;
   consumerImageUrl?:string;
   consumerRole?:string;
   consumerLastActive?:string;
+  consumerOwnerName?:string;
   consumerSpaces?:string[];
   targetSpaceId?:string;
   targetSpaceName?:string;
@@ -48,20 +44,23 @@ export type EventType ={
   task?:TaskType;
   notificationContent?:string
   notificationType?:"warning"|"info"|"alert";
-  storeNotificationOnDb?:boolean
+  notificationTimeStamp?:string;
+  storeNotificationOnDb?:boolean;
+  notificationSenderId?:string;
 }
 
 export const NotificationSocketProvider = ({ children }: Props) => {
-  const [notifications, setNotifications] = useState<Notification[]>([
+  const [notifications, setNotifications] = useState<EventType[]>([
     {
-      message: "Welcome user to Fluentawork",
-      type: "info",
-      timestamp: new Date().toLocaleString(),
+      notificationContent: "Welcome user to Fluentawork",
+      notificationType: "info",
+      notificationTimeStamp: new Date().toLocaleString(),
+      
     },
   ]);
 
   useEffect(() => {
-    const handleNotification = (data: Notification) => {
+    const handleNotification = (data: EventType) => {
       console.log("notification received ", data);
       setNotifications((prev) => [...prev, data]);
     };
@@ -74,25 +73,35 @@ export const NotificationSocketProvider = ({ children }: Props) => {
   }, []);
 
   const connectNotificationSocket =(data:EventType)=>{
-    const {companyId,consumerId,consumerImageUrl,consumerLastActive,consumerRole,consumerSpaces,consumerName} =data
+    const {companyId,consumerId,consumerImageUrl,consumerLastActive,consumerRole,consumerSpaces,consumerName,companyName} =data
+    console.log('data for socket connection notification',data)
     const payload:EventType={
-      companyId,consumerId,consumerRole,consumerLastActive,consumerSpaces,consumerImageUrl,consumerName
+      companyId,consumerId,consumerRole,consumerLastActive,consumerSpaces,consumerImageUrl,consumerName,companyName
     }
     notificationSocket.emit("user-connect",payload)
   }
 
-  const sendNotification = (roomId: string, message: string, type: string) => {
-    const payload: Notification = {
-      roomId,
-      message,
-      type,
-      timestamp: new Date().toISOString(),
+  const sendNotification = (companyId:string,targetSpaceId: string, notificationContent: string, notificationType: "warning" | "info" | "alert" ,storeNotificationOnDb:boolean,notificationSenderId:string) => {
+    const payload: EventType = {
+      companyId,
+      targetSpaceId,
+      notificationContent,
+      notificationType,
+      notificationTimeStamp: new Date().toISOString(),
+      storeNotificationOnDb,
+      notificationSenderId
     };
 
-    notificationSocket.emit("notification", { roomId, ...payload });
+    notificationSocket.emit("notification", payload );
   };
 
   const clearNotification = () => setNotifications([]);
+
+  const updateNotifications =(data:EventType[])=>{
+    if(data){
+      setNotifications(data)
+    }
+  }
 
   return (
     <NotificationContext.Provider
@@ -101,7 +110,8 @@ export const NotificationSocketProvider = ({ children }: Props) => {
         sendNotification,
         clearNotification,
         notifications,
-        connectNotificationSocket
+        connectNotificationSocket,
+        updateNotifications
       }}
     >
       {children}

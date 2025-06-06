@@ -6,9 +6,45 @@ import {
 } from "@/components/ui/dropdown-menu";
 
 import { useNotification } from "../hooks/useNotification";
+import { useSelector } from "react-redux";
+import { RootState } from "@/redux/store/appStore";
+import { useEffect } from "react";
+import { managerFetchNotifications } from "@/features/manager/api/manager.api";
+import { userFetchNotifications } from "@/features/user/api/user.api";
 
-export const NotificationComponent = function () {
-  const { notifications, clearNotification } = useNotification();
+export const NotificationComponent = function ({role}:{role:string}) {
+  console.log("hey im notif")
+  const { notifications, clearNotification ,updateNotifications} = useNotification();
+  const manager =useSelector((state:RootState)=>state.manager);
+  const user = useSelector((state:RootState)=>state.user)
+
+useEffect(()=>{
+  console.log("inside notification component")
+if(role =="manager"){
+  async function fetchNotification(){
+ const res =await managerFetchNotifications(manager.company.id,manager.id);
+ if(res.success){
+  console.log(res.data)
+    updateNotifications(res.data)
+ }else{}
+    console.warn("failed to fetch notifications")
+  }
+  fetchNotification()
+}else if(role=="user"){
+    async function fetchNotification(){
+ const res =await userFetchNotifications(user.company.id!,user.id);
+ if(res.success){
+  console.log(res.data)
+    updateNotifications(res.data)
+ }else{}
+    console.warn("failed to fetch notifications")
+  }
+  fetchNotification()
+}
+},[])
+
+
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -22,9 +58,9 @@ export const NotificationComponent = function () {
               <div className="mb-4 grid grid-cols-[25px_1fr] items-start pb-4 last:mb-0 last:pb-0">
                 <span className="flex h-2 w-2 translate-y-1.5 rounded-full bg-blue-500" />
                 <div className="grid gap-1">
-                  <p className="text-sm font-medium">{i.message}</p>
+                  <p className="text-sm font-medium">{i.notificationContent}</p>
                   <p className="text-sm text-gray-500 dark:text-gray-400">
-                    {i.timestamp}
+                    {i.notificationTimeStamp}
                   </p>
                 </div>
               </div>

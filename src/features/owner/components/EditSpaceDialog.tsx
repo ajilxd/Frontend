@@ -51,17 +51,15 @@ export const EditSpaceDialog: FC<EditSpaceDialogProps> = ({
     isError: isSpaceError,
     error: spaceError,
   } = useOwnerSpaceBySpaceIdQuery(spaceId);
-  console.log({ managers, space });
 
-  const ManagerIds = space?.managers?.map(
-    (item) => item.managerId && item?.managerId
-  );
+  const ManagerIds = space?.managers?.map((item) => item.managerId);
+
   const initialValues = {
     name: space?.name ?? "",
-    description: space?.description || "",
-    visibility: space?.visibility || "public",
-    status: space?.status || "active",
-    managers: ManagerIds,
+    description: space?.description ?? "",
+    visibility: space?.visibility ?? "public",
+    status: space?.status ?? "active",
+    managers: ManagerIds ?? [],
   };
 
   return (
@@ -70,50 +68,33 @@ export const EditSpaceDialog: FC<EditSpaceDialogProps> = ({
         <DialogHeader>
           <DialogTitle>Edit Space</DialogTitle>
         </DialogHeader>
-        {spaceError?.message}
+        {isSpaceError && <p className="text-red-500">{spaceError?.message}</p>}
         {!isSpaceError && space && (
           <Formik
             enableReinitialize
             initialValues={initialValues}
             validationSchema={editSpaceValidationSchema}
             onSubmit={async (values) => {
-              console.log("Submitting space data for:", spaceId, values);
-              const validManagers = values.managers?.map((item) => {
-                return {
-                  managerId: item,
-                };
-              });
-              const response = await ownerUpdateSpace("" + owner._id, spaceId, {
+              const validManagers = values.managers.map((id) => ({ managerId: id }));
+              const response = await ownerUpdateSpace(String(owner._id), spaceId, {
                 ...values,
                 managers: validManagers,
               });
+
               if (response.success) {
-                enqueueSnackbar("Space updated succesfully", {
-                  variant: "success",
-                });
+                enqueueSnackbar("Space updated successfully", { variant: "success" });
               } else {
-                enqueueSnackbar("something went wrong ,try again", {
-                  variant: "error",
-                });
+                enqueueSnackbar("Something went wrong, try again", { variant: "error" });
                 console.warn(response.message);
               }
+
               closeHandler();
             }}
           >
-            {({
-              values,
-              handleChange,
-              setFieldValue,
-              errors,
-              touched,
-              isSubmitting,
-            }) => (
+            {({ values, handleChange, setFieldValue, errors, touched, isSubmitting }) => (
               <Form className="grid gap-4 py-4">
-                {/* Name */}
                 <div className="grid grid-cols-4 items-center gap-4">
-                  <Label htmlFor="name" className="text-right">
-                    Name
-                  </Label>
+                  <Label htmlFor="name" className="text-right">Name</Label>
                   <Input
                     id="name"
                     name="name"
@@ -122,17 +103,12 @@ export const EditSpaceDialog: FC<EditSpaceDialogProps> = ({
                     className="col-span-3"
                   />
                   {touched.name && errors.name && (
-                    <p className="col-start-2 col-span-3 text-sm text-red-500">
-                      {errors.name}
-                    </p>
+                    <p className="col-start-2 col-span-3 text-sm text-red-500">{errors.name}</p>
                   )}
                 </div>
 
-                {/* Description */}
                 <div className="grid grid-cols-4 items-center gap-4">
-                  <Label htmlFor="description" className="text-right">
-                    Description
-                  </Label>
+                  <Label htmlFor="description" className="text-right">Description</Label>
                   <Input
                     id="description"
                     name="description"
@@ -142,11 +118,8 @@ export const EditSpaceDialog: FC<EditSpaceDialogProps> = ({
                   />
                 </div>
 
-                {/* Visibility */}
                 <div className="grid grid-cols-4 items-center gap-4">
-                  <Label htmlFor="visibility" className="text-right">
-                    Visibility
-                  </Label>
+                  <Label htmlFor="visibility" className="text-right">Visibility</Label>
                   <Select
                     value={values.visibility}
                     onValueChange={(val) => setFieldValue("visibility", val)}
@@ -161,11 +134,8 @@ export const EditSpaceDialog: FC<EditSpaceDialogProps> = ({
                   </Select>
                 </div>
 
-                {/* Status */}
                 <div className="grid grid-cols-4 items-center gap-4">
-                  <Label htmlFor="status" className="text-right">
-                    Status
-                  </Label>
+                  <Label htmlFor="status" className="text-right">Status</Label>
                   <Select
                     value={values.status}
                     onValueChange={(val) => setFieldValue("status", val)}
@@ -180,7 +150,6 @@ export const EditSpaceDialog: FC<EditSpaceDialogProps> = ({
                   </Select>
                 </div>
 
-                {/* Managers */}
                 <div className="grid grid-cols-4 items-center gap-4">
                   <Label className="text-right">Manager</Label>
                   {hasLoadingManagerError ? (
@@ -190,11 +159,8 @@ export const EditSpaceDialog: FC<EditSpaceDialogProps> = ({
                   ) : (
                     <Select
                       onValueChange={(managerId) => {
-                        if (values.managers) {
-                          setFieldValue("managers", [
-                            ...values.managers,
-                            managerId,
-                          ]);
+                        if (!values.managers.includes(managerId)) {
+                          setFieldValue("managers", [...values.managers, managerId]);
                         }
                       }}
                     >
@@ -206,10 +172,7 @@ export const EditSpaceDialog: FC<EditSpaceDialogProps> = ({
                           <SelectItem
                             key={manager._id}
                             value={manager._id}
-                            disabled={
-                              values.managers &&
-                              values.managers.includes(manager._id)
-                            }
+                            disabled={values.managers.includes(manager._id)}
                           >
                             {manager.name}
                           </SelectItem>
@@ -224,29 +187,25 @@ export const EditSpaceDialog: FC<EditSpaceDialogProps> = ({
                   )}
                 </div>
 
-                {/* Selected Managers Display */}
                 <div className="grid grid-cols-4 items-center gap-4">
                   <div></div>
                   <div className="col-span-3 flex flex-wrap gap-2">
-                    {managers?.map((manager) => {
+                    {values.managers.map((id) => {
+                      const manager = managers?.find((m) => m._id === id);
+                      if (!manager) return null;
                       return (
                         <div
                           key={manager._id}
                           className="bg-gray-100 rounded-md px-2 py-1 flex items-center"
                         >
-                          <span className="dark:text-slate-900">
-                            {manager.name}
-                          </span>
+                          <span className="dark:text-slate-900">{manager.name}</span>
                           <button
                             type="button"
                             className="ml-2 text-gray-500 hover:text-red-500"
                             onClick={() =>
                               setFieldValue(
                                 "managers",
-                                values.managers &&
-                                  values.managers.filter(
-                                    (id) => id !== manager._id
-                                  )
+                                values.managers.filter((mId) => mId !=manager._id)
                               )
                             }
                           >
@@ -258,7 +217,6 @@ export const EditSpaceDialog: FC<EditSpaceDialogProps> = ({
                   </div>
                 </div>
 
-                {/* Submit */}
                 <DialogFooter className="mt-4">
                   <Button type="submit" disabled={isSubmitting}>
                     Save Changes

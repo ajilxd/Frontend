@@ -8,5 +8,4 @@ export const userDocumentsQueryOptions = (
 ): UseQueryOptions<DocType[], Error> => ({
   queryKey: ["user", "documents", spaceId],
   queryFn: () => userGetDocuments(spaceId),
-  staleTime: 10 * 60 * 1000,
 });

@@ -39,7 +39,7 @@ type Props = {
   };
 };
 
-// (Same imports…)
+
 
 const Chat: React.FC<Props> = ({ useChatQuery, user, useSpaceQuery }) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -240,10 +240,10 @@ const Chat: React.FC<Props> = ({ useChatQuery, user, useSpaceQuery }) => {
                 </ChatBubble>
               );
             })}
-            {typingMessages?.map((i, index) => (
+            {typingMessages?.filter(i=>i.userId!=user.id).map((i, index) => (
               <ChatBubble>
                 <ChatBubbleAvatar
-                  fallback={i.senderImageUrl ?? i.senderName.slice(0, 2)}
+                  fallback={i.senderImageUrl || i.senderName.slice(0, 2)}
                 ></ChatBubbleAvatar>
                 <ChatBubbleMessage isLoading={true} key={"typing" + index} />
               </ChatBubble>

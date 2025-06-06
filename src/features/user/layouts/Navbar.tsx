@@ -42,7 +42,7 @@ export const Navbar: React.FC<NavbarPropsType> = ({
             <Moon className="h-5 w-5" />
           )}
         </Button>
-        <NotificationComponent />
+        <NotificationComponent role="user"/>
       </div>
     </>
   );

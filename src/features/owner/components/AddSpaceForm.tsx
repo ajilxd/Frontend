@@ -1,5 +1,4 @@
 import { useQueryClient } from "@tanstack/react-query";
-import axios from "axios";
 import { Formik, Form, Field, ErrorMessage, FormikHelpers } from "formik";
 import { X } from "lucide-react";
 import { enqueueSnackbar } from "notistack";
@@ -66,13 +65,6 @@ export const AddSpaceForm: React.FC<Prop> = ({ ownerId }) => {
   const { company } = useContext(OwnerContext);
   const { data: managers } = useManagersQuery(ownerId);
 
-  // if (isError) {
-  //   if (axios.isAxiosError(error)) {
-  //     setLoadingManagerError(error?.response?.data?.message);
-  //   } else {
-  //     setLoadingManagerError(error.message);
-  //   }
-  // }
 
   const handleTagInput = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter" && tagInput.trim() !== "") {

@@ -35,13 +35,10 @@ export default function DocumentApp() {
 
   const { data: docs = [], refetch } = useUserDocumentsQuery(spaceid);
 
-  const [documents, setDocuments] = useState<Partial<DocType>[]>([]);
+
   const [selectedDoc, setSelectedDoc] = useState<Partial<DocType> | null>(null);
   const [activeDocId, setActiveDocId] = useState<string | null>(null);
 
-  useEffect(() => {
-    setDocuments(docs);
-  }, []);
 
   const handleSelectDocument = (doc: Partial<DocType>) => {
     setSelectedDoc(doc);
@@ -51,33 +48,24 @@ export default function DocumentApp() {
   const handleContentChange = (newContent: string) => {
     if (!selectedDoc) return;
     const updatedDoc = { ...selectedDoc, content: newContent };
-    const updatedDocs = documents.map((doc) =>
-      doc._id === selectedDoc._id ? updatedDoc : doc
-    );
-    setDocuments(updatedDocs);
     setSelectedDoc(updatedDoc);
   };
 
   const handleTitleChange = (newTitle: string) => {
     if (!selectedDoc) return;
     const updatedDoc = { ...selectedDoc, title: newTitle };
-    const updatedDocs = documents.map((doc) =>
-      doc._id === selectedDoc._id ? updatedDoc : doc
-    );
-    setDocuments(updatedDocs);
     setSelectedDoc(updatedDoc);
   };
 
   const handleCreateDocument = () => {
     const newDoc: Partial<DocType> = {
-      title: `New Document ${documents.length + 1}`,
+      title: `New Document ${docs.length + 1}`,
       content: "<h1>New Document</h1><p>Start writing here...</p>",
       createdAt: new Date(),
       author: user.id,
     };
-    setDocuments([newDoc, ...documents]);
     setSelectedDoc(newDoc);
-    setActiveDocId(null); // no _id yet
+    setActiveDocId(null); 
   };
 
   const handleSubmit = async () => {
@@ -130,7 +118,7 @@ export default function DocumentApp() {
         </div>
 
         <div className="flex-1 overflow-y-auto p-3">
-          {documents.map((doc) => (
+          {docs.map((doc) => (
             <DocumentItem
               key={doc._id ?? doc.title}
               doc={doc}

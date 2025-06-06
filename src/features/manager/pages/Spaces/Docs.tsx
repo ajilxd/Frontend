@@ -1,11 +1,10 @@
 import { FilePlus, Edit2 } from "lucide-react";
 import { enqueueSnackbar } from "notistack";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
 
 import { Button } from "@/components/ui/button";
-import { useUserDocumentsQuery } from "@/queries/users/documents/useUserDocumentsQuery";
 import { RootState } from "@/redux/store/appStore";
 import { DocumentItem } from "@/shared/components/DocumentItem";
 import { EmptyDocState } from "@/shared/components/EmptyDocState";
@@ -16,6 +15,7 @@ import {
   managerCreateDocument,
   managerUpdateDocument,
 } from "../../api/manager.api";
+import { useManagerDocumentsQuery } from "@/queries/managers/documents/useUserDocumentsQuery";
 
 const formatDate = (date: Date | string) => {
   const parsedDate = new Date(date);
@@ -36,15 +36,13 @@ export default function DocumentApp() {
     throw new Error("Something went wrong. Try logging in again.");
   }
 
-  const { data: docs = [], refetch } = useUserDocumentsQuery(spaceid);
-
-  const [documents, setDocuments] = useState<Partial<DocType>[]>([]);
+  const { data: docs = [], refetch } = useManagerDocumentsQuery(spaceid);
   const [selectedDoc, setSelectedDoc] = useState<Partial<DocType> | null>(null);
   const [activeDocId, setActiveDocId] = useState<string | null>(null);
 
-  useEffect(() => {
-    setDocuments(docs);
-  }, []);
+
+  console.log(docs)
+
 
   const handleSelectDocument = (doc: Partial<DocType>) => {
     setSelectedDoc(doc);
@@ -54,21 +52,14 @@ export default function DocumentApp() {
   const handleContentChange = (newContent: string) => {
     if (!selectedDoc) return;
     const updatedDoc = { ...selectedDoc, content: newContent };
-    const updatedDocs = documents.map((doc) =>
-      doc._id === selectedDoc._id ? updatedDoc : doc
-    );
-    setDocuments(updatedDocs);
+  
     setSelectedDoc(updatedDoc);
   };
 
   const handleTitleChange = (newTitle: string) => {
     if (!selectedDoc) return;
     const updatedDoc = { ...selectedDoc, title: newTitle };
-    const updatedDocs = documents.map((doc) =>
-      doc._id === selectedDoc._id ? updatedDoc : doc
-    );
 
-    setDocuments(updatedDocs);
     setSelectedDoc(updatedDoc);
   };
 
@@ -79,12 +70,13 @@ export default function DocumentApp() {
       createdAt: new Date(),
       author: manager.id,
     };
-    setDocuments([newDoc, ...documents]);
+
     setSelectedDoc(newDoc);
     setActiveDocId(null); // no _id yet
   };
 
   const handleSubmit = async () => {
+    console.log(selectedDoc)
     if (!selectedDoc?.title) {
       enqueueSnackbar("Title is required.", { variant: "warning" });
       return;
@@ -134,7 +126,7 @@ export default function DocumentApp() {
         </div>
 
         <div className="flex-1 overflow-y-auto p-3">
-          {documents.map((doc) => (
+          {docs.map((doc) => (
             <DocumentItem
               key={doc._id ?? doc.title}
               doc={doc}

@@ -9,6 +9,7 @@ type Profile = {
 
 type Company = {
   name?: string;
+  id?:string
 };
 
 type Owner = {
@@ -59,7 +60,7 @@ const initialState: UserState = {
     ownerSubscribedPlan: "",
     name: "",
   },
-  company: { name: "" },
+  company: { name:"",id:""},
   stats: undefined,
   id: "",
   manager: {
@@ -84,7 +85,7 @@ const userSlice = createSlice({
         data: {
           ownerName: string;
           ownerId: string;
-          company: string;
+          companyName: string;
           id: string;
           managerImage: string;
           managerName: string;
@@ -93,6 +94,7 @@ const userSlice = createSlice({
           name: string;
           image: string;
           email: string;
+          companyId:string;
         };
       }>
     ) {
@@ -100,7 +102,8 @@ const userSlice = createSlice({
       state.accessToken = action.payload.accessToken;
       state.loading = false;
       state.error = null;
-      state.company.name = action.payload.data.company ?? "";
+      state.company.name = action.payload.data.companyName;
+      state.company.id=action.payload.data.companyId;
       state.id = action.payload.data.id;
       state.manager.name = action.payload.data.managerName;
       state.manager.image = action.payload.data.managerImage ?? "";
@@ -113,11 +116,10 @@ const userSlice = createSlice({
       state.profile.email = action.payload.data.email;
     },
     userLogOutSuccess(state) {
-      state.isAuthenticated = true;
+      state.isAuthenticated = false;
       state.accessToken = "";
       state.loading = false;
       state.error = null;
-      state.company.name = "";
       state.id = "";
       state.manager.name = "";
       state.manager.image = "";

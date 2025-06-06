@@ -19,6 +19,8 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { UserType } from "@/types";
+import { managerSpaceMemberStatusUpdate } from "../api/manager.api";
+import { enqueueSnackbar } from "notistack";
 
 type Props = {
   members: UserType[];
@@ -35,6 +37,18 @@ export function MembersTable({
 }: Props) {
   const { spaceid } = useParams();
   console.log(selectedMembers);
+  const handleremoveMember =async (data:any)=>{
+    const {role:designation,_id:memberId,managerId} =data;
+    const statusUpdate ="true"
+    const payload ={designation,memberId,statusUpdate,spaceid,managerId};
+    console.log(payload)
+    const res = await managerSpaceMemberStatusUpdate(spaceid,managerId,memberId,{statusUpdate,designation})
+    if(res.success){
+      enqueueSnackbar("member updation was succesfull",{variant:"success"})
+    }else{
+      console.warn("something went wrong while updating member")
+    }
+  }
   return (
     <div className="rounded-md border border-gray-800 overflow-hidden">
       <Table>
@@ -139,7 +153,9 @@ export function MembersTable({
                     className="bg-gray-900 border-gray-800 text-gray-200"
                   >
                     <DropdownMenuItem className="text-red-500 hover:bg-gray-800 hover:text-red-500 cursor-pointer">
+                      <button onClick={()=>handleremoveMember(member)}>
                       Remove Member
+                      </button>
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>

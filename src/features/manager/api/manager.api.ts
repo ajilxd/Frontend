@@ -189,6 +189,22 @@ export const managerUpdateSpaceUsers = async (
   }
 };
 
+
+export const managerSpaceMemberStatusUpdate = async (spaceId:string,managerId:string,memberId:string,data:{designation:string,statusUpdate:boolean})=>{
+  try {
+    const response =await managerApi.put(`${baseUrl}/space/users`,{...data,spaceId,managerId,memberId})
+     if (response.status === 200) {
+      return {
+        success: true,
+        data: response.data.data,
+      };
+    }
+    throw new Error("unexpected response from server");
+  } catch (error) {
+    return catchResponse(error)
+  }
+}
+
 // #Task management
 
 export const managerAddTask = async (data: Partial<TaskType>) => {
@@ -429,3 +445,17 @@ export const managerLeaveMeeting = async (data: {
     return catchResponse(error);
   }
 };
+
+// notifications
+
+export const managerFetchNotifications =async (companyId:string,receiverId:string)=>{
+  try {
+    const res = await managerApi.get(`${baseUrl}/manager/notifications?companyId=${companyId}&receiverId=${receiverId}`)
+    if(res.status ===200 || res.status === 204){
+      return {success:true,data:res.data.data}
+    }
+    throw new Error("unexpected response from server")
+  } catch (error) {
+    return catchResponse(error)
+  }
+}

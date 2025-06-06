@@ -73,6 +73,7 @@ const Profile: React.FC<Props> = ({ role, id }) => {
     const filename = encodeURIComponent(file.name);
     const res = await fetch(`${baseUrl}/s3/presign?filename=${filename}`);
     const { url } = await res.json();
+    console.log(url)
 
     const uploadRes = await fetch(url, {
       method: "PUT",

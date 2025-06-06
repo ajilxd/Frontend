@@ -35,7 +35,7 @@ export const Navbar: React.FC<NavbarPropsType> = ({
           )}
         </Button>
 
-        <NotificationComponent />
+        <NotificationComponent role="manager" />
       </div>
     </>
   );

@@ -1,28 +1,15 @@
 import { enqueueSnackbar } from "notistack";
 import { useState, useEffect, useCallback } from "react";
 
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+
 import { PaginationComponent } from "@/shared/components/Pagination";
 
 import { adminFetchOwners, adminToggleOwnerStatus } from "../../api/admin.api";
 
-type OwnerType = {
-  _id: string;
-  createdAt: string;
-  email: string;
-  isBlocked: boolean;
-  isVerified: boolean;
-  name: string;
-  password?: string;
-  refreshToken: string;
-  stripe_customer_id: string;
-  updatedAt: string;
-  subscription?: {
-    planName?: string;
-    status?: string;
-    renewalDate?: string;
-    // Extend as needed
-  };
-};
+import { OwnerType } from "@/types";
+
+
 
 // Skeleton Loader Component
 const SkeletonRow = () => (
@@ -138,11 +125,11 @@ const OwnersTable = () => {
                           {owner.name}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
-                          <img
-                            src={`https://i.pravatar.cc/150?u=${owner._id}`}
-                            alt={`${owner.name}'s profile`}
-                            className="w-12 h-12 rounded-full object-cover"
-                          />
+                          <Avatar>
+        <AvatarImage src={owner.image} alt={owner.name} />
+        <AvatarFallback>{owner.name.slice(0,2)}</AvatarFallback>
+      </Avatar>
+     
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
                           {owner.email}
@@ -151,7 +138,7 @@ const OwnersTable = () => {
                           {new Date(owner.createdAt).toLocaleDateString()}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
-                          {owner.subscription?.planName ?? "No Plan"}
+                          {owner.subscription?.name ?? "No Plan"}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm">
                           <span

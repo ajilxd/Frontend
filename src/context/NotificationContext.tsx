@@ -2,18 +2,14 @@ import { createContext } from "react";
 import { Socket } from "socket.io-client";
 import { EventType } from "./NotificationContextProvider";
 
-type Notification = {
-  message: string;
-  from?: string;
-  timestamp?: string;
-};
 
 type NotificationSocketContextType = {
   notificationSocket: Socket;
   connectNotificationSocket: (data: EventType) => void
-  sendNotification: (roomId: string, message: string, type: string) => void;
+  sendNotification: (companyId: string, targetSpaceId: string, notificationContent: string, notificationType: "warning" | "info" | "alert", storeNotificationOnDb: boolean,notificationSenderId:string) => void
   clearNotification: () => void;
-  notifications: Notification[];
+  notifications: EventType[];
+  updateNotifications: (data: EventType[]) => void
 };
 
 export const NotificationContext =

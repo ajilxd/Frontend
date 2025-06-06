@@ -18,6 +18,7 @@ import { managerLoginSuccess } from "@/redux/slices/managerSlice";
 import { userLoginSuccess } from "@/redux/slices/userSlice";
 
 import { authlogin, authSendOtp } from "../api/auth.api";
+import { useNotification } from "@/shared/hooks/useNotification";
 
 const LoginByEmail: React.FC = () => {
   const [email, setEmail] = useState<string>("");
@@ -29,6 +30,7 @@ const LoginByEmail: React.FC = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { connectSocket } = useSocket();
+  const  {connectNotificationSocket}=useNotification()
 
   const handleLogin = async () => {
     if (!role) {
@@ -68,7 +70,7 @@ const LoginByEmail: React.FC = () => {
                   ? true
                   : false,
                 ownerSubscribedPlan: managerData.ownerSubscription.name,
-                company: managerData.companyName ?? "",
+                companyName: managerData.companyName ?? "",
                 companyId: managerData.companyId ?? "",
               },
             })
@@ -80,11 +82,13 @@ const LoginByEmail: React.FC = () => {
             senderImageUrl: managerData.image,
             senderName: managerData.name,
           });
+          connectNotificationSocket({consumerId:managerData.id,consumerImageUrl:managerData.image,consumerName:managerData.name,consumerRole:"manager",companyId:managerData.companyId,consumerLastActive:""+new Date(),consumerSpaces:managerData.spaces,companyName:managerData.companyName})
           setTimeout(() => navigate("/manager/dashboard"), 1500);
         }
       } else if (role === "user") {
         const userAccessToken = response.data.accessToken;
         const userData = response.data.data;
+        console.log("user data found",userData)
         if (!userAccessToken) {
           return console.warn("No accesstoken found,Try login again");
         }
@@ -108,7 +112,8 @@ const LoginByEmail: React.FC = () => {
                   ? true
                   : false,
                 ownerSubscribedPlan: userData.ownerSubscription.name,
-                company: "",
+                companyId:userData.companyId??"",
+                companyName:userData.companyName??"",
                 ownerName: userData.ownerName,
               },
             })
@@ -120,6 +125,7 @@ const LoginByEmail: React.FC = () => {
             senderName: userData.name,
             senderImageUrl: userData.image,
           });
+          connectNotificationSocket({consumerId:userData.id,consumerImageUrl:userData.image,consumerName:userData.name,consumerRole:"user",companyId:userData.companyId,consumerLastActive:""+new Date(),consumerSpaces:userData.spaces,companyName:userData.companyName})
           setTimeout(() => navigate("/user/dashboard"), 1500);
         }
       }

@@ -68,7 +68,7 @@ const managerSlice = createSlice({
         accessToken: string;
         data: {
           id: string;
-          company: string;
+          companyName: string;
           companyId: string;
           image: string;
           name: string;
@@ -80,16 +80,18 @@ const managerSlice = createSlice({
         };
       }>
     ) {
+      console.log('manager login data redux',action.payload.data)
       state.isAuthenticated = true;
       state.accessToken = action.payload.accessToken;
       state.loading = false;
       state.error = null;
       state.id = action.payload.data.id;
-      state.company.name = action.payload.data.company ?? "";
-      state.company.id = action.payload.data.companyId ?? "";
+      state.company.name = action.payload.data.companyName;
+      state.company.id = action.payload.data.companyId;
       state.profile.image = action.payload.data.image;
       state.profile.name = action.payload.data.name;
       state.profile.email = action.payload.data.email;
+      state.profile.id=action.payload.data.id;
       state.owner.name = action.payload.data.ownerName;
       state.owner.ownerId = action.payload.data.ownerId;
       state.owner.ownerIsSubscribed = action.payload.data.ownerIsSubscribed;
@@ -100,8 +102,6 @@ const managerSlice = createSlice({
       state.isAuthenticated = false;
       state.accessToken = null;
       state.loading = false;
-      state.company.name = "";
-      state.company.id = "";
       state.profile.image = "";
       state.profile.name = "";
       state.profile.email = "";
