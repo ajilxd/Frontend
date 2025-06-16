@@ -7,9 +7,7 @@ export const addSubscriptionValidationSchema = Yup.object({
   amount: Yup.number()
     .positive("Amount must be positive")
     .required("Amount is required"),
-  billingCycle: Yup.string()
-    .oneOf(["month", "year"], "Invalid billing cycle")
-    .required("Billing cycle is required"),
+  billingCycle: Yup.string().required("Billing cycle is required"),
   isActive: Yup.boolean().required("Status is required"),
   features: Yup.array().of(Yup.string()).min(1, "Select at least one feature"),
   description: Yup.string()

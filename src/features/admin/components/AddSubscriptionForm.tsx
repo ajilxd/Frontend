@@ -11,7 +11,10 @@ import {
   addSubscriptionFormInitialValues,
   subscripitonFeatures,
 } from "../constants/subscription.constants";
-import { SubscriptionType } from "../types/admin.model";
+
+import { useQueryClient } from "@tanstack/react-query";
+
+import { SubscriptionType } from "@/types";
 import { addSubscriptionValidationSchema } from "../validation/subscription.validation";
 
 export const AddSubscriptionForm = function ({
@@ -19,17 +22,20 @@ export const AddSubscriptionForm = function ({
   showAddForm,
 }: AddSubscriptionFormPropsType) {
   const { enqueueSnackbar } = useSnackbar();
+  const queryClient = useQueryClient();
 
   const formik = useFormik({
     initialValues: addSubscriptionFormInitialValues as SubscriptionType,
     validationSchema: addSubscriptionValidationSchema,
     onSubmit: async (values: SubscriptionType) => {
+      console.log("values of subscription submission ", values);
       const response = await adminAddSubscriptionService(values);
       if (response.success) {
         setShowAddForm(false);
         formik.resetForm({
           values: addSubscriptionFormInitialValues as SubscriptionType,
         });
+        queryClient.invalidateQueries({ queryKey: ["admin", "subscriptions"] });
         enqueueSnackbar("Subscription added successfully!", {
           variant: "success",
         });
@@ -140,7 +146,7 @@ export const AddSubscriptionForm = function ({
               <input
                 type="radio"
                 name="billingCycle"
-                value="monthly"
+                value="month"
                 onChange={formik.handleChange}
                 checked={formik.values.billingCycle === "month"}
                 className="h-4 w-4 text-blue-600 border-gray-300 focus:ring-blue-500"
@@ -153,7 +159,7 @@ export const AddSubscriptionForm = function ({
               <input
                 type="radio"
                 name="billingCycle"
-                value="yearly"
+                value="year"
                 onChange={formik.handleChange}
                 checked={formik.values.billingCycle === "year"}
                 className="h-4 w-4 text-blue-600 border-gray-300 focus:ring-blue-500"
@@ -237,9 +243,9 @@ export const AddSubscriptionForm = function ({
                   <input
                     type="checkbox"
                     name="features"
-                    value={feature.id}
+                    value={feature.name}
                     onChange={formik.handleChange}
-                    checked={formik.values.features.includes(feature.id)}
+                    checked={formik.values.features.includes(feature.name)}
                     className="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
                   />
                   <span className="ml-2 text-gray-700 dark:text-gray-200">

@@ -2,7 +2,7 @@ import { adminApi } from "@/axios";
 import { catchResponse } from "@/errors/catchResponse";
 
 import { adminSigninRequestType } from "./admin.dto";
-import { SubscriptionType } from "../types/admin.model";
+import { SubscriptionType } from "@/types";
 
 const baseUrl = import.meta.env.VITE_API_URL;
 
@@ -34,16 +34,21 @@ export const adminLogOutService = async () => {
   }
 };
 
-export const adminFetchSubscriptionsService = async () => {
+export const adminFetchSubscriptions = async () => {
   try {
     const res = await adminApi.get(`${baseUrl}/admin/subscriptions`);
-    return {
-      success: true,
-      data: res.data.data,
-      message: "subscription fetched succesfully",
-    };
+    if (res.status === 201) {
+      return res.data.data;
+    }
+
+    if (res.status === 204) {
+      console.warn("no subscriptons found");
+      return [];
+    }
+
+    throw new Error("Unexpected response from server");
   } catch (error) {
-    catchResponse(error);
+    throw catchResponse(error);
   }
 };
 
@@ -68,17 +73,18 @@ export const adminFetchOwners = async (page: number, itemPerPage: number) => {
     const response = await adminApi.get(
       `${baseUrl}/admin/owners?page=${page}&itemPerPage=${itemPerPage}`
     );
-    console.log("response from server", response);
+    console.log(response);
     if (response.status === 200) {
-      return {
-        success: true,
-        data: response.data,
-        message: "fetching owners went successful",
-      };
+      console.log(response.data.data);
+      return response.data.data;
+    }
+
+    if (response.status === 204) {
+      return [];
     }
     throw new Error("unexpected response from server");
   } catch (err) {
-    return catchResponse(err);
+    throw catchResponse(err);
   }
 };
 
@@ -104,13 +110,13 @@ export async function adminToggleOwnerStatus(id: string) {
 export async function adminToggleSubscriptionStatus(id: string) {
   try {
     const response = await adminApi.patch(
-      `${baseUrl}/admin/toggle-owner-status/${id}`
+      `${baseUrl}/admin/toggle-subscription-status/${id}`
     );
     if (response.status === 200) {
       return {
         success: true,
         data: response.data,
-        message: "subscription updation went sucessfull",
+        message: "subscription status changed  sucessfully",
       };
     }
     throw new Error("unexpected response from server");

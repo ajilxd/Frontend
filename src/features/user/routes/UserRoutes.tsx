@@ -45,7 +45,7 @@ const UserRoutes: React.FC = () => {
               path="meeting"
               element={
                 <Meeting
-                  user={{ ...user, role: "user" }}
+                  user={{ ...user, role: "user", companyId: user.company.id! }}
                   useMeetingsQuery={useUserMeetingsQuery}
                 />
               }

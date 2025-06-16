@@ -1,8 +1,17 @@
 import { Search, Filter } from "lucide-react";
 import React, { useState, useEffect } from "react";
 
-import { adminFetchSubscriptionsService } from "../api/admin.api";
-import { SubscriptionType } from "../types/admin.model";
+import {
+  Select,
+  SelectTrigger,
+  SelectValue,
+  SelectContent,
+  SelectItem,
+} from "@/components/ui/select";
+
+import { useSubscriptonsQuery } from "@/queries/admin/subscriptions/useSubscripitonQuery";
+
+import { SubscriptionType } from "@/types";
 
 type Props = {
   updateFilteredSubscriptions: (data: SubscriptionType[]) => void;
@@ -12,29 +21,9 @@ export const SearchQueryNStatus: React.FC<Props> = ({
   updateFilteredSubscriptions,
 }) => {
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectedStatus, setSelectedStatus] = useState("All");
-  const [subscriptions, setSubscriptions] = useState<SubscriptionType[]>();
+  const [selectedStatus, setSelectedStatus] = useState("all");
 
-  useEffect(() => {
-    async function adminFetchSubscriptions() {
-      const response = await adminFetchSubscriptionsService();
-
-      return response;
-    }
-    adminFetchSubscriptions()
-      .then((response) => {
-        if (response?.success) {
-          if (response.data) {
-            setSubscriptions(response.data);
-          } else {
-            setSubscriptions([]);
-          }
-        } else {
-          throw new Error("error at fetching subscriptions");
-        }
-      })
-      .catch((err) => console.error(err));
-  }, []);
+  const { data: subscriptions } = useSubscriptonsQuery();
 
   useEffect(() => {
     const filteredSubscriptions =
@@ -46,8 +35,8 @@ export const SearchQueryNStatus: React.FC<Props> = ({
           sub.billingCycle.toLowerCase().includes(searchTerm.toLowerCase());
 
         const matchesStatus =
-          selectedStatus === "All" ||
-          sub.isActive === (selectedStatus === "true");
+          selectedStatus === "all" ||
+          sub.isActive === (selectedStatus === "active" ? true : false);
 
         return matchesSearch && matchesStatus;
       });
@@ -73,19 +62,25 @@ export const SearchQueryNStatus: React.FC<Props> = ({
           />
         </div>
 
-        {/* Status Filter */}
         <div className="relative">
           <div className="flex items-center gap-2 px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-200">
-            <Filter className="h-4 w-4 text-gray-400" />
-            <select
-              className="bg-transparent focus:outline-none pr-8"
-              value={selectedStatus}
-              onChange={(e) => setSelectedStatus(e.target.value)}
-            >
-              <option value="All">All Status</option>
-              <option value="true">Active</option>
-              <option value="false">Inactive</option>
-            </select>
+            <Select value={selectedStatus} onValueChange={setSelectedStatus}>
+              <Filter className="h-4 w-4 text-gray-400" />
+              <SelectTrigger className="w-[180px]">
+                <SelectValue placeholder="All Status" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all" className="text-gray-700">
+                  All Status
+                </SelectItem>
+                <SelectItem value="active" className="text-green-500">
+                  Active
+                </SelectItem>
+                <SelectItem value="inactive" className="text-red-500">
+                  Inactive
+                </SelectItem>
+              </SelectContent>
+            </Select>
           </div>
         </div>
       </div>

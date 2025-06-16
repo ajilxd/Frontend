@@ -94,9 +94,10 @@ export type SubscriptionType = {
   name: string;
   stripe_product_id?: string;
   stripe_price_id?: string;
-  isActive: string;
+  isActive: boolean;
   description: string;
   features: Array<string>;
+  createdAt?: Date;
 };
 
 export type OwnerSubscriptionType = {
@@ -291,4 +292,5 @@ export type OwnerType = {
   image: string;
   invitedBy?: string;
   createdAt: string;
+  subscription?: OwnerSubscriptionType;
 };

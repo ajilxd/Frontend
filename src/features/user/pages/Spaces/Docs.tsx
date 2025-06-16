@@ -1,6 +1,6 @@
 import { FilePlus, Edit2 } from "lucide-react";
 import { enqueueSnackbar } from "notistack";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
 
@@ -13,6 +13,7 @@ import { QuillEditor } from "@/shared/components/QuillEditor";
 import { DocType } from "@/types";
 
 import { userCreateDocument, userUpdateDocument } from "../../api/user.api"; // Ensure updateUserDocument is implemented
+import { useNotification } from "@/shared/hooks/useNotification";
 
 const formatDate = (date: Date | string) => {
   const parsedDate = new Date(date);
@@ -34,11 +35,10 @@ export default function DocumentApp() {
   }
 
   const { data: docs = [], refetch } = useUserDocumentsQuery(spaceid);
-
+  const { sendNotification } = useNotification();
 
   const [selectedDoc, setSelectedDoc] = useState<Partial<DocType> | null>(null);
   const [activeDocId, setActiveDocId] = useState<string | null>(null);
-
 
   const handleSelectDocument = (doc: Partial<DocType>) => {
     setSelectedDoc(doc);
@@ -65,7 +65,7 @@ export default function DocumentApp() {
       author: user.id,
     };
     setSelectedDoc(newDoc);
-    setActiveDocId(null); 
+    setActiveDocId(null);
   };
 
   const handleSubmit = async () => {
@@ -79,6 +79,14 @@ export default function DocumentApp() {
         const res = await userUpdateDocument(selectedDoc._id, selectedDoc);
         if (res.success) {
           enqueueSnackbar("Document updated successfully.");
+          sendNotification(
+            user.company.id!,
+            spaceid,
+            `${user.profile.name} has updated a document . ${selectedDoc.title}`,
+            "info",
+            true,
+            user.id
+          );
           await refetch();
         } else {
           enqueueSnackbar("Failed to update document.", { variant: "error" });
@@ -92,6 +100,14 @@ export default function DocumentApp() {
         );
         if (res.success) {
           enqueueSnackbar("Document created successfully.");
+          sendNotification(
+            user.company.id!,
+            spaceid,
+            `${user.profile.name} has created a document . ${selectedDoc.title}`,
+            "info",
+            true,
+            user.id
+          );
           await refetch();
         } else {
           enqueueSnackbar("Failed to create document.", { variant: "error" });

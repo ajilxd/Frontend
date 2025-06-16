@@ -1,4 +1,4 @@
-import { UseQueryResult,useQueryClient } from "@tanstack/react-query";
+import { UseQueryResult } from "@tanstack/react-query";
 import {
   Search,
   Calendar,
@@ -29,6 +29,7 @@ type Props = {
     id: string;
     profile: { name?: string; image?: string };
     role: string;
+    companyId: string;
   };
   useMeetingsQuery: (spaceId: string) => UseQueryResult<MeetingType[], Error>;
 };
@@ -41,12 +42,13 @@ const Meeting: React.FC<Props> = ({ user, useMeetingsQuery }) => {
   const [expandedMeetingId, setExpandedMeetingId] = useState<string | null>(
     null
   );
-  const {refreshMeeting,resetRefreshMeeting,triggerRefreshMeeting} = usePeerSocket()
+  const { refreshMeeting, resetRefreshMeeting, triggerRefreshMeeting } =
+    usePeerSocket();
   const {
     data: meetings,
     isError: hasMeetingFetchError,
     error: meetingFetchError,
-    refetch
+    refetch,
   } = useMeetingsQuery(spaceid!);
 
   const { sendNotification } = useNotification();
@@ -57,22 +59,19 @@ const Meeting: React.FC<Props> = ({ user, useMeetingsQuery }) => {
 
   if (hasMeetingFetchError) {
     console.error("Error at fetching meetings", meetingFetchError);
-  };
-
-
- React.useEffect(() => {
-  console.log('inside refresh meeting useEffect',refreshMeeting)
-  if (refreshMeeting) {
-    const refresh = async () => {
-      await refetch();
-      resetRefreshMeeting();
-      console.log("Meeting refreshed and flag reset.");
-    };
-    refresh();
   }
-}, [refreshMeeting]);
 
-
+  React.useEffect(() => {
+    console.log("inside refresh meeting useEffect", refreshMeeting);
+    if (refreshMeeting) {
+      const refresh = async () => {
+        await refetch();
+        resetRefreshMeeting();
+        console.log("Meeting refreshed and flag reset.");
+      };
+      refresh();
+    }
+  }, [refreshMeeting]);
 
   const formatDate = (dateString: string) => {
     if (!dateString) return "N/A";
@@ -112,11 +111,14 @@ const Meeting: React.FC<Props> = ({ user, useMeetingsQuery }) => {
       }
       if (response && response.success) {
         console.log("Call initiated");
-         triggerRefreshMeeting(spaceid)
+        triggerRefreshMeeting(spaceid);
         sendNotification(
+          user.companyId,
           spaceid,
-          user.profile.name + " has initiated the call",
-          "info"
+          `${user.profile.name} has initiated a call`,
+          "info",
+          false,
+          user.id
         );
         const rtpCapabilities = response.data.rtpCapabilities;
         const sendtransportOptions = response.data.sendtransportOptions;
@@ -141,7 +143,6 @@ const Meeting: React.FC<Props> = ({ user, useMeetingsQuery }) => {
           meeting.meetingId
         );
 
-        
         if (user.role === "user") {
           navigate("/user/dashboard/spaces/" + spaceid + "/call");
         }
@@ -206,9 +207,14 @@ const Meeting: React.FC<Props> = ({ user, useMeetingsQuery }) => {
         { variant: "success" }
       );
       sendNotification(
+        user.companyId,
         spaceid,
-        user.profile.name + " has initiated the call",
-        "info"
+        `${
+          user.profile.name
+        } has scheduled  a call at ${scheduledDate.toLocaleString()}`,
+        "info",
+        false,
+        user.id
       );
       setShowScheduleModal(false);
       setScheduledDate(null);

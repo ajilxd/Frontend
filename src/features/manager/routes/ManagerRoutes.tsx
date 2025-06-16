@@ -49,7 +49,11 @@ const ManagerRoutes: React.FC = () => {
                 path="meeting"
                 element={
                   <Meeting
-                    user={{ ...manager, role: "manager" }}
+                    user={{
+                      ...manager,
+                      role: "manager",
+                      companyId: manager.company.id,
+                    }}
                     useMeetingsQuery={useManagerMeetingsQuery}
                   />
                 }

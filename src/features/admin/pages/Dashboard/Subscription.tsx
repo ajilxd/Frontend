@@ -4,7 +4,7 @@ import { useCallback, useState } from "react";
 import { AddSubscriptionForm } from "../../components/AddSubscriptionForm";
 import { SearchQueryNStatus } from "../../components/SearchQueryNStatus";
 import { SubscriptionListTable } from "../../components/SubscriptionTable";
-import { SubscriptionType } from "../../types/admin.model";
+import { SubscriptionType } from "@/types";
 
 const Subscription = () => {
   const [showAddForm, setShowAddForm] = useState(false);

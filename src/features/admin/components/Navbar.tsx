@@ -15,15 +15,7 @@ export default function Navbar({ toggleSidebar }: NavbarProps) {
         <button className="lg:hidden mr-2" onClick={toggleSidebar}>
           <Menu size={20} />
         </button>
-        <div className="relative mx-4 lg:mx-0">
-          <span className="absolute inset-y-0 left-0 flex items-center pl-3">
-            <Search size={18} className="text-gray-500 dark:text-gray-400" />
-          </span>
-          <input
-            className="w-32 sm:w-64 rounded-md pl-10 pr-4 py-2 focus:outline-none focus:ring-1 focus:ring-indigo-500 bg-gray-100 text-gray-900 dark:bg-gray-800 dark:text-white"
-            placeholder="Search..."
-          />
-        </div>
+        <div className="relative mx-4 lg:mx-0"></div>
       </div>
 
       <div className="flex items-center space-x-4">

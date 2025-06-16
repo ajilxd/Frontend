@@ -1,22 +1,36 @@
 import React from "react";
 
-import { SubscriptionType } from "../types/admin.model";
+import { SubscriptionType } from "@/types";
+import { adminToggleSubscriptionStatus } from "../api/admin.api";
+import { enqueueSnackbar } from "notistack";
+import { useQueryClient } from "@tanstack/react-query";
 
 type Prop = {
   subscriptions: SubscriptionType[];
 };
 
 export const SubscriptionListTable: React.FC<Prop> = ({ subscriptions }) => {
+  const queryClient = useQueryClient();
+
   const getStatusBadgeClass = (status: string) => {
-    switch (status) {
-      case "Active":
-        return "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300";
-      case "Cancelled":
-        return "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300";
-      case "Pending":
-        return "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300";
-      default:
-        return "bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300";
+    if (status) {
+      return "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300";
+    } else {
+      return "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300";
+    }
+  };
+
+  const handleSubscriptionStatusChange = async (id: string, name: string) => {
+    const res = await adminToggleSubscriptionStatus(id);
+    if (res.success) {
+      enqueueSnackbar(`subscription status changed succesfully for ${name}`, {
+        variant: "success",
+      });
+      queryClient.invalidateQueries({ queryKey: ["admin", "subscriptions"] });
+    } else {
+      enqueueSnackbar(`try again later ....`);
+
+      console.warn(res.message);
     }
   };
 
@@ -31,16 +45,21 @@ export const SubscriptionListTable: React.FC<Prop> = ({ subscriptions }) => {
         <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
           <thead className="bg-gray-50 dark:bg-gray-700">
             <tr>
-              {["Plan", "Amount", "Billing", "Status", "Date Created"].map(
-                (heading) => (
-                  <th
-                    key={heading}
-                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider"
-                  >
-                    {heading}
-                  </th>
-                )
-              )}
+              {[
+                "Plan",
+                "Amount",
+                "Billing",
+                "Status",
+                "Date Created",
+                "Actions",
+              ].map((heading) => (
+                <th
+                  key={heading}
+                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider"
+                >
+                  {heading}
+                </th>
+              ))}
             </tr>
           </thead>
           <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
@@ -85,6 +104,24 @@ export const SubscriptionListTable: React.FC<Prop> = ({ subscriptions }) => {
                         day: "numeric",
                       }
                     )}
+                  </td>
+                  <td>
+                    <button
+                      className={`px-4 py-1.5 rounded-lg text-sm font-medium transition-colors
+      ${
+        subscription.isActive
+          ? "bg-red-100 text-red-700 hover:bg-red-200"
+          : "bg-green-100 text-green-700 hover:bg-green-200"
+      }`}
+                      onClick={() =>
+                        handleSubscriptionStatusChange(
+                          subscription._id,
+                          subscription.name
+                        )
+                      }
+                    >
+                      {subscription.isActive ? "Disable" : "Enable"}
+                    </button>
                   </td>
                 </tr>
               ))

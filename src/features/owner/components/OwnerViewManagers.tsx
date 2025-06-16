@@ -24,13 +24,17 @@ import { RootState } from "@/redux/store/appStore";
 import { ChaseSpinner } from "@/shared/components/ChaseSpinner";
 
 import { ownerToggleManagerStatus } from "../api/owner.api";
-import { ManagerInfoDialog } from "./ManagerInfoDialogue";
+import { EditManagerModal } from "./editManagerModal";
+import { ManagerType } from "@/types";
 
 export function OwnerViewManagers() {
   const owner = useSelector((state: RootState) => state.owner);
   const queryClient = useQueryClient();
-  const [open, setOpen] = useState(false);
-  const [manager, setManager] = useState({ name: "", email: "" });
+
+  const [canShowEditManagerModal, setCanShowEditManagerModal] = useState(false);
+  const [editManagerData, setEditManagerData] = useState<null | ManagerType>(
+    null
+  );
 
   const handleToggleStatus = async (managerId: string) => {
     const response = await ownerToggleManagerStatus(managerId, "" + owner._id);
@@ -54,11 +58,9 @@ export function OwnerViewManagers() {
 
   return (
     <>
-      <ManagerInfoDialog
-        open={open}
-        onClose={setOpen}
-        name={manager.name}
-        email={manager.email}
+      <EditManagerModal
+        canShow={canShowEditManagerModal}
+        managerData={editManagerData}
       />
 
       <div className="w-full p-4 space-y-4 bg-white dark:bg-slate-900 rounded-lg">
@@ -152,11 +154,11 @@ export function OwnerViewManagers() {
                           <DropdownMenuItem
                             className="cursor-pointer text-slate-700 dark:text-slate-300"
                             onClick={() => {
-                              setOpen(true);
-                              setManager(manager);
+                              setCanShowEditManagerModal(true);
+                              setEditManagerData(manager);
                             }}
                           >
-                            View Details
+                            Edit Details
                           </DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>

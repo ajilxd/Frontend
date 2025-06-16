@@ -16,6 +16,7 @@ import {
   managerUpdateDocument,
 } from "../../api/manager.api";
 import { useManagerDocumentsQuery } from "@/queries/managers/documents/useUserDocumentsQuery";
+import { useNotification } from "@/shared/hooks/useNotification";
 
 const formatDate = (date: Date | string) => {
   const parsedDate = new Date(date);
@@ -40,9 +41,7 @@ export default function DocumentApp() {
   const [selectedDoc, setSelectedDoc] = useState<Partial<DocType> | null>(null);
   const [activeDocId, setActiveDocId] = useState<string | null>(null);
 
-
-  console.log(docs)
-
+  const { sendNotification } = useNotification();
 
   const handleSelectDocument = (doc: Partial<DocType>) => {
     setSelectedDoc(doc);
@@ -52,7 +51,7 @@ export default function DocumentApp() {
   const handleContentChange = (newContent: string) => {
     if (!selectedDoc) return;
     const updatedDoc = { ...selectedDoc, content: newContent };
-  
+
     setSelectedDoc(updatedDoc);
   };
 
@@ -76,7 +75,7 @@ export default function DocumentApp() {
   };
 
   const handleSubmit = async () => {
-    console.log(selectedDoc)
+    console.log(selectedDoc);
     if (!selectedDoc?.title) {
       enqueueSnackbar("Title is required.", { variant: "warning" });
       return;
@@ -87,6 +86,14 @@ export default function DocumentApp() {
         const res = await managerUpdateDocument(selectedDoc._id, selectedDoc);
         if (res.success) {
           enqueueSnackbar("Document updated successfully.");
+          sendNotification(
+            manager.company.id,
+            spaceid,
+            `${manager.profile.name} has updated an document , ${selectedDoc.title}`,
+            "info",
+            true,
+            manager.id
+          );
           await refetch();
         } else {
           enqueueSnackbar("Failed to update document.", { variant: "error" });
@@ -100,6 +107,14 @@ export default function DocumentApp() {
         );
         if (res.success) {
           enqueueSnackbar("Document created successfully.");
+          sendNotification(
+            manager.company.id,
+            spaceid,
+            `${manager.profile.name} has created an document, ${selectedDoc.title}`,
+            "info",
+            true,
+            manager.id
+          );
           await refetch();
         } else {
           enqueueSnackbar("Failed to create document.", { variant: "error" });
