@@ -8,8 +8,6 @@ type Props = {
   children: React.ReactNode;
 };
 
-
-
 type TaskType = {
   id: string;
   name: string;
@@ -20,34 +18,56 @@ type TaskType = {
     name: string;
     imageUrl?: string;
   };
+};
+
+export interface IMediaMeta {
+  contentType?: string;
+  size?: number;
+  originalName?: string;
+  duration?: number;
+  extension?: string;
 }
 
+export type EventType = {
+  companyId?: string;
+  companyName?: string;
+  consumerId?: string;
+  consumerName?: string;
+  consumerImageUrl?: string;
+  consumerRole?: string;
+  consumerLastActive?: string;
+  consumerOwnerName?: string;
+  consumerSpaces?: string[];
+  targetSpaceId?: string;
+  targetSpaceName?: string;
+  timestamp?: string;
+  producerName?: string;
+  producerId?: string;
+  producerImageUrl?: string;
+  type?: "notification" | "event" | "both";
+  isTaskUpdatedEvent?: boolean;
+  task?: TaskType;
+  notificationContent?: string;
+  notificationType?: "warning" | "info" | "alert";
+  notificationTimeStamp?: string;
+  storeNotificationOnDb?: boolean;
+  notificationSenderId?: string;
+};
 
-export type EventType ={
-  companyId?:string;
-  companyName?:string;
-  consumerId?:string;
-  consumerName?:string;
-  consumerImageUrl?:string;
-  consumerRole?:string;
-  consumerLastActive?:string;
-  consumerOwnerName?:string;
-  consumerSpaces?:string[];
-  targetSpaceId?:string;
-  targetSpaceName?:string;
-  timestamp?:string;
-  producerName?:string;
-  producerId?:string;
-  producerImageUrl?:string;
-  type?:"notification"|"event"|"both";
-  isTaskUpdatedEvent?:boolean;
-  task?:TaskType;
-  notificationContent?:string
-  notificationType?:"warning"|"info"|"alert";
-  notificationTimeStamp?:string;
-  storeNotificationOnDb?:boolean;
-  notificationSenderId?:string;
-}
+export type PeerMessageType = {
+  _id?: string;
+
+  senderId: string;
+  receiverId: string;
+  type: string;
+  content: string;
+  mediaMeta?: IMediaMeta;
+  read?: boolean;
+  isDeleted?: boolean;
+  createdAt?: string;
+  isLoading?: boolean;
+  image?: string;
+};
 
 export const NotificationSocketProvider = ({ children }: Props) => {
   const [notifications, setNotifications] = useState<EventType[]>([
@@ -55,7 +75,6 @@ export const NotificationSocketProvider = ({ children }: Props) => {
       notificationContent: "Welcome user to Fluentawork",
       notificationType: "info",
       notificationTimeStamp: new Date().toLocaleString(),
-      
     },
   ]);
 
@@ -72,16 +91,39 @@ export const NotificationSocketProvider = ({ children }: Props) => {
     };
   }, []);
 
-  const connectNotificationSocket =(data:EventType)=>{
-    const {companyId,consumerId,consumerImageUrl,consumerLastActive,consumerRole,consumerSpaces,consumerName,companyName} =data
-    console.log('data for socket connection notification',data)
-    const payload:EventType={
-      companyId,consumerId,consumerRole,consumerLastActive,consumerSpaces,consumerImageUrl,consumerName,companyName
-    }
-    notificationSocket.emit("user-connect",payload)
-  }
+  const connectNotificationSocket = (data: EventType) => {
+    const {
+      companyId,
+      consumerId,
+      consumerImageUrl,
+      consumerLastActive,
+      consumerRole,
+      consumerSpaces,
+      consumerName,
+      companyName,
+    } = data;
+    // console.log("data for socket connection notification", data);
+    const payload: EventType = {
+      companyId,
+      consumerId,
+      consumerRole,
+      consumerLastActive,
+      consumerSpaces,
+      consumerImageUrl,
+      consumerName,
+      companyName,
+    };
+    notificationSocket.emit("user-connect", payload);
+  };
 
-  const sendNotification = (companyId:string,targetSpaceId: string, notificationContent: string, notificationType: "warning" | "info" | "alert" ,storeNotificationOnDb:boolean,notificationSenderId:string) => {
+  const sendNotification = (
+    companyId: string,
+    targetSpaceId: string,
+    notificationContent: string,
+    notificationType: "warning" | "info" | "alert",
+    storeNotificationOnDb: boolean,
+    notificationSenderId: string
+  ) => {
     const payload: EventType = {
       companyId,
       targetSpaceId,
@@ -89,19 +131,36 @@ export const NotificationSocketProvider = ({ children }: Props) => {
       notificationType,
       notificationTimeStamp: new Date().toISOString(),
       storeNotificationOnDb,
-      notificationSenderId
+      notificationSenderId,
     };
 
-    notificationSocket.emit("notification", payload );
+    notificationSocket.emit("notification", payload);
+  };
+
+  const sendMessageToPeer = (data: PeerMessageType) => {
+    notificationSocket.emit("send-peer-message", data);
+  };
+
+  const receiveMessageFromPeer = (
+    callback: (msg: PeerMessageType) => void
+  ): (() => void) => {
+    const handler = (data: PeerMessageType) => {
+      callback(data);
+    };
+    notificationSocket.on("receive-peer-message", handler);
+
+    return () => {
+      notificationSocket.off("receive-peer-message", handler);
+    };
   };
 
   const clearNotification = () => setNotifications([]);
 
-  const updateNotifications =(data:EventType[])=>{
-    if(data){
-      setNotifications(data)
+  const updateNotifications = (data: EventType[]) => {
+    if (data) {
+      setNotifications(data);
     }
-  }
+  };
 
   return (
     <NotificationContext.Provider
@@ -111,7 +170,9 @@ export const NotificationSocketProvider = ({ children }: Props) => {
         clearNotification,
         notifications,
         connectNotificationSocket,
-        updateNotifications
+        updateNotifications,
+        sendMessageToPeer,
+        receiveMessageFromPeer,
       }}
     >
       {children}

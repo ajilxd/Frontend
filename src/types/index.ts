@@ -294,3 +294,14 @@ export type OwnerType = {
   createdAt: string;
   subscription?: OwnerSubscriptionType;
 };
+
+export type CompanyMemberP2PChatType = {
+  name: string;
+  role: string;
+  userId: string;
+  image: string;
+  companyId: string;
+  joinedDate?: string;
+  blocked?: string;
+  lastSeen?: Date;
+};

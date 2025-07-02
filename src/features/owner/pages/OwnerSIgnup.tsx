@@ -20,13 +20,12 @@ const OwnerSignup: React.FC = () => {
   };
 
   const handleSubmit = async (values: typeof initialValues) => {
-    console.log("Form Submitted", values);
     setLoading(true);
 
     const response = await ownerSignupService(values);
     if (response.success) {
       setVisibility(true);
-      setEmail(values.email);
+      setEmail(values.email.toLowerCase());
       setTimeout(() => {
         setSignupError("");
       }, 2500);
@@ -35,8 +34,11 @@ const OwnerSignup: React.FC = () => {
         if (response.status == 409) {
           setSignupError("Already an account is registered with this email");
         }
+
+        if (response.status == 500) {
+          setSignupError("Something went wrong try again later - server error");
+        }
       }
-      setSignupError(response.message);
     }
 
     setLoading(false);
@@ -98,7 +100,6 @@ const OwnerSignup: React.FC = () => {
                   isSubmitting,
                 }) => (
                   <form onSubmit={handleSubmit} className="space-y-4">
-                    {/* Name */}
                     <div>
                       <label className="block text-sm font-medium text-gray-300">
                         Name
@@ -119,7 +120,6 @@ const OwnerSignup: React.FC = () => {
                       )}
                     </div>
 
-                    {/* Email */}
                     <div>
                       <label className="block text-sm font-medium text-gray-300">
                         Email
@@ -140,7 +140,6 @@ const OwnerSignup: React.FC = () => {
                       )}
                     </div>
 
-                    {/* Password */}
                     <div>
                       <label className="block text-sm font-medium text-gray-300">
                         Password
@@ -161,7 +160,6 @@ const OwnerSignup: React.FC = () => {
                       )}
                     </div>
 
-                    {/* Confirm Password */}
                     <div>
                       <label className="block text-sm font-medium text-gray-300">
                         Confirm Password

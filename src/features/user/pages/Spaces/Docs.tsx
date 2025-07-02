@@ -100,8 +100,11 @@ export default function DocumentApp() {
         );
         if (res.success) {
           enqueueSnackbar("Document created successfully.");
+          if (!user.company.id) {
+            return console.warn("No company id found login again");
+          }
           sendNotification(
-            user.company.id!,
+            user.company.id,
             spaceid,
             `${user.profile.name} has created a document . ${selectedDoc.title}`,
             "info",

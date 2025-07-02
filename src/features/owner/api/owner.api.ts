@@ -13,7 +13,6 @@ export async function ownerSigninService(formData: {
   try {
     const response = await ownerApi.post(`${baseUrl}/owner/login`, formData);
 
-    console.log(response);
     if (response.status == 200) {
       return {
         success: true,
@@ -63,6 +62,24 @@ export async function ownerOtpVerificationService(email: string, otp: string) {
     }
     throw new Error(`Unexpected response from server`);
   } catch (error: unknown) {
+    return catchResponse(error);
+  }
+}
+
+export async function ownerOtpRequestService(email: string) {
+  try {
+    const response = await ownerApi.post(`${baseUrl}/owner/request-otp`, {
+      email,
+    });
+
+    if (response.status === 201) {
+      return {
+        success: true,
+        message: "Otp has been succesfully send to your email",
+      };
+    }
+    throw new Error(`Unexpected response from server`);
+  } catch (error) {
     return catchResponse(error);
   }
 }
@@ -153,6 +170,10 @@ export async function ownerFetchSubscriptions() {
     const response = await ownerApi.get(`${baseUrl}/owner/subscriptions`);
     if (response.status === 200) {
       return response.data.data;
+    }
+
+    if (response.status === 204) {
+      return [];
     }
     throw new Error("unxpected response from server");
   } catch (error) {
@@ -406,5 +427,24 @@ export const ownerFetchSpace = async (ownerId: string) => {
     throw new Error("unexpected response from server");
   } catch (error) {
     throw catchResponse(error);
+  }
+};
+
+export const ownerUpdateManagerDetails = async (data: {
+  email: string;
+  name: string;
+}) => {
+  try {
+    const response = await ownerApi.put(`${baseUrl}/owner/manager`, data);
+    if (response.status === 200) {
+      return {
+        success: true,
+        data: response.data.data,
+        message: response.data.message,
+      };
+    }
+    throw new Error("Unexpected response from server");
+  } catch (error) {
+    return catchResponse(error);
   }
 };

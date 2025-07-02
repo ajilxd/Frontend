@@ -22,7 +22,6 @@ export default function Members() {
   const { data: users } = useManagerUsersQuery(manager.id);
 
   const members = users?.filter((item) => item.spaces?.includes("" + spaceid));
-  console.log("members from members page", members);
 
   const toggleMemberSelection = (memberId: string) => {
     if (selectedMembers.includes(memberId)) {

@@ -15,12 +15,13 @@ import { TransportProvider } from "./context/TransportContextProvider.tsx";
 import { ErrorFallback } from "./errors/ErrorFallback.tsx";
 import { store } from "./redux/store/appStore.ts";
 import { NotificationSocketProvider } from "./context/NotificationContextProvider.tsx";
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       retry: (failureCount, error: any) => {
-        if (error?.response?.status === 401) return false;
+        if (error?.response?.status === 404) return false;
         return failureCount < 2;
       },
       refetchOnWindowFocus: false,
@@ -43,8 +44,10 @@ createRoot(document.getElementById("root")!).render(
                       anchorOrigin={{ vertical: "top", horizontal: "right" }}
                       autoHideDuration={3000}
                     >
-                      <AuthProvider />
-                      <App />
+                      <AuthProvider>
+                        <App />
+                        <ReactQueryDevtools initialIsOpen={false} />
+                      </AuthProvider>
                     </SnackbarProvider>
                   </ThemeContextProvider>
                 </BrowserRouter>

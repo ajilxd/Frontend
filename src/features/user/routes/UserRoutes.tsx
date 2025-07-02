@@ -16,6 +16,8 @@ import DefaultDashboard from "../pages/Dashboard";
 import Docs from "../pages/Spaces/Docs";
 import { Members } from "../pages/Spaces/Members";
 import { Tasks } from "../pages/Spaces/Tasks";
+import { ChatLayout } from "@/shared/components/PersonalChats/chat-layout";
+import { useUserCompanyMembersQuery } from "@/queries/users/company/useUserCompanyMembersQuery";
 
 const UserRoutes: React.FC = () => {
   const user = useSelector((state: RootState) => state.user);
@@ -64,6 +66,17 @@ const UserRoutes: React.FC = () => {
           <Route
             path="profile"
             element={<Profile role="user" id={user.id} />}
+          ></Route>
+
+          <Route
+            path="chat"
+            element={
+              <ChatLayout
+                navCollapsedSize={8}
+                defaultLayout={undefined}
+                user={{ ...user, role: "user" }}
+              />
+            }
           ></Route>
         </Route>
       </Routes>

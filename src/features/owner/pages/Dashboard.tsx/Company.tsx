@@ -9,12 +9,7 @@ import CompanyDetails from "../../components/CompanyDetails";
 export default function Company() {
   const owner = useSelector((state: RootState) => state.owner);
 
-  const { data: Company, isLoading } = useOwnerCompanyQuery("" + owner._id);
-
-  if (isLoading)
-    return (
-      <div className="text-center mt-10 text-muted-foreground">Loading...</div>
-    );
+  const { data: Company } = useOwnerCompanyQuery("" + owner._id);
 
   return (
     <div className="max-w-4xl mx-auto py-10 px-4">

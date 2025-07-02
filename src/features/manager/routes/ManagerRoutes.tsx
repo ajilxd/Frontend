@@ -18,6 +18,7 @@ import Members from "../pages/Spaces/Members";
 import Tasks from "../pages/Spaces/Tasks";
 import { useManagerMeetingsQuery } from "@/queries/managers/meetings/useManagerMeetingQuery";
 import Profile from "@/shared/pages/Profile";
+import { ChatLayout } from "@/shared/components/PersonalChats/chat-layout";
 
 const ManagerRoutes: React.FC = () => {
   const manager = useSelector((state: RootState) => state.manager);
@@ -31,6 +32,16 @@ const ManagerRoutes: React.FC = () => {
           >
             <Route index element={<DefaultDashboard />}></Route>
             <Route path="users" element={<UsersDashboard />}></Route>
+            <Route
+              path="chat"
+              element={
+                <ChatLayout
+                  navCollapsedSize={8}
+                  defaultLayout={undefined}
+                  user={{ ...manager, role: "manager" }}
+                />
+              }
+            ></Route>
             <Route path="spaces/:spaceid">
               <Route path="members" element={<Members />}></Route>
               <Route path="tasks" element={<Tasks />}></Route>

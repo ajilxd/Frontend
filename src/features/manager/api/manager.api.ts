@@ -165,7 +165,6 @@ export const managerUpdateSpace = async (
   }
 };
 
-
 export const managerUpdateSpaceUsers = async (
   managerId: string,
   spaceId: string,
@@ -175,7 +174,7 @@ export const managerUpdateSpaceUsers = async (
     const response = await managerApi.post(`${baseUrl}/space/users`, {
       ...updateData,
       spaceId,
-     managerId,
+      managerId,
     });
     if (response.status === 200) {
       return {
@@ -189,11 +188,20 @@ export const managerUpdateSpaceUsers = async (
   }
 };
 
-
-export const managerSpaceMemberStatusUpdate = async (spaceId:string,managerId:string,memberId:string,data:{designation:string,statusUpdate:boolean})=>{
+export const managerSpaceMemberStatusUpdate = async (
+  spaceId: string,
+  managerId: string,
+  memberId: string,
+  data: { designation: string; statusUpdate: boolean }
+) => {
   try {
-    const response =await managerApi.put(`${baseUrl}/space/users`,{...data,spaceId,managerId,memberId})
-     if (response.status === 200) {
+    const response = await managerApi.put(`${baseUrl}/space/users`, {
+      ...data,
+      spaceId,
+      managerId,
+      memberId,
+    });
+    if (response.status === 200) {
       return {
         success: true,
         data: response.data.data,
@@ -201,9 +209,9 @@ export const managerSpaceMemberStatusUpdate = async (spaceId:string,managerId:st
     }
     throw new Error("unexpected response from server");
   } catch (error) {
-    return catchResponse(error)
+    return catchResponse(error);
   }
-}
+};
 
 // #Task management
 
@@ -314,7 +322,7 @@ export const managerGetDocuments = async (spaceId: string) => {
     const response = await managerApi.get(
       `${baseUrl}/document?spaceId=${spaceId}`
     );
-    console.log("docs", response.data.data);
+    // console.log("docs", response.data.data);
     if (response.status == 200) {
       return response.data.data;
     }
@@ -448,14 +456,40 @@ export const managerLeaveMeeting = async (data: {
 
 // notifications
 
-export const managerFetchNotifications =async (companyId:string,receiverId:string)=>{
+export const managerFetchNotifications = async (
+  companyId: string,
+  receiverId: string
+) => {
   try {
-    const res = await managerApi.get(`${baseUrl}/manager/notifications?companyId=${companyId}&receiverId=${receiverId}`)
-    if(res.status ===200 || res.status === 204){
-      return {success:true,data:res.data.data}
+    const res = await managerApi.get(
+      `${baseUrl}/manager/notifications?companyId=${companyId}&receiverId=${receiverId}`
+    );
+    if (res.status === 200 || res.status === 204) {
+      return { success: true, data: res.data.data };
     }
-    throw new Error("unexpected response from server")
+    throw new Error("unexpected response from server");
   } catch (error) {
-    return catchResponse(error)
+    return catchResponse(error);
   }
-}
+};
+
+//companyMembers
+
+export const managerFetchCompanyMembers = async (companyId: string) => {
+  try {
+    console.log("hey im member fetcher");
+    if (!companyId) throw new Error("Invalid companyId");
+    const res = await managerApi.get(`${baseUrl}/manager/members/${companyId}`);
+    console.log("fetching members", res);
+    if (res.status === 200 || res.status === 204) {
+      return {
+        success: true,
+        data: res.data.data || [],
+        message: "Succesfully fetched chats ",
+      };
+    }
+    throw new Error("unexpected response from server");
+  } catch (error) {
+    return catchResponse(error);
+  }
+};

@@ -61,6 +61,7 @@ export function OwnerViewManagers() {
       <EditManagerModal
         canShow={canShowEditManagerModal}
         managerData={editManagerData}
+        onClose={() => setCanShowEditManagerModal(false)}
       />
 
       <div className="w-full p-4 space-y-4 bg-white dark:bg-slate-900 rounded-lg">
@@ -86,7 +87,9 @@ export function OwnerViewManagers() {
               {isError && (
                 <TableRow>
                   <TableCell colSpan={4} className="text-center text-red-500">
-                    {error.message}
+                    {error.status === 404
+                      ? "No manager data found"
+                      : "something went wrong"}
                   </TableCell>
                 </TableRow>
               )}

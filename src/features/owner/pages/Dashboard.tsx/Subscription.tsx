@@ -18,6 +18,8 @@ const Subscription: React.FC = () => {
   const { _id: ownerId, stripe_customer_id: stripeCustomerId } = owner || {};
   const { data: subscripitons } = useSubscriptionsQuery();
 
+  console.log(subscripitons);
+
   const { data: activeSubscription } = useOwnerSubscriptionQuery(
     "" + owner._id
   );
@@ -49,14 +51,19 @@ const Subscription: React.FC = () => {
         stripeCustomerId,
         subscriptionId,
       });
-      setCheckoutId(result?.data?.id);
+      if (result.success) {
+        setCheckoutId(result?.data?.id);
+      } else {
+        console.warn(
+          "Failed to set the checkout id - couldnt fetch from server"
+        );
+      }
     } catch (err) {
       console.error(err);
       enqueueSnackbar("Failed to initiate checkout", { variant: "error" });
     }
   };
 
-  // Redirect to Stripe checkout if sessionId is available
   useEffect(() => {
     if (checkoutId && stripe) {
       stripe.redirectToCheckout({ sessionId: checkoutId });

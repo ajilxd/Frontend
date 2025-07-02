@@ -8,6 +8,7 @@ import {
   MessageSquare,
   PhoneCall,
   User,
+  MessageSquareIcon,
 } from "lucide-react";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
@@ -65,6 +66,15 @@ export const Sidebar: React.FC<SidebarPropsType> = ({
             >
               <User className="h-5 w-5 mr-3" />
               <span>Profile</span>
+            </Button>
+
+            <Button
+              variant="ghost"
+              className="w-full justify-start"
+              onClick={() => navigate("/user/dashboard/chat")}
+            >
+              <MessageSquareIcon className="h-5 w-5 mr-3" />
+              <span>Messages</span>
             </Button>
 
             <Button variant="ghost" className="w-full justify-start">

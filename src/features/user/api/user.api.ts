@@ -204,7 +204,7 @@ export const userUpdateDocument = async (
   try {
     const response = await userApi.put(`${baseUrl}/document/${docId}`, data);
     if (response.status === 200) {
-      return {data:response.data.data,success:true};
+      return { data: response.data.data, success: true };
     }
     throw new Error("Unexpected response from server");
   } catch (error) {
@@ -303,15 +303,35 @@ export const userLeaveMeeting = async (data: {
   }
 };
 
-
-export const userFetchNotifications =async (companyId:string,receiverId:string)=>{
+export const userFetchNotifications = async (
+  companyId: string,
+  receiverId: string
+) => {
   try {
-    const res = await userApi.get(`${baseUrl}/user/notifications?companyId=${companyId}&receiverId=${receiverId}`)
-    if(res.status ===200 || res.status === 204){
-      return {success:true,data:res.data.data}
+    const res = await userApi.get(
+      `${baseUrl}/user/notifications?companyId=${companyId}&receiverId=${receiverId}`
+    );
+    if (res.status === 200 || res.status === 204) {
+      return { success: true, data: res.data.data };
     }
-    throw new Error("unexpected response from server")
+    throw new Error("unexpected response from server");
   } catch (error) {
-    return catchResponse(error)
+    return catchResponse(error);
   }
-}
+};
+
+export const userFetchCompanyMembers = async (companyId: string) => {
+  try {
+    const res = await userApi.get(`${baseUrl}/user/members/${companyId}`);
+    if (res.status === 200 || res.status === 204) {
+      return {
+        success: true,
+        data: res.data.data || [],
+        message: "Succesfully fetched chats",
+      };
+    }
+    throw new Error("unexpected response from server");
+  } catch (error) {
+    return catchResponse(error);
+  }
+};

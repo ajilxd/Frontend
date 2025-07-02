@@ -40,7 +40,9 @@ export const EditCompanyDetailsModal = () => {
       queryClient.invalidateQueries({
         queryKey: ["owner", "company", "" + owner._id],
       });
-      enqueueSnackbar("Successfully edited company details");
+      enqueueSnackbar("Successfully edited company details", {
+        variant: "success",
+      });
       setOpen(false);
     } else {
       enqueueSnackbar("Something went wrong. Try again.", { variant: "error" });

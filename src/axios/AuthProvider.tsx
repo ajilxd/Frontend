@@ -8,8 +8,9 @@ import {
   adminApi,
   setupInterceptors,
 } from "./.";
+import { ReactNode } from "react";
 
-export default function AuthProvider() {
+export default function AuthProvider({ children }: { children: ReactNode }) {
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -19,5 +20,5 @@ export default function AuthProvider() {
     setupInterceptors({ apiInstance: adminApi, role: "admin", navigate });
   }, [navigate]);
 
-  return null;
+  return <>{children}</>;
 }

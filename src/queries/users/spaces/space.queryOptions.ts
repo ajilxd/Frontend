@@ -11,7 +11,6 @@ export const userSpacesQueryOptions = (
 ): UseQueryOptions<SpaceType[], Error> => ({
   queryKey: ["user", "spaces", userId],
   queryFn: () => userFetchSpaces(userId),
-  staleTime: 5 * 60 * 1000,
 });
 
 export const userGetSpaceByIdQueryOptions = (

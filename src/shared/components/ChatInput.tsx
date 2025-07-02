@@ -25,7 +25,6 @@ export const ChatInputComponent: React.FC<Props> = ({ user, chatsLength }) => {
   const { spaceid } = useParams();
   const { sendMessage, sendTyping, sendStopTyping } = useSocket();
   function typingHandler(data: boolean) {
-    console.log("hey iam typing");
     if (!isTyping && data) {
       sendTyping({ room: spaceid, userId: user.id });
     } else if (isTyping && !data) {
@@ -34,7 +33,6 @@ export const ChatInputComponent: React.FC<Props> = ({ user, chatsLength }) => {
     setIsTyping(data);
   }
 
-  console.log("user is typing", isTyping);
   function updateCurrentMessage(content: string) {
     setMessage(content);
   }

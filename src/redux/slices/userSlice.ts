@@ -8,8 +8,8 @@ type Profile = {
 };
 
 type Company = {
-  name?: string;
-  id?:string
+  name: string;
+  id: string;
 };
 
 type Owner = {
@@ -60,7 +60,7 @@ const initialState: UserState = {
     ownerSubscribedPlan: "",
     name: "",
   },
-  company: { name:"",id:""},
+  company: { name: "", id: "" },
   stats: undefined,
   id: "",
   manager: {
@@ -94,7 +94,7 @@ const userSlice = createSlice({
           name: string;
           image: string;
           email: string;
-          companyId:string;
+          companyId: string;
         };
       }>
     ) {
@@ -103,7 +103,7 @@ const userSlice = createSlice({
       state.loading = false;
       state.error = null;
       state.company.name = action.payload.data.companyName;
-      state.company.id=action.payload.data.companyId;
+      state.company.id = action.payload.data.companyId;
       state.id = action.payload.data.id;
       state.manager.name = action.payload.data.managerName;
       state.manager.image = action.payload.data.managerImage ?? "";

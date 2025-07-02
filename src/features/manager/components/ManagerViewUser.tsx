@@ -100,7 +100,7 @@ export function ManagerViewUsers() {
                       >
                         {user.isBlocked ? "Unblock" : "Block"}
                       </DropdownMenuItem>
-                      <DropdownMenuItem
+                      {/* <DropdownMenuItem
                         className="cursor-pointer text-slate-700 dark:text-slate-300"
                         onClick={() => {
                           enqueueSnackbar(`Viewing details for ${user.name}`, {
@@ -109,7 +109,7 @@ export function ManagerViewUsers() {
                         }}
                       >
                         View Details
-                      </DropdownMenuItem>
+                      </DropdownMenuItem> */}
                     </DropdownMenuContent>
                   </DropdownMenu>
                 </TableCell>

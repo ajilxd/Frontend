@@ -3,35 +3,59 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
   DialogFooter,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { ManagerType } from "@/types";
+import { enqueueSnackbar } from "notistack";
+import { ownerUpdateManagerDetails } from "../api/owner.api";
 
 export const EditManagerModal = function ({
   canShow,
   managerData,
+  onClose,
 }: {
   canShow: boolean;
   managerData: Partial<ManagerType> | null;
+  onClose: () => void;
 }) {
-  if (!canShow || !managerData) return;
-  const [name, setName] = useState(managerData.name);
-  const [email, setEmail] = useState(managerData.email);
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
 
-  const handleSubmit = () => {
+  useEffect(() => {
+    if (managerData) {
+      setName(managerData.name || "");
+      setEmail(managerData.email || "");
+    }
+  }, [managerData]);
+
+  const handleSubmit = async () => {
+    if (!name) {
+      enqueueSnackbar("Name cant be empty", { variant: "warning" });
+      return;
+    }
+    if (!email) {
+      enqueueSnackbar("email cant be empty", { variant: "warning" });
+      return;
+    }
     console.log("Saving:", { name, email });
+    const res = await ownerUpdateManagerDetails({ name, email });
+    if (res.success) {
+      enqueueSnackbar("Manager updation went succesfull", {
+        variant: "success",
+      });
+      onClose();
+    } else {
+      enqueueSnackbar("something went wrong, Try later", { variant: "error" });
+      console.warn(res.message);
+    }
   };
 
   return (
-    <Dialog>
-      <DialogTrigger asChild>
-        <Button>Edit Manager</Button>
-      </DialogTrigger>
+    <Dialog open={canShow} onOpenChange={onClose}>
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Edit Manager Details</DialogTitle>
@@ -61,9 +85,7 @@ export const EditManagerModal = function ({
           </div>
         </div>
         <DialogFooter>
-          <Button type="submit" onClick={handleSubmit}>
-            Save Changes
-          </Button>
+          <Button onClick={handleSubmit}>Save Changes</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
