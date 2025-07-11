@@ -305,3 +305,62 @@ export type CompanyMemberP2PChatType = {
   blocked?: string;
   lastSeen?: Date;
 };
+
+export interface IParticipantMetadata {
+  name: string;
+  role: string;
+  status: string;
+  lastSeen: Date;
+  userId: string;
+  image: string;
+}
+
+export interface IUserChatlist {
+  chatId: string;
+  participants: [string, string];
+  createdAt?: Date;
+  lastMessage?: string;
+  lastMessageTime?: Date;
+  participantsMetadata: [IParticipantMetadata, IParticipantMetadata];
+}
+
+export type MessageType = "text" | "image" | "audio" | "video" | "file";
+
+export interface IMediaMeta {
+  contentType?: string;
+  size?: number;
+  originalName?: string;
+  duration?: number;
+  extension?: string;
+}
+
+export interface IUserMessage {
+  _id: string;
+  chatId: string;
+  senderId: string;
+  receiverId: string;
+  type: MessageType;
+  content: string;
+  mediaMeta?: IMediaMeta;
+  createdAt?: Date;
+  read?: boolean;
+  isDeleted?: boolean;
+}
+
+type AssigneeType = {
+  id: string;
+  name: string;
+  email: string;
+};
+
+export type EventType = {
+  title: string;
+  start: Date;
+  end: Date;
+  id: string;
+  assignee: AssigneeType[];
+  description: string;
+  status: TaskStatusType;
+  type: "Task";
+  color?: string;
+};

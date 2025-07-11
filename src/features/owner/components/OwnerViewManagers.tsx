@@ -62,6 +62,7 @@ export function OwnerViewManagers() {
         canShow={canShowEditManagerModal}
         managerData={editManagerData}
         onClose={() => setCanShowEditManagerModal(false)}
+        ownerId={owner._id}
       />
 
       <div className="w-full p-4 space-y-4 bg-white dark:bg-slate-900 rounded-lg">

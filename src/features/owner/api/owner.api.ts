@@ -433,6 +433,7 @@ export const ownerFetchSpace = async (ownerId: string) => {
 export const ownerUpdateManagerDetails = async (data: {
   email: string;
   name: string;
+  id: string;
 }) => {
   try {
     const response = await ownerApi.put(`${baseUrl}/owner/manager`, data);

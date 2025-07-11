@@ -86,7 +86,11 @@ export const Sidebar: React.FC<SidebarPropsType> = ({
               <span>Messages</span>
             </Button>
 
-            <Button variant="ghost" className="w-full justify-start">
+            <Button
+              variant="ghost"
+              className="w-full justify-start"
+              onClick={() => navigate("/manager/dashboard/calendar")}
+            >
               <Calendar className="h-5 w-5 mr-3" />
               <span>Calendar</span>
             </Button>

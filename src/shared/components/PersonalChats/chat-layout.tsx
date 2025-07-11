@@ -2,9 +2,10 @@ import React, { useEffect, useState } from "react";
 import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
 
 import { cn } from "@/lib/utils";
-import { Sidebar } from "./sidebar";
+import { Sidebar } from "./Sidebar";
 import { Chat } from "./chat";
-import { CompanyMemberP2PChatType } from "@/types";
+import { IParticipantMetadata, IUserChatlist, IUserMessage } from "@/types";
+import { UseQueryResult } from "@tanstack/react-query";
 
 type Props = {
   user: {
@@ -16,6 +17,10 @@ type Props = {
   defaultLayout: number[] | undefined;
   navCollapsedSize: number;
   defaultCollapsed?: boolean;
+  usePeerChatQuery: (userId: string) => UseQueryResult<IUserChatlist[], Error>;
+  usePeerMessageQuery: (
+    chatId: string
+  ) => UseQueryResult<IUserMessage[], Error>;
 };
 
 export function ChatLayout({
@@ -23,24 +28,35 @@ export function ChatLayout({
   defaultCollapsed = false,
   navCollapsedSize,
   user,
+  usePeerChatQuery,
+  usePeerMessageQuery,
 }: Props) {
   console.log(`company id of ${user.profile.name} is ${user.company.id}`);
 
   const [isCollapsed, setIsCollapsed] = React.useState(defaultCollapsed);
 
   const [selectedUser, setSelectedUser] =
-    React.useState<CompanyMemberP2PChatType>({
-      name: "",
-      image: "",
-      userId: "",
-      role: "",
-      companyId: "",
-    });
+    React.useState<IParticipantMetadata | null>(null);
+
+  const [selectedChat, setSelectedChat] = React.useState<IUserChatlist | null>(
+    null
+  );
+
+  const [refreshChat, setRefreshChat] = React.useState<boolean>(false);
+
+  const refreshChatsHandler = () => setRefreshChat((prev) => !prev);
 
   const [isMobile, setIsMobile] = useState(false);
 
-  const selectedUserHandler = (data: CompanyMemberP2PChatType) =>
+  const selectedUserHandler = (data: IParticipantMetadata) => {
+    console.log("User has been selected", data);
     setSelectedUser(data);
+  };
+
+  const selectedChatHandler = (data: IUserChatlist | null) => {
+    console.log("User has been selected", data);
+    setSelectedChat(data);
+  };
 
   useEffect(() => {
     const checkScreenWidth = () => {
@@ -87,9 +103,13 @@ export function ChatLayout({
       >
         <Sidebar
           isCollapsed={isCollapsed || isMobile}
-          isMobile={isMobile}
           user={user}
           selectUserHandler={selectedUserHandler}
+          selectedUser={selectedUser}
+          usePeerChatQuery={usePeerChatQuery}
+          selectedChatHandler={selectedChatHandler}
+          refreshChat={refreshChat}
+          refreshChatHandler={refreshChatsHandler}
         />
       </Panel>
 
@@ -97,10 +117,13 @@ export function ChatLayout({
 
       <Panel defaultSize={defaultLayout[1]} minSize={30}>
         <Chat
-          messages={selectedUser.messages}
           selectedUser={selectedUser}
           isMobile={isMobile}
           user={user}
+          selectedChat={selectedChat}
+          usePeerMessageQuery={usePeerMessageQuery}
+          refreshChat={refreshChat}
+          refreshChatHandler={refreshChatsHandler}
         />
       </Panel>
     </PanelGroup>

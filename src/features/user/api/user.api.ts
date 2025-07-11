@@ -335,3 +335,41 @@ export const userFetchCompanyMembers = async (companyId: string) => {
     return catchResponse(error);
   }
 };
+
+export const userFetchPeerChats = async (userId: string) => {
+  try {
+    const res = await userApi.get(`${baseUrl}/user/peerchats?userId=${userId}`);
+    if (res.status === 200) {
+      return res.data.data;
+    }
+    throw new Error("Unexpected respnse from server");
+  } catch (error) {
+    throw catchResponse(error);
+  }
+};
+
+export const userFetchPeerMessages = async (chatId: string) => {
+  try {
+    const res = await userApi.get(
+      `${baseUrl}/user/peermessages?chatId=${chatId}`
+    );
+    if (res.status === 200) {
+      return res.data.data;
+    }
+    throw new Error("Unexpected response from server");
+  } catch (error) {
+    throw catchResponse(error);
+  }
+};
+
+export const userFetchEvents = async (managerId: string) => {
+  try {
+    const res = await userApi.get(`${baseUrl}/user/events/${managerId}`);
+    if (res.status === 200) {
+      return res.data.data;
+    }
+    throw new Error("Unexpected response from server");
+  } catch (error) {
+    throw catchResponse(error);
+  }
+};

@@ -7,7 +7,6 @@ import { BrowserRouter } from "react-router-dom";
 
 import "./index.css";
 import App from "./App.tsx";
-import AuthProvider from "./axios/AuthProvider.tsx";
 import { PeerSocketProvider } from "./context/PeerSocketContextProvider.tsx";
 import { SocketProvider } from "./context/SocketContextProvider.tsx";
 import { ThemeContextProvider } from "./context/ThemeContextProvider.tsx";
@@ -15,7 +14,10 @@ import { TransportProvider } from "./context/TransportContextProvider.tsx";
 import { ErrorFallback } from "./errors/ErrorFallback.tsx";
 import { store } from "./redux/store/appStore.ts";
 import { NotificationSocketProvider } from "./context/NotificationContextProvider.tsx";
-import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
+import AuthContextProvider from "./context/AuthContextProvider.tsx";
+import { Calendar } from "./shared/components/Calander/context/CalendarContextProvider.tsx";
+import { CalendarEvent } from "./shared/components/Calander/types.calendar.ts";
+import { EventType } from "react-hook-form";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -38,18 +40,26 @@ createRoot(document.getElementById("root")!).render(
             <SocketProvider>
               <Provider store={store}>
                 <BrowserRouter>
-                  <ThemeContextProvider>
-                    <SnackbarProvider
-                      maxSnack={3}
-                      anchorOrigin={{ vertical: "top", horizontal: "right" }}
-                      autoHideDuration={3000}
-                    >
-                      <AuthProvider>
-                        <App />
-                        <ReactQueryDevtools initialIsOpen={false} />
-                      </AuthProvider>
-                    </SnackbarProvider>
-                  </ThemeContextProvider>
+                  <AuthContextProvider>
+                    <ThemeContextProvider>
+                      <Calendar
+                        onEventClick={(event: EventType) =>
+                          alert("Event clicked: " + JSON.stringify(event))
+                        }
+                      >
+                        <SnackbarProvider
+                          maxSnack={3}
+                          anchorOrigin={{
+                            vertical: "top",
+                            horizontal: "right",
+                          }}
+                          autoHideDuration={3000}
+                        >
+                          <App />
+                        </SnackbarProvider>
+                      </Calendar>
+                    </ThemeContextProvider>
+                  </AuthContextProvider>
                 </BrowserRouter>
               </Provider>
             </SocketProvider>

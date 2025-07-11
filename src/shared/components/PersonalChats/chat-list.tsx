@@ -1,22 +1,18 @@
 import { AnimatePresence, motion } from "framer-motion";
 import {
-  ChatBubbleAvatar,
   ChatBubbleMessage,
   ChatBubbleTimestamp,
   ChatBubble,
-  ChatBubbleAction,
-  ChatBubbleActionWrapper,
 } from "@/components/ui/chat/chat-bubble";
 import { ChatMessageList } from "@/components/ui/chat/chat-message-list";
 
-import { Forward, Heart } from "lucide-react";
 import { useEffect, useRef } from "react";
-import { PeerMessageType } from "@/context/NotificationContextProvider";
-import { CompanyMemberP2PChatType } from "@/types";
+import { IParticipantMetadata, IUserMessage } from "@/types";
+import EmptyMessagesState from "./EmptyMessageState";
 
 interface ChatListProps {
-  messages: PeerMessageType[];
-  selectedUser: CompanyMemberP2PChatType;
+  messages: IUserMessage[];
+  selectedUser: IParticipantMetadata;
   isMobile: boolean;
 }
 
@@ -33,11 +29,6 @@ export function ChatList({ messages, selectedUser }: ChatListProps) {
     return () => clearTimeout(timeout);
   }, [messages]);
 
-  const actionIcons = [
-    { icon: Forward, type: "Forward" },
-    { icon: Heart, type: "Like" },
-  ];
-
   return (
     <div className="w-full flex flex-col flex-1 overflow-hidden">
       <div className="overflow-y-auto flex-1">
@@ -52,7 +43,7 @@ export function ChatList({ messages, selectedUser }: ChatListProps) {
 
                 return (
                   <motion.div
-                    key={message.id || index} // Prefer message.id if available
+                    key={message._id || index}
                     layout
                     initial={{ opacity: 0, y: 50 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -67,34 +58,47 @@ export function ChatList({ messages, selectedUser }: ChatListProps) {
                     }}
                     className="flex flex-col gap-2 p-4"
                   >
-                    <ChatBubble variant={variant}>
-                      <ChatBubbleAvatar src={message.image} />
-                      <ChatBubbleMessage isLoading={message.isLoading}>
-                        {message.content}
-                        {message.createdAt && (
-                          <ChatBubbleTimestamp timestamp={message.createdAt} />
-                        )}
-                      </ChatBubbleMessage>
-                      <ChatBubbleActionWrapper>
-                        {actionIcons.map(({ icon: Icon, type }) => (
-                          <ChatBubbleAction
-                            key={type}
-                            className="size-7"
-                            icon={<Icon className="size-4" />}
-                            onClick={() =>
-                              console.log(
-                                `Action "${type}" clicked for message ${index}`
-                              )
-                            }
+                    {message.type === "text" && (
+                      <ChatBubble variant={variant}>
+                        <ChatBubbleMessage>
+                          {message.content}
+                          {message.createdAt && (
+                            <ChatBubbleTimestamp
+                              timestamp={
+                                "" +
+                                new Date(message.createdAt).toLocaleTimeString()
+                              }
+                            />
+                          )}
+                        </ChatBubbleMessage>
+                      </ChatBubble>
+                    )}
+
+                    {message.type === "image" && (
+                      <ChatBubble variant={variant}>
+                        <ChatBubbleMessage>
+                          <img
+                            src={message.content}
+                            className="rounded-xl object-cover w-full max-w-xs max-h-80"
+                            alt=""
                           />
-                        ))}
-                      </ChatBubbleActionWrapper>
-                    </ChatBubble>
+
+                          {message.createdAt && (
+                            <ChatBubbleTimestamp
+                              timestamp={
+                                "" +
+                                new Date(message.createdAt).toLocaleTimeString()
+                              }
+                            />
+                          )}
+                        </ChatBubbleMessage>
+                      </ChatBubble>
+                    )}
                   </motion.div>
                 );
               })
             ) : (
-              <div className="p-4 text-muted-foreground">No messages</div>
+              <EmptyMessagesState />
             )}
           </AnimatePresence>
           <div ref={messagesEndRef} />

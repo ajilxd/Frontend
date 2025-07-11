@@ -1,6 +1,5 @@
 import { useSelector } from "react-redux";
 import { Route, Routes } from "react-router-dom";
-
 import PrivateRoute from "@/hoc/PrivateRoute";
 import { useUserChatsQuery } from "@/queries/users/chats/useChatQuery";
 import { useUserMeetingsQuery } from "@/queries/users/meetings/useUserMeetingQuery";
@@ -17,7 +16,10 @@ import Docs from "../pages/Spaces/Docs";
 import { Members } from "../pages/Spaces/Members";
 import { Tasks } from "../pages/Spaces/Tasks";
 import { ChatLayout } from "@/shared/components/PersonalChats/chat-layout";
-import { useUserCompanyMembersQuery } from "@/queries/users/company/useUserCompanyMembersQuery";
+import { useUserPeerChatsQuery } from "@/queries/users/p2pchat/useUserPeerChatsQuery";
+import { useUserPeerMessagesQuery } from "@/queries/users/p2pMessage/useUserPeerMessageQuery";
+import { CalendarEvents } from "@/shared/components/Calander/CalanderPage";
+import { useUserEventsQuery } from "@/queries/users/events/useUserEventsQuery";
 
 const UserRoutes: React.FC = () => {
   const user = useSelector((state: RootState) => state.user);
@@ -74,6 +76,17 @@ const UserRoutes: React.FC = () => {
               <ChatLayout
                 navCollapsedSize={8}
                 defaultLayout={undefined}
+                user={{ ...user, role: "user" }}
+                usePeerChatQuery={useUserPeerChatsQuery}
+                usePeerMessageQuery={useUserPeerMessagesQuery}
+              />
+            }
+          ></Route>
+          <Route
+            path="calendar"
+            element={
+              <CalendarEvents
+                useEventsQuery={useUserEventsQuery}
                 user={{ ...user, role: "user" }}
               />
             }

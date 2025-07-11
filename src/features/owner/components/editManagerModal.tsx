@@ -12,18 +12,28 @@ import { useState, useEffect } from "react";
 import { ManagerType } from "@/types";
 import { enqueueSnackbar } from "notistack";
 import { ownerUpdateManagerDetails } from "../api/owner.api";
+import { useQueryClient } from "@tanstack/react-query";
 
 export const EditManagerModal = function ({
   canShow,
   managerData,
   onClose,
+  ownerId,
 }: {
   canShow: boolean;
   managerData: Partial<ManagerType> | null;
   onClose: () => void;
+  ownerId: string;
 }) {
+  if (!managerData?._id) {
+    return;
+  }
+  if (!ownerId) {
+    return;
+  }
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
+  const queryClient = useQueryClient();
 
   useEffect(() => {
     if (managerData) {
@@ -41,11 +51,18 @@ export const EditManagerModal = function ({
       enqueueSnackbar("email cant be empty", { variant: "warning" });
       return;
     }
-    console.log("Saving:", { name, email });
-    const res = await ownerUpdateManagerDetails({ name, email });
+
+    const res = await ownerUpdateManagerDetails({
+      name,
+      email,
+      id: managerData?._id!,
+    });
     if (res.success) {
       enqueueSnackbar("Manager updation went succesfull", {
         variant: "success",
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["owner", "managers", ownerId],
       });
       onClose();
     } else {

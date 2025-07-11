@@ -3,6 +3,8 @@ import { useEffect, useState } from "react";
 import { notificationSocket } from "@/socket/notificationSocket";
 
 import { NotificationContext } from "./NotificationContext";
+import { IUserMessage } from "@/types";
+import { useQueryClient } from "@tanstack/react-query";
 
 type Props = {
   children: React.ReactNode;
@@ -54,9 +56,18 @@ export type EventType = {
   notificationSenderId?: string;
 };
 
+export type ParticipantsMetaData = {
+  name: string;
+  image: string;
+  status: string;
+  lastSeen: string;
+  userId: string;
+  role: string;
+};
+
 export type PeerMessageType = {
   _id?: string;
-
+  companyId: string;
   senderId: string;
   receiverId: string;
   type: string;
@@ -67,9 +78,11 @@ export type PeerMessageType = {
   createdAt?: string;
   isLoading?: boolean;
   image?: string;
+  participantsMetadata?: [ParticipantsMetaData, ParticipantsMetaData];
 };
 
 export const NotificationSocketProvider = ({ children }: Props) => {
+  const queryClient = useQueryClient();
   const [notifications, setNotifications] = useState<EventType[]>([
     {
       notificationContent: "Welcome user to Fluentawork",
@@ -83,9 +96,32 @@ export const NotificationSocketProvider = ({ children }: Props) => {
       console.log("notification received ", data);
       setNotifications((prev) => [...prev, data]);
     };
+
+    const handleNewMessage = (data: IUserMessage) => {
+      // manager
+      queryClient.invalidateQueries({
+        queryKey: ["manager", "peerchats", data.receiverId],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["manager", "peermessages", data.chatId],
+      });
+
+      //user
+
+      queryClient.invalidateQueries({
+        queryKey: ["user", "peerchats", data.receiverId],
+      });
+
+      queryClient.invalidateQueries({
+        queryKey: ["user", "peermessages", data.chatId],
+      });
+    };
     notificationSocket.connect();
     notificationSocket.on("notification", handleNotification);
-
+    notificationSocket.on("receive-peer-message", (data) => {
+      console.log(` data from the message `, data);
+      handleNewMessage(data);
+    });
     return () => {
       notificationSocket.off("notification", handleNotification);
     };
@@ -147,7 +183,9 @@ export const NotificationSocketProvider = ({ children }: Props) => {
     const handler = (data: PeerMessageType) => {
       callback(data);
     };
-    notificationSocket.on("receive-peer-message", handler);
+    notificationSocket.on("receive-peer-message", (data) =>
+      console.log(`data from the peer`, data)
+    );
 
     return () => {
       notificationSocket.off("receive-peer-message", handler);

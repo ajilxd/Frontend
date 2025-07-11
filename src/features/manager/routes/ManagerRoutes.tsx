@@ -19,6 +19,10 @@ import Tasks from "../pages/Spaces/Tasks";
 import { useManagerMeetingsQuery } from "@/queries/managers/meetings/useManagerMeetingQuery";
 import Profile from "@/shared/pages/Profile";
 import { ChatLayout } from "@/shared/components/PersonalChats/chat-layout";
+import { useManagerPeerChatsQuery } from "@/queries/managers/p2pchat/useManagerPeerChatsQuery";
+import { useManagerPeerMessagesQuery } from "@/queries/managers/p2pMessage/useManagerPeerMessageQuery";
+import { CalendarEvents } from "@/shared/components/Calander/CalanderPage";
+import { useManagerEventsQuery } from "@/queries/managers/events/useManageEventQuery";
 
 const ManagerRoutes: React.FC = () => {
   const manager = useSelector((state: RootState) => state.manager);
@@ -39,6 +43,8 @@ const ManagerRoutes: React.FC = () => {
                   navCollapsedSize={8}
                   defaultLayout={undefined}
                   user={{ ...manager, role: "manager" }}
+                  usePeerChatQuery={useManagerPeerChatsQuery}
+                  usePeerMessageQuery={useManagerPeerMessagesQuery}
                 />
               }
             ></Route>
@@ -82,6 +88,15 @@ const ManagerRoutes: React.FC = () => {
             <Route
               path="profile"
               element={<Profile id={manager.id} role="manager" />}
+            ></Route>
+            <Route
+              path="calendar"
+              element={
+                <CalendarEvents
+                  useEventsQuery={useManagerEventsQuery}
+                  user={{ ...manager, role: "manager" }}
+                />
+              }
             ></Route>
           </Route>
         </Routes>

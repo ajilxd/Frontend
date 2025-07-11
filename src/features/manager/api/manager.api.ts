@@ -477,10 +477,8 @@ export const managerFetchNotifications = async (
 
 export const managerFetchCompanyMembers = async (companyId: string) => {
   try {
-    console.log("hey im member fetcher");
     if (!companyId) throw new Error("Invalid companyId");
     const res = await managerApi.get(`${baseUrl}/manager/members/${companyId}`);
-    console.log("fetching members", res);
     if (res.status === 200 || res.status === 204) {
       return {
         success: true,
@@ -491,5 +489,45 @@ export const managerFetchCompanyMembers = async (companyId: string) => {
     throw new Error("unexpected response from server");
   } catch (error) {
     return catchResponse(error);
+  }
+};
+
+export const managerFetchPeerChats = async (userId: string) => {
+  try {
+    const res = await managerApi.get(
+      `${baseUrl}/manager/peerchats?userId=${userId}`
+    );
+    if (res.status === 200) {
+      return res.data.data;
+    }
+    throw new Error("Unexpected respnse from server");
+  } catch (error) {
+    throw catchResponse(error);
+  }
+};
+
+export const managerFetchPeerMessages = async (chatId: string) => {
+  try {
+    const res = await managerApi.get(
+      `${baseUrl}/manager/peermessages?chatId=${chatId}`
+    );
+    if (res.status === 200) {
+      return res.data.data;
+    }
+    throw new Error("Unexpected response from server");
+  } catch (error) {
+    throw catchResponse(error);
+  }
+};
+
+export const managerFetchEvents = async (managerId: string) => {
+  try {
+    const res = await managerApi.get(`${baseUrl}/manager/events/${managerId}`);
+    if (res.status === 200) {
+      return res.data.data;
+    }
+    throw new Error("Unexpected response from server");
+  } catch (error) {
+    throw catchResponse(error);
   }
 };

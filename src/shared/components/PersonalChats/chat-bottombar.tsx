@@ -1,27 +1,21 @@
-import {
-  FileImage,
-  Mic,
-  Paperclip,
-  PlusCircle,
-  SendHorizontal,
-  ThumbsUp,
-} from "lucide-react";
+import { FileImage, Paperclip, SendHorizontal, ThumbsUp } from "lucide-react";
 
 import React, { useEffect, useRef, useState } from "react";
-import { Link } from "react-router-dom";
-import { Button, buttonVariants } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
+
+import { Button } from "@/components/ui/button";
+
 import { AnimatePresence, motion } from "framer-motion";
 import { EmojiPicker } from "./emoji-picker";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
 import { ChatInput } from "@/components/ui/chat/chat-input";
 import { useNotification } from "@/shared/hooks/useNotification";
-import { PeerMessageType } from "@/context/NotificationContextProvider";
-import { CompanyMemberP2PChatType } from "@/types";
+import {
+  ParticipantsMetaData,
+  PeerMessageType,
+} from "@/context/NotificationContextProvider";
+import { IParticipantMetadata, IUserChatlist } from "@/types";
+import { useQueryClient } from "@tanstack/react-query";
+import { baseUrl } from "@/constants/app";
+import { ImageIconUpload } from "./ImageIconUpload";
 
 interface ChatBottombarProps {
   isMobile: boolean;
@@ -31,7 +25,9 @@ interface ChatBottombarProps {
     company: { id?: string; name?: string };
     role: string;
   };
-  selectedUser: CompanyMemberP2PChatType;
+  selectedUser: IParticipantMetadata;
+  selectedChat: IUserChatlist | null;
+  refreshChatHandler: () => void;
 }
 
 export const BottombarIcons = [{ icon: FileImage }, { icon: Paperclip }];
@@ -40,15 +36,39 @@ export default function ChatBottombar({
   isMobile,
   user,
   selectedUser,
+  selectedChat,
+  refreshChatHandler,
 }: ChatBottombarProps) {
   const [message, setMessage] = useState("");
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const { sendMessageToPeer } = useNotification();
+  const queryClient = useQueryClient();
 
   // const [isLoading, setisLoading] = useState(false);
+  if (!user.company.id) {
+    throw new Error("Company id havent fetched properly");
+  }
 
   const handleInputChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
     setMessage(event.target.value);
+  };
+
+  const sendParticipantMetaData: ParticipantsMetaData = {
+    name: user.profile.name!,
+    role: user.role,
+    image: user.profile.image! || "",
+    status: "active",
+    userId: user.id,
+    lastSeen: "" + new Date(),
+  };
+
+  const receiveParticipantMetaData: ParticipantsMetaData = {
+    name: selectedUser.name,
+    role: selectedUser.role,
+    image: selectedUser.image,
+    status: "active",
+    userId: selectedUser.userId,
+    lastSeen: "" + new Date(),
   };
 
   const handleThumbsUp = () => {
@@ -58,9 +78,84 @@ export default function ChatBottombar({
       image: user.profile.image,
       content: "👍",
       type: "text",
+      companyId: user.company.id!,
+      participantsMetadata: [
+        sendParticipantMetaData,
+        receiveParticipantMetaData,
+      ],
     };
     sendMessageToPeer(newMessage);
     setMessage("");
+    refreshChatHandler();
+    if (user.role === "user" && selectedChat?.chatId) {
+      queryClient.invalidateQueries({
+        queryKey: ["user", "peermessages", selectedChat.chatId],
+      });
+    }
+
+    if (user.role === "manager" && selectedChat?.chatId) {
+      queryClient.invalidateQueries({
+        queryKey: ["manager", "peermessages", selectedChat.chatId],
+      });
+    }
+  };
+
+  const handleImageUpload = async (file: File) => {
+    if (!file) return;
+    const filename = encodeURIComponent(file.name).split(".")[0];
+    const filetype = encodeURIComponent(file.name).split(".")[1];
+    const res = await fetch(`${baseUrl}/s3/presign?filename=${filename}`);
+    const { url } = await res.json();
+    console.log(url);
+
+    const uploadRes = await fetch(url, {
+      method: "PUT",
+      headers: { "Content-Type": file.type },
+      body: file,
+    });
+    console.log(uploadRes);
+    if (uploadRes.ok) {
+      const publicUrl = `https://fluentawork-assets.s3.eu-north-1.amazonaws.com/${filename}`;
+      console.log("Uploaded to:", publicUrl);
+      const newMessage: PeerMessageType = {
+        senderId: user.id,
+        receiverId: selectedUser.userId,
+        content: publicUrl,
+        type: "image",
+        mediaMeta: {
+          contentType: file.type,
+          size: file.size,
+          originalName: filename,
+          extension: filetype,
+        },
+        companyId: user.company.id!,
+        participantsMetadata: [
+          sendParticipantMetaData,
+          receiveParticipantMetaData,
+        ],
+      };
+      sendMessageToPeer(newMessage);
+      if (user.role === "user" && selectedChat?.chatId) {
+        queryClient.invalidateQueries({
+          queryKey: ["user", "peerchats", user.id],
+        });
+        queryClient.invalidateQueries({
+          queryKey: ["user", "peermessages", selectedChat.chatId],
+        });
+      }
+
+      if (user.role === "manager" && selectedChat?.chatId) {
+        queryClient.invalidateQueries({
+          queryKey: ["manager", "peerchats", user.id],
+        });
+        queryClient.invalidateQueries({
+          queryKey: ["manager", "peermessages", selectedChat.chatId],
+        });
+      }
+    } else {
+      const errorDetails = await uploadRes.text();
+      console.error("Upload failed:", errorDetails);
+    }
   };
 
   const handleSend = () => {
@@ -71,12 +166,38 @@ export default function ChatBottombar({
         image: "",
         content: message,
         type: "text",
+        companyId: user.company.id!,
+        participantsMetadata: [
+          sendParticipantMetaData,
+          receiveParticipantMetaData,
+        ],
       };
       sendMessageToPeer(newMessage);
       setMessage("");
+      refreshChatHandler();
       if (inputRef.current) {
         inputRef.current.focus();
       }
+    }
+    console.log(
+      `user is ${user.role} & selected chat id ${selectedChat?.chatId}`
+    );
+    if (user.role === "user" && selectedChat?.chatId) {
+      queryClient.invalidateQueries({
+        queryKey: ["user", "peerchats", user.id],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["user", "peermessages", selectedChat.chatId],
+      });
+    }
+
+    if (user.role === "manager" && selectedChat?.chatId) {
+      queryClient.invalidateQueries({
+        queryKey: ["manager", "peerchats", user.id],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["manager", "peermessages", selectedChat.chatId],
+      });
     }
   };
 
@@ -101,75 +222,9 @@ export default function ChatBottombar({
   return (
     <div className="px-2 py-4 flex justify-between w-full items-center gap-2">
       <div className="flex">
-        <Popover>
-          <PopoverTrigger asChild>
-            <Link
-              to="#"
-              className={cn(
-                buttonVariants({ variant: "ghost", size: "icon" }),
-                "h-9 w-9",
-                "shrink-0"
-              )}
-            >
-              <PlusCircle size={22} className="text-muted-foreground" />
-            </Link>
-          </PopoverTrigger>
-          <PopoverContent side="top" className="w-full p-2">
-            {message.trim() || isMobile ? (
-              <div className="flex gap-2">
-                <Link
-                  to="#"
-                  className={cn(
-                    buttonVariants({ variant: "ghost", size: "icon" }),
-                    "h-9 w-9",
-                    "shrink-0"
-                  )}
-                >
-                  <Mic size={22} className="text-muted-foreground" />
-                </Link>
-                {BottombarIcons.map((icon, index) => (
-                  <Link
-                    key={index}
-                    to="#"
-                    className={cn(
-                      buttonVariants({ variant: "ghost", size: "icon" }),
-                      "h-9 w-9",
-                      "shrink-0"
-                    )}
-                  >
-                    <icon.icon size={22} className="text-muted-foreground" />
-                  </Link>
-                ))}
-              </div>
-            ) : (
-              <Link
-                to="#"
-                className={cn(
-                  buttonVariants({ variant: "ghost", size: "icon" }),
-                  "h-9 w-9",
-                  "shrink-0"
-                )}
-              >
-                <Mic size={22} className="text-muted-foreground" />
-              </Link>
-            )}
-          </PopoverContent>
-        </Popover>
         {!message.trim() && !isMobile && (
           <div className="flex">
-            {BottombarIcons.map((icon, index) => (
-              <Link
-                key={index}
-                to="#"
-                className={cn(
-                  buttonVariants({ variant: "ghost", size: "icon" }),
-                  "h-9 w-9",
-                  "shrink-0"
-                )}
-              >
-                <icon.icon size={22} className="text-muted-foreground" />
-              </Link>
-            ))}
+            <ImageIconUpload onSelect={handleImageUpload} />
           </div>
         )}
       </div>
