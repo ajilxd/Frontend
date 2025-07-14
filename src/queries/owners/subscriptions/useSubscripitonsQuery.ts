@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 
-import { ownerSubscriptionsQueryOptions } from "./subscriptions.queryOptions";
+import { subscriptionsQueryOptions } from "./subscriptions.queryOptions";
 
 export const useSubscriptionsQuery = () => {
-  return useQuery(ownerSubscriptionsQueryOptions());
+  return useQuery(subscriptionsQueryOptions());
 };

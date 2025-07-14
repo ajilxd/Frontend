@@ -8,6 +8,7 @@ import AdminLogin from "../pages/AdminLogin";
 import AdminDashboard from "../pages/Dashboard";
 import OwnersTable from "../pages/Dashboard/Owners";
 import SubscriptionDashboard from "../pages/Dashboard/Subscription";
+import UserTable from "../pages/UserManagement";
 
 const AdminRoutes: React.FC = () => {
   return (
@@ -29,6 +30,7 @@ const AdminRoutes: React.FC = () => {
             element={<SubscriptionDashboard />}
           ></Route>
           <Route path="owners" element={<OwnersTable />}></Route>
+          <Route path="users" element={<UserTable />}></Route>
         </Route>
       </Routes>
     </>

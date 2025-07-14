@@ -102,7 +102,7 @@ const PaymentStatus: React.FC = () => {
                   transition={{ duration: 0.4, delay: 0.4 }}
                   className="flex flex-col sm:flex-row gap-3 justify-center"
                 >
-                  <Button variant="outline" onClick={handleClose}>
+                  <Button variant="default" onClick={handleClose}>
                     Go Back
                   </Button>
                   {status === "success" && (

@@ -29,6 +29,9 @@ import { ManagerType } from "@/types";
 
 export function OwnerViewManagers() {
   const owner = useSelector((state: RootState) => state.owner);
+  if (!owner || !owner._id) {
+    return;
+  }
   const queryClient = useQueryClient();
 
   const [canShowEditManagerModal, setCanShowEditManagerModal] = useState(false);

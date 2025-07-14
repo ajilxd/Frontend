@@ -11,14 +11,15 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 
-import { OwnerSubscriptionDetailsType } from "../ActiveSubscription";
+import { OwnerSubscriptionType } from "@/types";
 
 interface ActivePlanDialogProps {
-  activePlan: OwnerSubscriptionDetailsType;
+  activePlan: OwnerSubscriptionType;
 }
 
 export function ActivePlanDialog({ activePlan }: ActivePlanDialogProps) {
   const [open, setOpen] = useState(false);
+  console.log("active plan", activePlan);
 
   const handleClose = () => {
     setOpen(false);
@@ -40,7 +41,9 @@ export function ActivePlanDialog({ activePlan }: ActivePlanDialogProps) {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant="outline">View Subscription</Button>
+        <button className="px-5 py-2.5 bg-slate-100 text-slate-700 text-sm font-medium rounded-lg border border-slate-200 hover:bg-slate-200 hover:border-slate-300  active:bg-slate-300 ">
+          View Subscription
+        </button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[500px] w-full">
         <DialogHeader>
@@ -86,13 +89,15 @@ export function ActivePlanDialog({ activePlan }: ActivePlanDialogProps) {
               <div className="flex justify-between text-sm">
                 <span>Will Cancel After:</span>
                 <span className="font-medium">
-                  {activePlan.cancel_at?.toLocaleDateString() || "N/A"}
+                  {new Date(activePlan.cancel_at!)?.toLocaleDateString() ||
+                    "N/A"}
                 </span>
               </div>
               <div className="flex justify-between text-sm">
                 <span>Cancelled At:</span>
                 <span className="font-medium">
-                  {activePlan.canceled_at?.toLocaleDateString() || "N/A"}
+                  {new Date(activePlan.canceled_at!)?.toLocaleDateString() ||
+                    "N/A"}
                 </span>
               </div>
             </>

@@ -1,4 +1,4 @@
-import { X, Users, ShoppingBag } from "lucide-react";
+import { X, Users, ShoppingBag, UserSearch } from "lucide-react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
@@ -10,6 +10,7 @@ enum AdminSidebarType {
   Dashboard = "Dashboard",
   Owners = "Owners",
   Subscriptions = "Subscriptions",
+  AllUsers = "AllUsers",
 }
 
 type SidebarProps = {
@@ -44,6 +45,14 @@ export default function Sidebar({ isOpen, toggleSidebar }: SidebarProps) {
       },
       icon: <Users size={18} />,
       label: "Owners",
+    },
+    [AdminSidebarType.AllUsers]: {
+      onClick: () => {
+        setActive(AdminSidebarType.AllUsers);
+        navigate("/admin/dashboard/users");
+      },
+      icon: <UserSearch size={18} />,
+      label: "All Users",
     },
   };
   return (

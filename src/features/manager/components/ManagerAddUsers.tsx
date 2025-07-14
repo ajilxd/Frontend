@@ -164,10 +164,6 @@ export function ManagerAddUsers() {
                 </div>
               ) : null}
             </div>
-
-            <div className="text-sm text-slate-500 dark:text-slate-400">
-              <p>A temporary password will be sent to this email address.</p>
-            </div>
           </div>
         </form>
       </CardContent>

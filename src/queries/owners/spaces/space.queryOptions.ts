@@ -11,7 +11,7 @@ export const ownerSpacesQueryOptions = (
 ): UseQueryOptions<SpaceType[], Error> => ({
   queryKey: ["owner", "spaces", ownerId],
   queryFn: () => ownerFetchSpace(ownerId),
-  staleTime: 5 * 60 * 1000,
+  staleTime: Infinity,
 });
 
 export const ownerGetSpaceByIdQueryOptions = (
@@ -19,4 +19,5 @@ export const ownerGetSpaceByIdQueryOptions = (
 ): UseQueryOptions<SpaceType, Error> => ({
   queryKey: ["owner", "spaces", spaceId],
   queryFn: () => ownerFetchSpaceBySpaceId(spaceId),
+  staleTime: Infinity,
 });

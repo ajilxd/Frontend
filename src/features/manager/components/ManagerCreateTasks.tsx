@@ -161,15 +161,25 @@ export const ManagerCreateTasks: React.FC = () => {
     const response = await managerAddTask(result);
 
     if (response.success) {
-      if(!spaceid) return console.warn ("couldnt find space id")
+      if (!spaceid) return console.warn("couldnt find space id");
       enqueueSnackbar("Task added successfully", { variant: "success" });
-      const message=  manager.profile.name + " created a new task";
-      sendNotification(manager.company.id,spaceid,message,"info",true,manager.id)
+      const message = manager.profile.name + " created a new task";
+      sendNotification(
+        manager.company.id,
+        spaceid,
+        message,
+        "info",
+        true,
+        manager.id
+      );
       queryClient.invalidateQueries({
         queryKey: ["manager", "tasks", spaceid],
       });
       queryClient.invalidateQueries({
         queryKey: ["manager", "tasks", manager.id],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["manager", "events", manager.id],
       });
     } else {
       enqueueSnackbar("Something went wrong", { variant: "error" });

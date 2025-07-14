@@ -71,15 +71,12 @@ const Subscription: React.FC = () => {
   }, [checkoutId, stripe]);
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-950 transition-colors duration-300">
-      {/* Navigation */}
-      <nav className="bg-gray-100 dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5">
-          <h1 className="text-2xl font-semibold text-gray-900 dark:text-gray-100 tracking-tight">
-            Subscriptions
-          </h1>
-        </div>
-      </nav>
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-950 transition-colors duration-300 p-8">
+      <div className="flex items-center justify-between pb-4 border-b border-slate-200 dark:border-slate-700">
+        <h1 className="text-2xl md:text-3xl font-semibold text-slate-900 dark:text-slate-100">
+          Subscription Management
+        </h1>
+      </div>
 
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
         <Card className="bg-gray-100 dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl shadow-sm hover:shadow-md transition-shadow duration-300">
@@ -119,8 +116,10 @@ const Subscription: React.FC = () => {
                     key={plan._id}
                     name={plan.name}
                     amount={plan.amount}
+                    features={plan.features}
                     onKnowMore={() => handleKnowMore(plan.name)}
                     alreadySubscribed={!!activeSubscription}
+                    description={plan.description}
                     onSubscribe={() =>
                       handleSubscribe(plan.stripe_price_id!, plan._id)
                     }

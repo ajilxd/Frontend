@@ -8,6 +8,7 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 import { useSelector } from "react-redux";
+import ReactAvatar from "react-avatar";
 
 import { Badge } from "@/components/ui/badge";
 import {
@@ -32,6 +33,12 @@ import { RootState } from "@/redux/store/appStore";
 
 import { AddSpaceForm } from "../../components/AddSpaceForm";
 import { EditSpaceDialog } from "../../components/EditSpaceDialog";
+import { Avatar, AvatarImage } from "@/components/ui/avatar";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 const Spaces = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -171,9 +178,53 @@ const Spaces = () => {
                             </TableCell>
                             <TableCell>
                               <div className="flex -space-x-2 overflow-hidden">
-                                {project.managers.length}
+                                {project.managers.map((i) => {
+                                  if (i.managerImage) {
+                                    return (
+                                      <Tooltip>
+                                        <TooltipTrigger asChild>
+                                          <div
+                                            key={i.managerId}
+                                            className="mr-2"
+                                          >
+                                            <Avatar>
+                                              <AvatarImage
+                                                src={i.managerImage}
+                                              />
+                                            </Avatar>
+                                          </div>
+                                        </TooltipTrigger>
+                                        <TooltipContent>
+                                          {i.managerName}
+                                        </TooltipContent>
+                                      </Tooltip>
+                                    );
+                                  } else {
+                                    return (
+                                      <Tooltip>
+                                        <TooltipTrigger asChild>
+                                          <div
+                                            key={i.managerId}
+                                            className="mr-2"
+                                          >
+                                            <ReactAvatar
+                                              name={i.managerName}
+                                              size="28"
+                                              round={true}
+                                              title=""
+                                            />
+                                          </div>
+                                        </TooltipTrigger>
+                                        <TooltipContent side="bottom">
+                                          {i.managerName}
+                                        </TooltipContent>
+                                      </Tooltip>
+                                    );
+                                  }
+                                })}
                               </div>
                             </TableCell>
+
                             <TableCell className="text-right">
                               <div className="relative inline-block text-left">
                                 <button

@@ -8,4 +8,5 @@ export const ownerCompanyQueryOptions = (
 ): UseQueryOptions<CompanyType, Error> => ({
   queryKey: ["owner", "company", ownerId],
   queryFn: () => ownerFetchCompany(ownerId),
+  staleTime: Infinity,
 });

@@ -11,12 +11,14 @@ interface PlanCardProps extends Plan {
   onSubscribe?: () => void;
   onCancel?: () => void;
   alreadySubscribed?: boolean;
+  description: string;
 }
 
 export const PlanCard: React.FC<PlanCardProps> = ({
   name,
   amount,
   features = [],
+  description,
   alreadySubscribed,
   onSubscribe,
 }) => {
@@ -32,6 +34,10 @@ export const PlanCard: React.FC<PlanCardProps> = ({
       <div className="mb-4">
         <span className="text-3xl font-bold text-gray-900">${amount}</span>
         <span className="text-sm text-gray-500">/month</span>
+      </div>
+
+      <div className="mb-4">
+        <span className="text-gray-700 text-sm">{description}</span>
       </div>
 
       <ul className="mb-6 space-y-3">

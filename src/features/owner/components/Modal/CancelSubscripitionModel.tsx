@@ -50,7 +50,9 @@ export function CancelSubscriptionDialog({ subscriptionId }: Props) {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant="destructive">Cancel Subscription</Button>
+        <button className="px-4 py-2 bg-red-50 text-red-600 hover:text-red-700 hover:bg-red-100 border border-red-200 text-sm font-medium rounded-md transition-colors duration-200">
+          Cancel Subscription
+        </button>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
