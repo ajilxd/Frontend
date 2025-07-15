@@ -16,7 +16,7 @@ import { store } from "./redux/store/appStore.ts";
 import { NotificationSocketProvider } from "./context/NotificationContextProvider.tsx";
 import AuthContextProvider from "./context/AuthContextProvider.tsx";
 import { Calendar } from "./shared/components/Calander/context/CalendarContextProvider.tsx";
-import { CalendarEvent } from "./shared/components/Calander/types.calendar.ts";
+import { Toaster } from "sonner";
 import { EventType } from "react-hook-form";
 
 const queryClient = new QueryClient({
@@ -56,6 +56,7 @@ createRoot(document.getElementById("root")!).render(
                           autoHideDuration={3000}
                         >
                           <App />
+                          <Toaster />
                         </SnackbarProvider>
                       </Calendar>
                     </ThemeContextProvider>

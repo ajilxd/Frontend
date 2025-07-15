@@ -73,9 +73,8 @@ export const adminFetchOwners = async (page: number, itemPerPage: number) => {
     const response = await adminApi.get(
       `${baseUrl}/admin/owners?page=${page}&itemPerPage=${itemPerPage}`
     );
-    console.log(response);
+
     if (response.status === 200) {
-      console.log(response.data.data);
       return response.data.data;
     }
 
@@ -120,6 +119,38 @@ export async function adminToggleSubscriptionStatus(id: string) {
       };
     }
     throw new Error("unexpected response from server");
+  } catch (error) {
+    return catchResponse(error);
+  }
+}
+
+export async function adminFetchAllUsers(page: Number, itemPerPage: Number) {
+  try {
+    if (!page || !itemPerPage) {
+      throw new Error("Page and itemPerpage is missing");
+    }
+    const response = await adminApi.get(
+      `${baseUrl}/admin/users?page=${page}&itemPerPage=${itemPerPage}`
+    );
+    if (response.status === 200) {
+      return response.data.data;
+    }
+    throw new Error("Unexpected response from server");
+  } catch (error) {
+    throw catchResponse(error);
+  }
+}
+
+export async function adminBlockUser(role: string, id: string, block: boolean) {
+  try {
+    const payload = { role, id, block };
+    const response = await adminApi.patch(`${baseUrl}/admin/users`, payload);
+    if (response.status === 200) {
+      return {
+        success: true,
+      };
+    }
+    throw new Error("Unexpected response from server");
   } catch (error) {
     return catchResponse(error);
   }

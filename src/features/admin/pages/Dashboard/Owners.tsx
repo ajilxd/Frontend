@@ -13,7 +13,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { PaginationComponent } from "@/shared/components/Pagination";
 
 import { adminToggleOwnerStatus } from "../../api/admin.api";
-import { useOwnersQuery } from "@/queries/admin/owners/userOwnerQuery";
+import { useAdminOwnersQuery } from "@/queries/admin/owners/useAdminOwnerQuery";
 
 const SkeletonRow = () => (
   <tr className="animate-pulse">
@@ -35,7 +35,7 @@ const OwnersTable = () => {
   const [loadingStates, setLoadingStates] = useState<Record<string, boolean>>(
     {}
   );
-  const { data, isLoading, refetch } = useOwnersQuery(page);
+  const { data, isLoading, refetch } = useAdminOwnersQuery(page);
 
   useEffect(() => {
     if (data) console.log("Owners Data: ", data);
@@ -144,14 +144,12 @@ const OwnersTable = () => {
                       className="group hover:bg-gradient-to-r hover:from-blue-50/50 hover:to-purple-50/50 dark:hover:from-blue-900/10 dark:hover:to-purple-900/10 transition-all duration-300 ease-in-out transform hover:scale-[1.01] hover:shadow-lg"
                       style={{ animationDelay: `${index * 50}ms` }}
                     >
-                      {/* Name */}
                       <td className="px-6 py-5">
                         <div className="font-semibold text-gray-900 dark:text-gray-100 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors duration-200">
                           {owner.name}
                         </div>
                       </td>
 
-                      {/* Avatar */}
                       <td className="px-6 py-5">
                         <div className="relative">
                           <Avatar className="h-12 w-12 ring-2 ring-gray-200 dark:ring-gray-600 group-hover:ring-blue-300 dark:group-hover:ring-blue-500 transition-all duration-300 shadow-lg">
@@ -164,14 +162,12 @@ const OwnersTable = () => {
                         </div>
                       </td>
 
-                      {/* Email */}
                       <td className="px-6 py-5">
                         <div className="text-sm text-gray-600 dark:text-gray-300 group-hover:text-gray-800 dark:group-hover:text-gray-100 transition-colors duration-200">
                           {owner.email}
                         </div>
                       </td>
 
-                      {/* Created Date */}
                       <td className="px-6 py-5">
                         <div className="text-sm text-gray-500 dark:text-gray-400 font-medium">
                           {new Date(owner.createdAt).toLocaleDateString(
@@ -185,7 +181,6 @@ const OwnersTable = () => {
                         </div>
                       </td>
 
-                      {/* Subscription */}
                       <td className="px-6 py-5">
                         <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium bg-gradient-to-r from-indigo-50 to-blue-50 text-indigo-700 border border-indigo-200 dark:from-indigo-900/20 dark:to-blue-900/20 dark:text-indigo-300 dark:border-indigo-800/30">
                           <CreditCard className="h-3 w-3" />
@@ -193,7 +188,6 @@ const OwnersTable = () => {
                         </div>
                       </td>
 
-                      {/* Status */}
                       <td className="px-6 py-5">
                         <div
                           className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-bold shadow-sm ${getStatusColor(
@@ -209,7 +203,6 @@ const OwnersTable = () => {
                         </div>
                       </td>
 
-                      {/* Actions */}
                       <td className="px-6 py-5">
                         <button
                           className={`relative inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-offset-2 shadow-lg ${
@@ -265,8 +258,7 @@ const OwnersTable = () => {
           </div>
         </div>
 
-        {/* Pagination */}
-        {data && data.totalPage > 1 && (
+        {data && data.totalPage && (
           <div className="mt-8 flex justify-center">
             <div className="bg-white/80 backdrop-blur-sm dark:bg-gray-900/80 rounded-2xl shadow-xl p-4 border border-gray-200/50 dark:border-gray-700/50">
               <PaginationComponent

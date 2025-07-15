@@ -364,3 +364,13 @@ export type EventType = {
   type: "Task";
   color?: string;
 };
+
+export type AccountType = {
+  role: "user" | "manager" | "owner";
+  name: string;
+  userId: string;
+  status: "active" | "inactive";
+  company: string;
+  joinedAt: Date;
+  image: string;
+};
