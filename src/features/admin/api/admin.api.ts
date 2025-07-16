@@ -124,13 +124,19 @@ export async function adminToggleSubscriptionStatus(id: string) {
   }
 }
 
-export async function adminFetchAllUsers(page: Number, itemPerPage: Number) {
+export async function adminFetchAllUsers(
+  page: Number,
+  itemPerPage: Number,
+  search: String,
+  role: String,
+  status: String
+) {
   try {
     if (!page || !itemPerPage) {
       throw new Error("Page and itemPerpage is missing");
     }
     const response = await adminApi.get(
-      `${baseUrl}/admin/users?page=${page}&itemPerPage=${itemPerPage}`
+      `${baseUrl}/admin/users?page=${page}&itemPerPage=${itemPerPage}&search=${search}&role=${role}&$status=${status}`
     );
     if (response.status === 200) {
       return response.data.data;
