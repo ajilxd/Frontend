@@ -155,3 +155,20 @@ export async function adminBlockUser(role: string, id: string, block: boolean) {
     return catchResponse(error);
   }
 }
+
+export async function adminFetchAllTransactions(
+  page: number,
+  itemPerPage: number
+) {
+  try {
+    const response = await adminApi.get(
+      `${baseUrl}/admin/transactions?page=${page}&itemPerPage=${itemPerPage}`
+    );
+    if (response.status === 200) {
+      return response.data.data;
+    }
+    throw new Error("unexpected response from server");
+  } catch (error) {
+    return catchResponse(error);
+  }
+}

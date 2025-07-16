@@ -1,5 +1,4 @@
 import { useStripe } from "@stripe/react-stripe-js";
-import { enqueueSnackbar } from "notistack";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 
@@ -11,18 +10,22 @@ import { RootState } from "@/redux/store/appStore";
 import { ownerPaymentCheckoutService } from "../../api/owner.api";
 import { ActiveSubscription } from "../../components/ActiveSubscription";
 import { PlanCard } from "../../components/PlanCard";
+import { useOwnerCompanyQuery } from "@/queries/owners/company/useOwnerCompanyQuery";
+
+import { toast } from "sonner";
 
 const Subscription: React.FC = () => {
   const stripe = useStripe();
   const owner = useSelector((state: RootState) => state.owner);
+  if (!owner._id || !owner) {
+    return;
+  }
   const { _id: ownerId, stripe_customer_id: stripeCustomerId } = owner || {};
   const { data: subscripitons } = useSubscriptionsQuery();
-
-  console.log(subscripitons);
-
   const { data: activeSubscription } = useOwnerSubscriptionQuery(
     "" + owner._id
   );
+  const { data: company } = useOwnerCompanyQuery(owner._id);
 
   const [checkoutId, setCheckoutId] = useState<string>("");
 
@@ -31,10 +34,11 @@ const Subscription: React.FC = () => {
   };
 
   const handleSubscribe = async (planId: string, subscriptionId: string) => {
+    if (!company) {
+      toast("Fill company details first!");
+      return;
+    }
     if (!ownerId || !stripeCustomerId || !subscriptionId || !planId) {
-      enqueueSnackbar("Missing required fields for checkout.", {
-        variant: "error",
-      });
       console.error("Missing fields", {
         ownerId,
         stripeCustomerId,
@@ -60,7 +64,7 @@ const Subscription: React.FC = () => {
       }
     } catch (err) {
       console.error(err);
-      enqueueSnackbar("Failed to initiate checkout", { variant: "error" });
+      toast.error("Failed to initiate checkout");
     }
   };
 

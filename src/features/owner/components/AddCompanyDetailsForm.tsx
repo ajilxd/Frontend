@@ -1,8 +1,8 @@
 import { useFormik } from "formik";
 import { Check, Plus } from "lucide-react";
-import { enqueueSnackbar } from "notistack";
 import { useState } from "react";
 import { useSelector } from "react-redux";
+import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -21,7 +21,6 @@ import {
 } from "@/components/ui/popover";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
-import { useOwnerSubscriptionQuery } from "@/queries/owners/subscriptions/useOwnerSubscriptionQuery";
 import { RootState } from "@/redux/store/appStore";
 
 import { ownerAddCompanyDetails } from "../api/owner.api";
@@ -47,8 +46,7 @@ export function AddCompanyDetailsForm() {
   const [open, setOpen] = useState(false);
   const [newIndustry, setNewIndustry] = useState("");
   const owner = useSelector((state: RootState) => state.owner);
-  const { data: OwnerSubscription } = useOwnerSubscriptionQuery("" + owner._id);
-  const queryClient = useQueryClient()
+  const queryClient = useQueryClient();
 
   const formik = useFormik({
     initialValues: {
@@ -65,16 +63,14 @@ export function AddCompanyDetailsForm() {
         industry: selectedIndustries,
       });
       if (res.success) {
-        enqueueSnackbar("Company details added succesfully", {
-          variant: "success",
-        });
+        toast.success("Company added succesfully");
 
         formik.resetForm();
-        queryClient.invalidateQueries({queryKey:["owner", "company", owner._id]})
-      } else {
-        enqueueSnackbar(res.message, {
-          variant: "error",
+        queryClient.invalidateQueries({
+          queryKey: ["owner", "company", owner._id],
         });
+      } else {
+        toast.error("Something went wrong try again");
       }
     },
   });
@@ -112,7 +108,6 @@ export function AddCompanyDetailsForm() {
           </h2>
         </div>
 
-        {/* Company Name */}
         <div className="space-y-1.5">
           <label
             htmlFor="companyName"
@@ -136,7 +131,6 @@ export function AddCompanyDetailsForm() {
           )}
         </div>
 
-        {/* Industry Select */}
         <div className="space-y-1.5">
           <label
             htmlFor="industries"
@@ -216,7 +210,6 @@ export function AddCompanyDetailsForm() {
           </Popover>
         </div>
 
-        {/* Website URL */}
         <div className="space-y-1.5">
           <label
             htmlFor="website"
@@ -241,7 +234,6 @@ export function AddCompanyDetailsForm() {
           )}
         </div>
 
-        {/* Description */}
         <div className="space-y-1.5">
           <label
             htmlFor="description"
@@ -269,7 +261,6 @@ export function AddCompanyDetailsForm() {
         <div className="pt-2">
           <Button
             type="submit"
-            disabled={!OwnerSubscription}
             className="w-full h-9 text-sm bg-blue-500 hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700 text-white font-medium rounded-md"
           >
             Register Company

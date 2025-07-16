@@ -42,11 +42,7 @@ createRoot(document.getElementById("root")!).render(
                 <BrowserRouter>
                   <AuthContextProvider>
                     <ThemeContextProvider>
-                      <Calendar
-                        onEventClick={(event: EventType) =>
-                          alert("Event clicked: " + JSON.stringify(event))
-                        }
-                      >
+                      <Calendar>
                         <SnackbarProvider
                           maxSnack={3}
                           anchorOrigin={{
@@ -56,7 +52,7 @@ createRoot(document.getElementById("root")!).render(
                           autoHideDuration={3000}
                         >
                           <App />
-                          <Toaster />
+                          <Toaster position="top-center" richColors />
                         </SnackbarProvider>
                       </Calendar>
                     </ThemeContextProvider>

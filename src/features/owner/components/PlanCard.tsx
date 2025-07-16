@@ -56,7 +56,7 @@ export const PlanCard: React.FC<PlanCardProps> = ({
       <div className="flex gap-3">
         <button
           onClick={onSubscribe}
-          disabled={alreadySubscribed}
+          // disabled={alreadySubscribed}
           className={`px-4 py-2 ${"bg-blue-600 hover:bg-blue-700"} text-white text-sm font-medium rounded-md transition-colors flex-1`}
         >
           Subscribe

@@ -1,8 +1,8 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { Formik, Form, Field, ErrorMessage } from "formik";
-import { enqueueSnackbar } from "notistack";
 import { useState } from "react";
 import { useSelector } from "react-redux";
+import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -40,12 +40,10 @@ export const EditCompanyDetailsModal = () => {
       queryClient.invalidateQueries({
         queryKey: ["owner", "company", "" + owner._id],
       });
-      enqueueSnackbar("Successfully edited company details", {
-        variant: "success",
-      });
+      toast.success("Company details updated succesfully");
       setOpen(false);
     } else {
-      enqueueSnackbar("Something went wrong. Try again.", { variant: "error" });
+      toast.error("something went wrong try again");
     }
     setSubmitting(false);
   };
