@@ -36,7 +36,6 @@ const AllUserTable = () => {
     setPage(page);
   }, []);
 
-  // Fixed: Use page state instead of hardcoded 1
   const { data } = useAdminAllUsersQuery(page, 10, search, role, status);
 
   const debouncedSetSearch = useCallback(
