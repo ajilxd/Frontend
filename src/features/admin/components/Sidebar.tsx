@@ -8,7 +8,6 @@ import SidebarLink from "./Sidebarlink";
 
 enum AdminSidebarType {
   Dashboard = "Dashboard",
-  Owners = "Owners",
   Subscriptions = "Subscriptions",
   AllUsers = "AllUsers",
   Transactions = "Transactions",
@@ -38,14 +37,6 @@ export default function Sidebar({ isOpen, toggleSidebar }: SidebarProps) {
       },
       icon: <ShoppingBag size={18} />,
       label: "Subscriptions",
-    },
-    [AdminSidebarType.Owners]: {
-      onClick: () => {
-        setActive(AdminSidebarType.Owners);
-        navigate("/admin/dashboard/owners");
-      },
-      icon: <Users size={18} />,
-      label: "Owners",
     },
     [AdminSidebarType.AllUsers]: {
       onClick: () => {
