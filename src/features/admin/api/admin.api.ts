@@ -158,11 +158,13 @@ export async function adminBlockUser(role: string, id: string, block: boolean) {
 
 export async function adminFetchAllTransactions(
   page: number,
-  itemPerPage: number
+  itemPerPage: number,
+  search: "" | string,
+  status: "" | "fail" | "success"
 ) {
   try {
     const response = await adminApi.get(
-      `${baseUrl}/admin/transactions?page=${page}&itemPerPage=${itemPerPage}`
+      `${baseUrl}/admin/transactions?page=${page}&itemPerPage=${itemPerPage}&search=${search}&status=${status}`
     );
     if (response.status === 200) {
       return response.data.data;

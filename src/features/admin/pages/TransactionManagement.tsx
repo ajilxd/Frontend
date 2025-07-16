@@ -1,4 +1,4 @@
-import { useState, useMemo, useCallback } from "react";
+import { useState, useCallback } from "react";
 import { Input } from "@/components/ui/input";
 import { Search } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
@@ -11,35 +11,47 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { formatDate } from "../utils";
 
 import { useAdminTransactionsQuery } from "@/queries/admin/transactions/useTransactionQuery";
 import { PaginationComponent } from "@/shared/components/Pagination";
-import type { TransactionType } from "@/types";
 import TransactionsMorePopOver from "../components/TransactionsMorePopOver";
+import { debounce } from "@/utils/debounce";
 
 const Transactions = () => {
-  const [searchQuery, setSearchQuery] = useState("");
+  const [search, setSearch] = useState("");
+  const [status, setStatus] = useState("");
+  const [inputSearch, setInputSearch] = useState("");
   const [page, setPage] = useState<number>(1);
 
   const memoisedPageUpdater = useCallback((page: number) => {
     setPage(page);
   }, []);
 
-  const { data, isFetched } = useAdminTransactionsQuery(page, 10);
+  const debouncedSetSearch = useCallback(
+    debounce((value: string) => {
+      setSearch(value);
+    }, 1000),
+    []
+  );
 
-  const filteredTransactions = useMemo(() => {
-    if (!searchQuery.trim()) {
-      return data?.transactions;
+  const handleStatusChange = useCallback((value: string) => {
+    if (value === "all") {
+      setStatus("");
+    } else {
+      setStatus(value);
     }
-    const query = searchQuery.toLowerCase().trim();
-    return data?.transactions?.filter(
-      (tx: TransactionType) =>
-        tx.customerName.toLowerCase().includes(query) ||
-        tx.companyName.toLowerCase().includes(query) ||
-        tx.subscriptionName.toLowerCase().includes(query)
-    );
-  }, [searchQuery, data, isFetched]);
+    setPage(1);
+  }, []);
+
+  const { data } = useAdminTransactionsQuery(page, 10, search, status);
 
   return (
     <div className="w-full space-y-4 dark:bg-gray-900">
@@ -48,21 +60,43 @@ const Transactions = () => {
           <CardTitle className="text-2xl pt-10 pb-5">
             All Transactions
           </CardTitle>
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 h-4 w-4" />
-            <Input
-              placeholder="Search by customer, company, or subscription..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-100 dark:placeholder-gray-400"
-            />
+          <div className="flex flex-col sm:flex-row gap-4">
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 h-4 w-4" />
+              <Input
+                placeholder="Search by customer, company, or subscription..."
+                value={inputSearch}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  setInputSearch(value);
+                  debouncedSetSearch(value);
+                }}
+                className="pl-10 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-100 dark:placeholder-gray-400"
+              />
+            </div>
+            <Select value={status} onValueChange={handleStatusChange}>
+              <SelectTrigger className="w-full sm:w-[180px] dark:bg-gray-800 dark:border-gray-700 dark:text-gray-100">
+                <SelectValue placeholder="Filter by status" />
+              </SelectTrigger>
+              <SelectContent className="dark:bg-gray-800 dark:border-gray-700">
+                <SelectItem value="all" className="dark:text-gray-100">
+                  All
+                </SelectItem>
+                <SelectItem value="success" className="dark:text-gray-100">
+                  Success Only
+                </SelectItem>
+                <SelectItem value="fail" className="dark:text-gray-100">
+                  Failure Only
+                </SelectItem>
+              </SelectContent>
+            </Select>
           </div>
         </CardHeader>
         <CardContent>
-          {filteredTransactions && filteredTransactions.length === 0 ? (
+          {data?.transactions && data.transactions.length === 0 ? (
             <div className="text-center py-8 text-muted-foreground dark:text-gray-400">
               <Search className="mx-auto h-12 w-12 mb-4 opacity-50" />
-              <p>No transactions found for "{searchQuery}"</p>
+              <p>No transactions found for "{search}"</p>
               <p className="text-sm mt-1">
                 Try searching by customer or company
               </p>
@@ -86,7 +120,7 @@ const Transactions = () => {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {filteredTransactions?.map((tx, index) => (
+                    {data?.transactions?.map((tx, index) => (
                       <TableRow key={`${tx.customerId}-${index}`}>
                         <TableCell>{index + 1}</TableCell>
                         <TableCell>{tx.customerName}</TableCell>
@@ -119,7 +153,7 @@ const Transactions = () => {
               </div>
 
               <div className="md:hidden space-y-4">
-                {filteredTransactions?.map((tx) => (
+                {data?.transactions?.map((tx) => (
                   <Card
                     key={`${tx.customerId}-${tx.createdAt}`}
                     className="p-4 dark:bg-gray-800 dark:border-gray-700"
