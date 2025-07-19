@@ -1,16 +1,34 @@
 import * as Yup from "yup";
 
 export const addSubscriptionValidationSchema = Yup.object({
-  name: Yup.string()
-    .required("Plan name is required")
-    .max(20, "Plan name must be 20 characters or less"),
-  amount: Yup.number()
-    .positive("Amount must be positive")
-    .required("Amount is required"),
-  billingCycle: Yup.string().required("Billing cycle is required"),
-  isActive: Yup.boolean().required("Status is required"),
-  features: Yup.array().of(Yup.string()).min(1, "Select at least one feature"),
-  description: Yup.string()
-    .required("description is required")
-    .max(500, "Description must be 500 characters or less"),
+  name: Yup.string().required("Plan name is required"),
+  description: Yup.string().required("Description is required"),
+  monthlyAmount: Yup.number().when("billingCycleType", {
+    is: (val: string) => val === "month" || val === "both",
+    then: (schema) =>
+      schema
+        .typeError("Monthly amount must be a number")
+        .required("Monthly amount is required")
+        .moreThan(0, "Must be greater than 0"),
+  }),
+  yearlyAmount: Yup.number().when("billingCycleType", {
+    is: "year",
+    then: (schema) =>
+      schema
+        .typeError("Yearly amount must be a number")
+        .required("Yearly amount is required")
+        .moreThan(0, "Must be greater than 0"),
+  }),
+  numberOfSpaces: Yup.number()
+    .typeError("Spaces must be a number")
+    .min(1, "At least 1 space required")
+    .required("Number of spaces is required"),
+  numberOfManagers: Yup.number()
+    .typeError("Managers must be a number")
+    .min(1, "At least 1 manager required")
+    .required("Number of managers is required"),
+  numberOfUsers: Yup.number()
+    .typeError("Users must be a number")
+    .min(1, "At least 1 user required")
+    .required("Number of users is required"),
 });

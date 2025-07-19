@@ -34,16 +34,19 @@ export const adminLogOutService = async () => {
   }
 };
 
-export const adminFetchSubscriptions = async () => {
+export const adminFetchSubscriptions = async (
+  page: number,
+  itemPerPage: number,
+  search: string,
+  billingCycle: string,
+  status: string
+) => {
   try {
-    const res = await adminApi.get(`${baseUrl}/admin/subscriptions`);
-    if (res.status === 201) {
+    const res = await adminApi.get(
+      `${baseUrl}/admin/subscriptions?page=${page}&itemPerPage=${itemPerPage}&search=${search}&billingCycle=${billingCycle}&status=${status}`
+    );
+    if (res.status === 200) {
       return res.data.data;
-    }
-
-    if (res.status === 204) {
-      console.warn("no subscriptons found");
-      return [];
     }
 
     throw new Error("Unexpected response from server");
@@ -52,7 +55,9 @@ export const adminFetchSubscriptions = async () => {
   }
 };
 
-export const adminAddSubscriptionService = async (data: SubscriptionType) => {
+export const adminAddSubscriptionService = async (
+  data: Partial<SubscriptionType>
+) => {
   try {
     const res = await adminApi.post(`${baseUrl}/admin/subscription`, data);
     if (res.status === 201) {

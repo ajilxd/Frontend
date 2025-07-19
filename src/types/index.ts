@@ -87,32 +87,43 @@ export type ManagerType = {
   companyName?: string;
 };
 
-export type SubscriptionType = {
-  _id: string;
-  billingCycle: string;
-  amount: string;
-  name: string;
-  stripe_product_id?: string;
-  stripe_price_id?: string;
-  isActive: boolean;
-  description: string;
-  features: Array<string>;
-  createdAt?: Date;
+export type Features = {
+  managerCount: number;
+  userCount: number;
+  chat: boolean;
+  meeting: boolean;
+  spaces: number;
 };
 
+export interface SubscriptionType {
+  _id: string;
+  name: string;
+  billingCycleType: string;
+  isActive: boolean;
+  yearlyAmount: number | string;
+  monthlyAmount: number | string;
+  stripe_product_id?: string;
+  description: string;
+  stripe_monthly_price_id?: string;
+  stripe_yearly_price_id?: string;
+  yearlyDiscountPercentage?: number;
+  features: Features;
+  userCount?: Number;
+}
+
 export type OwnerSubscriptionType = {
-  name?: string;
-  status?: string;
-  billingCycle?: string;
-  stripe_subscription_id?: string;
-  subscription_id?: string;
+  name: string;
+  status: string;
+  billingCycle: string;
+  stripe_subscription_id: string;
+  subscription_id: string;
   next_invoice?: string;
   cancel_at?: string;
   canceled_at?: string;
-  created?: string;
-  features?: Array<string>;
-  amount?: string;
-  expires_at?: string;
+  created: string;
+  features: Features;
+  amount: string;
+  expires_at: string;
   invoice?: string;
   cancel_at_period_end?: boolean;
 };

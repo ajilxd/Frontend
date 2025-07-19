@@ -7,9 +7,10 @@ import AdminDashboardLayout from "../layouts/AdminDashboardLayout";
 import AdminLogin from "../pages/AdminLogin";
 import AdminDashboard from "../pages/Dashboard";
 import OwnersTable from "../pages/Dashboard/Owners";
-import SubscriptionDashboard from "../pages/Dashboard/Subscription";
 import UserTable from "../pages/UserManagement";
 import Transactions from "../pages/TransactionManagement";
+import Subscription from "../pages/Subscriptions";
+import AddSubscriptionForm from "../pages/NewSubscription";
 
 const AdminRoutes: React.FC = () => {
   return (
@@ -27,12 +28,13 @@ const AdminRoutes: React.FC = () => {
         >
           <Route index element={<AdminDashboard />}></Route>
           <Route
-            path="subscriptions"
-            element={<SubscriptionDashboard />}
+            path="new-subscription"
+            element={<AddSubscriptionForm />}
           ></Route>
           <Route path="owners" element={<OwnersTable />}></Route>
           <Route path="users" element={<UserTable />}></Route>
           <Route path="transactions" element={<Transactions />}></Route>
+          <Route path="subscriptions" element={<Subscription />}></Route>
         </Route>
       </Routes>
     </>

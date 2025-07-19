@@ -33,7 +33,14 @@ const Subscription: React.FC = () => {
     console.log(`Learn more about ${name}`);
   };
 
-  const handleSubscribe = async (planId: string, subscriptionId: string) => {
+  const handleSubscribe = async (
+    planId: string,
+    subscriptionId: string,
+    billingCycleType: string,
+    yearly: boolean,
+    monthly: boolean,
+    amount: string
+  ) => {
     if (!company) {
       toast("Fill company details first!");
       return;
@@ -47,24 +54,31 @@ const Subscription: React.FC = () => {
       });
       return;
     }
-
-    try {
-      const result = await ownerPaymentCheckoutService({
-        ownerId,
-        planId,
-        stripeCustomerId,
-        subscriptionId,
-      });
-      if (result.success) {
-        setCheckoutId(result?.data?.id);
-      } else {
-        console.warn(
-          "Failed to set the checkout id - couldnt fetch from server"
-        );
-      }
-    } catch (err) {
-      console.error(err);
-      toast.error("Failed to initiate checkout");
+    console.log({
+      ownerId,
+      planId,
+      stripeCustomerId,
+      subscriptionId,
+      billingCycleType,
+      monthly,
+      yearly,
+      amount,
+    });
+    const result = await ownerPaymentCheckoutService({
+      ownerId,
+      planId,
+      stripeCustomerId,
+      subscriptionId,
+      billingCycleType,
+      monthly,
+      yearly,
+      amount,
+    });
+    if (result.success) {
+      setCheckoutId(result?.data?.id);
+    } else {
+      toast.warning("something went wrong");
+      console.warn("Failed to set the checkout id - couldnt fetch from server");
     }
   };
 
@@ -119,13 +133,32 @@ const Subscription: React.FC = () => {
                   <PlanCard
                     key={plan._id}
                     name={plan.name}
-                    amount={plan.amount}
                     features={plan.features}
                     onKnowMore={() => handleKnowMore(plan.name)}
+                    billingCycleType={plan.billingCycleType}
                     alreadySubscribed={!!activeSubscription}
                     description={plan.description}
-                    onSubscribe={() =>
-                      handleSubscribe(plan.stripe_price_id!, plan._id)
+                    monthlyAmount={+plan.monthlyAmount}
+                    yearlyAmount={+plan.yearlyAmount}
+                    onSubscribeMonthly={() =>
+                      handleSubscribe(
+                        plan.stripe_monthly_price_id!,
+                        plan._id,
+                        plan.billingCycleType,
+                        false,
+                        true,
+                        "" + plan.monthlyAmount
+                      )
+                    }
+                    onSubscribeYearly={() =>
+                      handleSubscribe(
+                        plan.stripe_yearly_price_id!,
+                        plan._id,
+                        plan.billingCycleType,
+                        true,
+                        false,
+                        "" + plan.yearlyAmount
+                      )
                     }
                   />
                 ))

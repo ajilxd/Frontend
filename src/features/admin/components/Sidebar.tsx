@@ -1,4 +1,11 @@
-import { X, Users, ShoppingBag, UserSearch, Receipt } from "lucide-react";
+import {
+  X,
+  Users,
+  ShoppingBag,
+  UserSearch,
+  Receipt,
+  DiamondPlus,
+} from "lucide-react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
@@ -11,6 +18,7 @@ enum AdminSidebarType {
   Subscriptions = "Subscriptions",
   AllUsers = "AllUsers",
   Transactions = "Transactions",
+  Add_Subscripition = "Add Subscription",
 }
 
 type SidebarProps = {
@@ -37,6 +45,14 @@ export default function Sidebar({ isOpen, toggleSidebar }: SidebarProps) {
       },
       icon: <ShoppingBag size={18} />,
       label: "Subscriptions",
+    },
+    [AdminSidebarType.Add_Subscripition]: {
+      onClick: () => {
+        setActive(AdminSidebarType.Add_Subscripition);
+        navigate("/admin/dashboard/new-subscription");
+      },
+      icon: <DiamondPlus size={18} />,
+      label: "Add Subscription",
     },
     [AdminSidebarType.AllUsers]: {
       onClick: () => {

@@ -4,6 +4,7 @@ import { OwnerSubscriptionType } from "@/types";
 
 import { ActivePlanDialog } from "./Modal/ActivePlanDialog";
 import { CancelSubscriptionDialog } from "./Modal/CancelSubscripitionModel";
+import { Boxes, Building, MessageCircleHeart, User, Video } from "lucide-react";
 
 interface ActiveSubscriptionProps {
   activePlan?: OwnerSubscriptionType;
@@ -65,7 +66,7 @@ export const ActiveSubscription: React.FC<ActiveSubscriptionProps> = ({
           </p>
           <div className="flex items-baseline gap-2">
             <span className="text-3xl font-bold text-gray-900">
-              ${activePlan.amount || "0"}
+              ₹{activePlan.amount || "0"}
             </span>
             <span className="text-sm text-gray-500">/{billingCycle}</span>
           </div>
@@ -90,15 +91,43 @@ export const ActiveSubscription: React.FC<ActiveSubscriptionProps> = ({
           Your Plan Features
         </h4>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          {activePlan.features?.length ? (
-            activePlan.features.map((feature, index) => (
-              <div
-                key={index}
-                className="bg-gray-50 p-3 rounded-md text-gray-700 text-sm"
-              >
-                • {feature}
+          {activePlan.features ? (
+            <>
+              <div className="bg-gray-50 p-3 rounded-md text-gray-700 text-sm">
+                <div className="flex gap-2">
+                  <Boxes size={24} />
+                  No of users {activePlan.features.userCount}
+                </div>
               </div>
-            ))
+              <div className="bg-gray-50 p-3 rounded-md text-gray-700 text-sm">
+                <div className="flex gap-2">
+                  <User size={24} />
+                  No of users {activePlan.features.userCount}
+                </div>
+              </div>
+              <div className="bg-gray-50 p-3 rounded-md text-gray-700 text-sm">
+                <div className="flex gap-2">
+                  <Building size={24} />
+                  No of spaces {activePlan.features.spaces}
+                </div>
+              </div>
+              <div className="bg-gray-50 p-3 rounded-md text-gray-700 text-sm">
+                {activePlan.features.meeting && (
+                  <div className="flex gap-2">
+                    <MessageCircleHeart size={24} />
+                    Chat included for groups
+                  </div>
+                )}
+              </div>
+              <div className="bg-gray-50 p-3 rounded-md text-gray-700 text-sm">
+                {activePlan.features.meeting && (
+                  <div className="flex gap-2">
+                    <Video size={24} />
+                    Meeting included for groups
+                  </div>
+                )}
+              </div>
+            </>
           ) : (
             <p className="text-sm text-gray-500">No features listed.</p>
           )}

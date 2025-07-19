@@ -181,9 +181,8 @@ export async function ownerFetchSubscriptions() {
   }
 }
 
-export async function ownerPaymentCheckoutService(
-  value: CheckoutPayment<string>
-) {
+export async function ownerPaymentCheckoutService(value: CheckoutPayment) {
+  console.log("checkout session value before sending", value);
   try {
     const response = await ownerApi.post(
       `${baseUrl}/payment/create-checkout-session`,
