@@ -5,6 +5,8 @@ import {
   UserSearch,
   Receipt,
   DiamondPlus,
+  icons,
+  FileChartColumnIncreasingIcon,
 } from "lucide-react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -19,6 +21,7 @@ enum AdminSidebarType {
   AllUsers = "AllUsers",
   Transactions = "Transactions",
   Add_Subscripition = "Add Subscription",
+  Sales_Report = "Sales Report",
 }
 
 type SidebarProps = {
@@ -69,6 +72,14 @@ export default function Sidebar({ isOpen, toggleSidebar }: SidebarProps) {
       },
       icon: <Receipt size={18} />,
       label: "Transactions",
+    },
+    [AdminSidebarType.Sales_Report]: {
+      onClick: () => {
+        setActive(AdminSidebarType.Sales_Report);
+        navigate("/admin/dashboard/sales-report");
+      },
+      icon: <FileChartColumnIncreasingIcon size={18} />,
+      label: "Sales report",
     },
   };
   return (

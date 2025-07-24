@@ -33,19 +33,29 @@ const Subscription: React.FC = () => {
     console.log(`Learn more about ${name}`);
   };
 
+  console.log(`active subscription`, activeSubscription);
+
   const handleSubscribe = async (
     planId: string,
     subscriptionId: string,
     billingCycleType: string,
     yearly: boolean,
     monthly: boolean,
-    amount: string
+    amount: string,
+    points: string,
+    upgrade: boolean
   ) => {
     if (!company) {
       toast("Fill company details first!");
       return;
     }
-    if (!ownerId || !stripeCustomerId || !subscriptionId || !planId) {
+    if (
+      !ownerId ||
+      !stripeCustomerId ||
+      !subscriptionId ||
+      !planId ||
+      !points
+    ) {
       console.error("Missing fields", {
         ownerId,
         stripeCustomerId,
@@ -54,16 +64,7 @@ const Subscription: React.FC = () => {
       });
       return;
     }
-    console.log({
-      ownerId,
-      planId,
-      stripeCustomerId,
-      subscriptionId,
-      billingCycleType,
-      monthly,
-      yearly,
-      amount,
-    });
+
     const result = await ownerPaymentCheckoutService({
       ownerId,
       planId,
@@ -73,6 +74,8 @@ const Subscription: React.FC = () => {
       monthly,
       yearly,
       amount,
+      points,
+      upgrade,
     });
     if (result.success) {
       setCheckoutId(result?.data?.id);
@@ -147,7 +150,9 @@ const Subscription: React.FC = () => {
                         plan.billingCycleType,
                         false,
                         true,
-                        "" + plan.monthlyAmount
+                        "" + plan.monthlyAmount,
+                        "" + plan.points,
+                        !!activeSubscription
                       )
                     }
                     onSubscribeYearly={() =>
@@ -157,9 +162,12 @@ const Subscription: React.FC = () => {
                         plan.billingCycleType,
                         true,
                         false,
-                        "" + plan.yearlyAmount
+                        "" + plan.yearlyAmount,
+                        "" + plan.points,
+                        !!activeSubscription
                       )
                     }
+                    allowUpgrade={+plan.points! > +activeSubscription?.points!}
                   />
                 ))
               )}

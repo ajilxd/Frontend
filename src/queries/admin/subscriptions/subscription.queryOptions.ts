@@ -2,7 +2,7 @@ import type { UseQueryOptions } from "@tanstack/react-query";
 
 import { adminFetchSubscriptions } from "@/features/admin/api/admin.api";
 
-import type { AdminSubscriptionType } from "@/types";
+import type { SubscriptionType } from "@/types";
 
 export const adminSubscripitonsQueryOptions = (
   page: number,
@@ -11,7 +11,7 @@ export const adminSubscripitonsQueryOptions = (
   billingCycle: string,
   status: string
 ): UseQueryOptions<
-  { subscriptions: AdminSubscriptionType[]; totalPage: number },
+  { subscriptions: SubscriptionType[]; totalPage: number },
   Error
 > => ({
   queryKey: ["admin", "subscriptions", { page, search, billingCycle, status }],

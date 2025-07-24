@@ -5,6 +5,7 @@ import { OwnerSubscriptionType } from "@/types";
 import { ActivePlanDialog } from "./Modal/ActivePlanDialog";
 import { CancelSubscriptionDialog } from "./Modal/CancelSubscripitionModel";
 import { Boxes, Building, MessageCircleHeart, User, Video } from "lucide-react";
+import { act } from "react";
 
 interface ActiveSubscriptionProps {
   activePlan?: OwnerSubscriptionType;
@@ -74,9 +75,7 @@ export const ActiveSubscription: React.FC<ActiveSubscriptionProps> = ({
 
         <div className="flex flex-col gap-3 md:self-start">
           <ActivePlanDialog activePlan={activePlan} />
-          <CancelSubscriptionDialog
-            subscriptionId={"" + activePlan.stripe_subscription_id}
-          />
+          <CancelSubscriptionDialog activePlan={activePlan} />
           <button
             className="px-4 py-2 bg-blue-50 text-blue-600 hover:text-blue-700 hover:bg-blue-100 border border-blue-200 text-sm font-medium rounded-md transition-colors duration-200"
             onClick={() => navigate("/owner/dashboard/invoices")}
@@ -96,7 +95,7 @@ export const ActiveSubscription: React.FC<ActiveSubscriptionProps> = ({
               <div className="bg-gray-50 p-3 rounded-md text-gray-700 text-sm">
                 <div className="flex gap-2">
                   <Boxes size={24} />
-                  No of users {activePlan.features.userCount}
+                  No of managers {activePlan.features.managerCount}
                 </div>
               </div>
               <div className="bg-gray-50 p-3 rounded-md text-gray-700 text-sm">

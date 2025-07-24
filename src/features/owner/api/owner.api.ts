@@ -1,7 +1,12 @@
 import { ownerApi } from "@/axios";
 import { baseUrl } from "@/constants/app";
 import { catchResponse } from "@/errors/catchResponse";
-import { ManagerType, OwnerType, SpaceType } from "@/types";
+import {
+  CancelSubscriptionType,
+  ManagerType,
+  OwnerType,
+  SpaceType,
+} from "@/types";
 
 import { CheckoutPayment, CompanyDetailsType } from "../types";
 import { CompanyDataType } from "../types/types.ownercontext";
@@ -215,10 +220,14 @@ export async function ownerFetchOwnSubscription(ownerId: string) {
   }
 }
 
-export async function ownerCancelSubscriptionService(id: string) {
+export async function ownerCancelSubscriptionService(
+  stripeSubscriptionId: string,
+  ownerId: string
+) {
   try {
-    const response = await ownerApi.delete(
-      `${baseUrl}/payment/cancel-subscription/${id}`
+    const response = await ownerApi.post(
+      `${baseUrl}/payment/cancel-subscription/${stripeSubscriptionId}`,
+      { ownerId }
     );
     if (response.status === 200) {
       return {

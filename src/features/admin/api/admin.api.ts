@@ -111,6 +111,27 @@ export async function adminToggleOwnerStatus(id: string) {
   }
 }
 
+export async function adminEditSubscription(
+  subscriptionId: string,
+  data: Partial<SubscriptionType>
+) {
+  try {
+    const res = await adminApi.put(
+      `${baseUrl}/admin/subscription/${subscriptionId}`,
+      data
+    );
+    if (res.status === 200) {
+      return {
+        success: true,
+        message: "updation went succesful",
+      };
+    }
+    throw new Error("Unexpected response from server");
+  } catch (error) {
+    return catchResponse(error);
+  }
+}
+
 export async function adminToggleSubscriptionStatus(id: string) {
   try {
     const response = await adminApi.patch(

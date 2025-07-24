@@ -1,16 +1,15 @@
 import { SubscriptionType } from "@/types";
-import { MoreHorizontal, Edit, Ban } from "lucide-react";
+import { MoreHorizontal, Ban } from "lucide-react";
 import { useState } from "react";
+import { EditSubscriptionModal } from "./EditSubscriptionModal";
 
 type Props = {
   subscription: SubscriptionType;
-  handleEditSubscription: (subscription: SubscriptionType) => void;
   handleDisableSubscription: (subscription: SubscriptionType) => void;
 };
 
 export const SubscriptionMorePopOver: React.FC<Props> = ({
   subscription,
-  handleEditSubscription,
   handleDisableSubscription,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -27,16 +26,10 @@ export const SubscriptionMorePopOver: React.FC<Props> = ({
       {isOpen && (
         <div className="absolute right-0 top-8 z-10 w-48 p-2 bg-popover border border-border rounded-md shadow-lg">
           <div className="space-y-1">
-            <button
-              className="w-full flex items-center justify-start text-sm h-8 px-2 rounded hover:bg-accent hover:text-accent-foreground text-left"
-              onClick={() => {
-                handleEditSubscription(subscription);
-                setIsOpen(false);
-              }}
-            >
-              <Edit className="h-4 w-4 mr-2" />
-              Edit
-            </button>
+            <EditSubscriptionModal
+              subscription={subscription}
+              closePopOverFn={() => setIsOpen(false)}
+            />
             <button
               className="w-full flex items-center justify-start text-sm h-8 px-2 rounded hover:bg-accent hover:text-accent-foreground text-destructive text-left disabled:opacity-50"
               onClick={() => {

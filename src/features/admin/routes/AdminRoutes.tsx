@@ -11,6 +11,7 @@ import UserTable from "../pages/UserManagement";
 import Transactions from "../pages/TransactionManagement";
 import Subscription from "../pages/Subscriptions";
 import AddSubscriptionForm from "../pages/NewSubscription";
+import SalesReportDashboard from "../pages/SalesReport";
 
 const AdminRoutes: React.FC = () => {
   return (
@@ -35,6 +36,7 @@ const AdminRoutes: React.FC = () => {
           <Route path="users" element={<UserTable />}></Route>
           <Route path="transactions" element={<Transactions />}></Route>
           <Route path="subscriptions" element={<Subscription />}></Route>
+          <Route path="sales-report" element={<SalesReportDashboard />}></Route>
         </Route>
       </Routes>
     </>

@@ -109,6 +109,7 @@ export interface SubscriptionType {
   yearlyDiscountPercentage?: number;
   features: Features;
   userCount?: Number;
+  points?: string;
 }
 
 export type OwnerSubscriptionType = {
@@ -126,6 +127,7 @@ export type OwnerSubscriptionType = {
   expires_at: string;
   invoice?: string;
   cancel_at_period_end?: boolean;
+  points: string;
 };
 
 export type InvoiceType = {

@@ -8,13 +8,13 @@ import { useSubscriptonsQuery } from "@/queries/admin/subscriptions/useSubscripi
 import { adminToggleSubscriptionStatus } from "../api/admin.api";
 import { toast } from "sonner";
 import { useQueryClient } from "@tanstack/react-query";
-import { sub } from "date-fns";
 
 const Subscription = () => {
   const [search, setSearch] = useState("");
   const [keystroke, setKeystroke] = useState("");
   const [billingCycle, setBillingCycle] = useState("");
   const [status, setStatus] = useState("");
+  const [edit, setEdit] = useState(false);
   const [page, setPage] = useState(1);
   const { data } = useSubscriptonsQuery(page, 10, search, billingCycle, status);
   console.log(data);
@@ -54,13 +54,6 @@ const Subscription = () => {
       } else {
         toast.error("Try again later");
       }
-    },
-    []
-  );
-
-  const handleEditSubscription = useCallback(
-    (subscription: SubscriptionType) => {
-      console.log("Editing subscription:", subscription);
     },
     []
   );
@@ -246,7 +239,6 @@ const Subscription = () => {
                             <td className="px-4 py-4 whitespace-nowrap text-right text-sm font-medium">
                               <SubscriptionMorePopOver
                                 subscription={subscription}
-                                handleEditSubscription={handleEditSubscription}
                                 handleDisableSubscription={
                                   handleDisableSubscription
                                 }
@@ -320,7 +312,9 @@ const Subscription = () => {
                             </div>
                             <SubscriptionMorePopOver
                               subscription={subscription}
-                              handleEditSubscription={handleEditSubscription}
+                              handleEditSubscription={() =>
+                                handleEditSubscription(subscription)
+                              }
                               handleDisableSubscription={
                                 handleDisableSubscription
                               }

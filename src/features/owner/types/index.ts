@@ -19,5 +19,7 @@ export type CheckoutPayment = {
   billingCycleType: string;
   yearly: boolean;
   monthly: boolean;
-  amount:string;
+  amount: string;
+  points: string;
+  upgrade: boolean;
 };

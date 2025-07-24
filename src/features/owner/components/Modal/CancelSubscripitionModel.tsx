@@ -19,25 +19,35 @@ import {
   ownerCancelSubscriptionService,
   ownerFetchOwnSubscription,
 } from "../../api/owner.api";
+import { CancelSubscriptionType, OwnerSubscriptionType } from "@/types";
+import { useQueryClient } from "@tanstack/react-query";
 
 type Props = {
-  subscriptionId: string;
+  activePlan: OwnerSubscriptionType;
 };
 
-export function CancelSubscriptionDialog({ subscriptionId }: Props) {
+export function CancelSubscriptionDialog({ activePlan }: Props) {
   const [open, setOpen] = useState(false);
   const ownerData = useSelector((state: RootState) => state.owner);
-  const { updateActiveSubscription } = useContext(OwnerContext);
+  const queryClient = useQueryClient();
+
+  // const { updateActiveSubscription } = useContext(OwnerContext);
 
   const handleConfirm = () => {
     async function cancelSubscriptionRunner() {
-      const response = await ownerCancelSubscriptionService(subscriptionId);
       if (!ownerData) {
         return console.warn("owner data couldnt fetch from redux");
       }
+      const response = await ownerCancelSubscriptionService(
+        activePlan.stripe_subscription_id,
+        ownerData._id
+      );
       const result = await ownerFetchOwnSubscription(ownerData._id!);
       if (response.success && result.success) {
-        updateActiveSubscription(result.data.data);
+        // updateActiveSubscription(result.data.data);
+        queryClient.invalidateQueries({
+          queryKey: ["owner", "subscriptions", ownerData._id],
+        });
         enqueueSnackbar(response.message, { variant: "success" });
       } else {
         enqueueSnackbar(response.message, { variant: "error" });

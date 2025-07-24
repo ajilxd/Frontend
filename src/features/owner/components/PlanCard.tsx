@@ -15,6 +15,7 @@ interface PlanCardProps extends Plan {
   onSubscribeYearly?: () => void;
   alreadySubscribed?: boolean;
   description: string;
+  allowUpgrade: string;
 }
 
 export const PlanCard: React.FC<PlanCardProps> = ({
@@ -27,10 +28,16 @@ export const PlanCard: React.FC<PlanCardProps> = ({
   alreadySubscribed,
   onSubscribeMonthly,
   onSubscribeYearly,
+  allowUpgrade,
 }) => {
+  console.log("active subscription", alreadySubscribed);
   if (alreadySubscribed) {
     console.warn("Already have an active subscription");
   }
+
+  const upgrade = !!allowUpgrade;
+  console.log("point", upgrade);
+  const condn = alreadySubscribed ? !upgrade : false;
 
   return (
     <div className="bg-white rounded-2xl shadow p-6 flex flex-col gap-6 hover:shadow-lg transition-shadow ">
@@ -116,30 +123,40 @@ export const PlanCard: React.FC<PlanCardProps> = ({
           <>
             <button
               onClick={onSubscribeMonthly}
-              className="flex-1 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-md transition-colors"
+              className={`flex-1 px-4 py-2  bg-blue-600 ${
+                upgrade && `bg-yellow-600`
+              } hover:bg-blue-700 text-white text-sm font-medium rounded-md transition-colors`}
+              disabled={condn}
             >
-              Subscribe Monthly
+              <p>Subscribe monthly {upgrade && `upgrade`}</p>
             </button>
             <button
               onClick={onSubscribeYearly}
-              className="flex-1 px-4 py-2 bg-green-600 hover:bg-green-700 text-white text-sm font-medium rounded-md transition-colors"
+              className={`flex-1 px-4 py-2 bg-green-600 ${
+                upgrade && `bg-yellow-600`
+              } hover:bg-green-700 text-white text-sm font-medium rounded-md transition-colors`}
+              disabled={condn}
             >
-              Subscribe Yearly
+              <p>Subscribe yearly {upgrade && `upgrade`}</p>
             </button>
           </>
         ) : billingCycleType === "month" ? (
           <button
             onClick={onSubscribeMonthly}
             className="w-full px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-md transition-colors"
+            disabled={condn}
           >
             Subscribe
           </button>
         ) : (
           <button
             onClick={onSubscribeYearly}
-            className="w-full px-4 py-2 bg-green-600 hover:bg-green-700 text-white text-sm font-medium rounded-md transition-colors"
+            className={`w-full px-4 py-2 ${
+              upgrade && `bg-yellow-600`
+            }  bg-green-600  hover:bg-green-700 text-white text-sm font-medium rounded-md transition-colors`}
+            disabled={condn}
           >
-            Subscribe
+            {!upgrade ? `Subscribe` : `Upgrade`}
           </button>
         )}
       </div>
