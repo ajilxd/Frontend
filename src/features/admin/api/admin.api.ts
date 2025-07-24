@@ -206,3 +206,34 @@ export async function adminFetchAllTransactions(
     return catchResponse(error);
   }
 }
+
+export async function adminFetchAllSubscribers(
+  page: number,
+  itemPerPage: number,
+  search: "" | string,
+  status: "" | string
+) {
+  try {
+    const response = await adminApi.get(
+      `${baseUrl}/admin/subscribers?page=${page}&itemPerPage=${itemPerPage}&search=${search}&status=${status}`
+    );
+    if (response.status === 200) {
+      return response.data.data;
+    }
+    throw new Error("unexpected response from server");
+  } catch (error) {
+    return catchResponse(error);
+  }
+}
+
+export async function adminFetchSalesReport() {
+  try {
+    const response = await adminApi.get(`${baseUrl}/admin/sales-report`);
+    if (response.status === 200) {
+      return response.data.data;
+    }
+    throw new Error("Unexpcted response from server");
+  } catch (error) {
+    return catchResponse(error);
+  }
+}

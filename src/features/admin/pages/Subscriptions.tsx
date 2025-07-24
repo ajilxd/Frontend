@@ -14,7 +14,6 @@ const Subscription = () => {
   const [keystroke, setKeystroke] = useState("");
   const [billingCycle, setBillingCycle] = useState("");
   const [status, setStatus] = useState("");
-  const [edit, setEdit] = useState(false);
   const [page, setPage] = useState(1);
   const { data } = useSubscriptonsQuery(page, 10, search, billingCycle, status);
   console.log(data);
@@ -312,9 +311,6 @@ const Subscription = () => {
                             </div>
                             <SubscriptionMorePopOver
                               subscription={subscription}
-                              handleEditSubscription={() =>
-                                handleEditSubscription(subscription)
-                              }
                               handleDisableSubscription={
                                 handleDisableSubscription
                               }

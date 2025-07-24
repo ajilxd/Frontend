@@ -110,6 +110,7 @@ export interface SubscriptionType {
   features: Features;
   userCount?: Number;
   points?: string;
+  createdAt: Date;
 }
 
 export type OwnerSubscriptionType = {
@@ -403,4 +404,66 @@ export interface TransactionType {
   createdAt?: string;
   errorMessage?: string;
   billingCycle?: string;
+}
+
+export type MonthName =
+  | "Jan"
+  | "Feb"
+  | "Mar"
+  | "Apr"
+  | "May"
+  | "Jun"
+  | "Jul"
+  | "Aug"
+  | "Sep"
+  | "Oct"
+  | "Nov"
+  | "Dec";
+
+export interface MonthData {
+  sales: number;
+  revenue: number;
+  newCustomers: number;
+}
+
+export interface YearlyReportItem extends MonthData {
+  month: MonthName;
+}
+
+export interface SubscriptionSalesDataItem {
+  _id: string;
+  count: number;
+}
+
+export interface SalesReportResponse {
+  yearlyReport: YearlyReportItem[];
+  churnRate: number;
+  lostCustomersCount: number;
+  activeCustomersCount: number;
+  totalRevenue: number;
+  upgradeCount: number;
+  failedPaymentsCount: number;
+  subscriptionSalesData: SubscriptionSalesDataItem[];
+}
+
+export interface ISubscriber {
+  _id: string;
+  name: string;
+  status: string;
+  billingCycle: string;
+  cancelledAt: string;
+  expiresAt: Date;
+  subscriptionId: string;
+  amount: number;
+  customerName: string;
+  customerId: string;
+  createdAt: string;
+  features: {
+    managerCount: number;
+    userCount: number;
+    chat: boolean;
+    meeting: boolean;
+    spaces: number;
+  };
+  points: number;
 }
