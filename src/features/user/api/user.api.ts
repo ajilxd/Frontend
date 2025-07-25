@@ -373,3 +373,15 @@ export const userFetchEvents = async (managerId: string) => {
     throw catchResponse(error);
   }
 };
+
+export const userFetchDashboard = async (userId: string) => {
+  try {
+    const res = await userApi.get(`${baseUrl}/user/dashboard?userId=${userId}`);
+    if (res.status === 200) {
+      return res.data.data;
+    }
+    throw new Error("Unexpected response from server");
+  } catch (error) {
+    throw catchResponse(error);
+  }
+};

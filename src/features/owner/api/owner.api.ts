@@ -1,12 +1,7 @@
 import { ownerApi } from "@/axios";
 import { baseUrl } from "@/constants/app";
 import { catchResponse } from "@/errors/catchResponse";
-import {
-  CancelSubscriptionType,
-  ManagerType,
-  OwnerType,
-  SpaceType,
-} from "@/types";
+import { ManagerType, OwnerType, SpaceType } from "@/types";
 
 import { CheckoutPayment, CompanyDetailsType } from "../types";
 import { CompanyDataType } from "../types/types.ownercontext";
@@ -451,6 +446,20 @@ export const ownerUpdateManagerDetails = async (data: {
         data: response.data.data,
         message: response.data.message,
       };
+    }
+    throw new Error("Unexpected response from server");
+  } catch (error) {
+    return catchResponse(error);
+  }
+};
+
+export const ownerFetchDashboard = async (ownerId: string) => {
+  try {
+    const response = await ownerApi.get(
+      `${baseUrl}/owner/dashboard?ownerId=${ownerId}`
+    );
+    if (response.status === 200) {
+      return response.data.data;
     }
     throw new Error("Unexpected response from server");
   } catch (error) {

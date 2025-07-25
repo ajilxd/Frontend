@@ -9,6 +9,7 @@ import {
   PhoneCall,
   User,
   MessageSquareIcon,
+  LayoutDashboard,
 } from "lucide-react";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
@@ -63,6 +64,14 @@ export const Sidebar: React.FC<SidebarPropsType> = ({
             <Button
               variant="ghost"
               className="w-full justify-start"
+              onClick={() => navigate("/manager/dashboard")}
+            >
+              <LayoutDashboard className="h-5 w-5 mr-3" />
+              <span>Dashboard</span>
+            </Button>
+            <Button
+              variant="ghost"
+              className="w-full justify-start"
               onClick={() => navigate("/manager/dashboard/profile")}
             >
               <User className="h-5 w-5 mr-3" />
@@ -96,7 +105,6 @@ export const Sidebar: React.FC<SidebarPropsType> = ({
             </Button>
           </div>
 
-          {/* Spaces/Projects Section */}
           <div className="mt-6">
             <Collapsible open={isSpacesOpen} onOpenChange={toggleSpaces}>
               <CollapsibleTrigger asChild>

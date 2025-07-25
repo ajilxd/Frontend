@@ -1,215 +1,195 @@
-import { useState } from "react";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Progress } from "@/components/ui/progress";
+import {
+  Activity,
+  Building2,
+  Users,
+  Crown,
+  CheckCircle,
+  Clock,
+  ClipboardCheck,
+} from "lucide-react";
+import { useSelector } from "react-redux";
+import { RootState } from "@/redux/store/appStore";
+import { useUserDashboardQuery } from "@/queries/users/dashboard/useUserDashboardQuery";
 
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+const UserDashboard = () => {
+  const userId = useSelector((state: RootState) => state.user).id;
+  if (!userId) {
+    console.warn("Please login again -userId is missing");
+    return;
+  }
+  const { data } = useUserDashboardQuery(userId);
 
-export const DefaultDashboard = () => {
-  const [stats] = useState({
-    activeSpaces: 5,
-    tasksDue: 12,
-  });
-
-  const [activities] = useState([
-    { id: 1, text: "John updated Task #123", color: "bg-blue-500" },
-    { id: 2, text: "Sarah added Doc #456", color: "bg-green-500" },
-    { id: 3, text: "Team added new member", color: "bg-purple-500" },
-  ]);
-
-  const [chats] = useState([
-    { id: 1, name: "Team Sync", unread: 3, color: "bg-blue-500" },
-    { id: 2, name: "Project X", unread: 1, color: "bg-green-500" },
-    { id: 3, name: "General", unread: 5, color: "bg-purple-500" },
-  ]);
-
-  const [projects] = useState([
-    {
-      id: "project-alpha",
-      name: "Project Alpha",
-      color: "bg-blue-500",
-      members: 8,
-      tasks: 15,
-    },
-    {
-      id: "project-beta",
-      name: "Project Beta",
-      color: "bg-green-500",
-      members: 5,
-      tasks: 10,
-    },
-  ]);
-
-  const [taskStatus] = useState([
-    { status: "Completed", value: 60, color: "text-green-500" },
-    { status: "In Progress", value: 25, color: "text-blue-500" },
-    { status: "Pending", value: 15, color: "text-red-500" },
-  ]);
+  const completionPercentage = Math.round(
+    (data?.taskStats.completed || 1 / (data?.taskStats.totalTasks || 1)) * 100
+  );
 
   return (
-    <>
-      <h1 className="text-xl md:text-2xl font-semibold text-gray-900 dark:text-gray-100 mb-6">
-        Dashboard
-      </h1>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
-        {/* Overview Widget */}
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-gray-600 dark:text-gray-400">
-              Overview
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <p className="text-xs text-gray-500 dark:text-gray-400">
-                  Active Spaces
-                </p>
-                <p className="text-lg font-semibold text-blue-600 dark:text-blue-400">
-                  {stats.activeSpaces}
-                </p>
-              </div>
-              <div>
-                <p className="text-xs text-gray-500 dark:text-gray-400">
-                  Tasks Due
-                </p>
-                <p className="text-lg font-semibold text-blue-600 dark:text-blue-400">
-                  {stats.tasksDue}
-                </p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 p-4 md:p-6 lg:p-8">
+      <div className="mb-8 flex justify-between items-start">
+        <div>
+          <h1 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-gray-100 mb-2">
+            User Dashboard
+          </h1>
+          <p className="text-gray-600 dark:text-gray-400">
+            Track your subscription, company info and tasks
+          </p>
+        </div>
+      </div>
 
-        {/* Task Progress - replaced chart with progress text */}
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-gray-600 dark:text-gray-400">
-              Task Progress
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="py-4">
-              {taskStatus.map((item) => (
-                <div key={item.status} className="mb-3 last:mb-0">
-                  <div className="flex justify-between text-sm mb-1">
-                    <span className={`font-medium ${item.color}`}>
-                      {item.status}
+      <div className="space-y-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <Card className="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700">
+            <CardHeader className="pb-3">
+              <CardTitle className="flex items-center gap-2 text-lg font-semibold text-gray-900 dark:text-gray-100">
+                <Activity className="w-5 h-5 text-blue-500" />
+                Subscription
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <h3 className="text-xl font-bold text-gray-900 dark:text-gray-100 mb-2">
+                {data?.subscriptionStats.name}
+              </h3>
+              <Badge
+                variant="default"
+                className={`px-3 py-1 ${
+                  data?.subscriptionStats.status === "active"
+                    ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200"
+                    : "bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200"
+                }`}
+              >
+                {data?.subscriptionStats.status === "active"
+                  ? "Active"
+                  : "Inactive"}
+              </Badge>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700">
+            <CardHeader className="pb-3">
+              <CardTitle className="flex items-center gap-2 text-lg font-semibold text-gray-900 dark:text-gray-100">
+                <Building2 className="w-5 h-5 text-purple-500" />
+                Company Info
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <h3 className="text-xl font-bold text-gray-900 dark:text-gray-100 mb-2">
+                {data?.companyStats.name}
+              </h3>
+
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Crown className="w-4 h-4 text-amber-500" />
+                    <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                      Owner
                     </span>
-                    <span className="font-medium">{item.value}%</span>
                   </div>
-                  <div className="h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
-                    <div
-                      className={`h-full ${
-                        item.status === "Completed"
-                          ? "bg-green-500"
-                          : item.status === "In Progress"
-                          ? "bg-blue-500"
-                          : "bg-red-500"
-                      }`}
-                      style={{ width: `${item.value}%` }}
-                    />
-                  </div>
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Recent Activity */}
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-gray-600 dark:text-gray-400">
-              Recent Activity
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <ul className="space-y-2 text-sm">
-              {activities.map((activity) => (
-                <li key={activity.id} className="flex items-center">
-                  <span
-                    className={`w-1.5 h-1.5 ${activity.color} rounded-full mr-2`}
-                  ></span>
-                  {activity.text}
-                </li>
-              ))}
-            </ul>
-          </CardContent>
-        </Card>
-
-        {/* Active Chats */}
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-gray-600 dark:text-gray-400">
-              Active Chats
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="pb-4">
-            <ul className="space-y-2">
-              {chats.map((chat) => (
-                <li key={chat.id} className="flex justify-between items-center">
-                  <div className="flex items-center">
-                    <span
-                      className={`w-1.5 h-1.5 ${chat.color} rounded-full mr-2`}
-                    ></span>
-                    <span className="text-sm">{chat.name}</span>
-                  </div>
-                  <span className="px-2 py-0.5 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-300 text-xs rounded-full">
-                    {chat.unread}
+                  <span className="text-sm font-semibold text-gray-900 dark:text-gray-100">
+                    {data?.companyStats.owner}
                   </span>
-                </li>
-              ))}
-            </ul>
-          </CardContent>
-        </Card>
+                </div>
 
-        {/* Space Highlights */}
-        <Card className="md:col-span-2">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-gray-600 dark:text-gray-400">
-              Space Highlights
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Users className="w-4 h-4 text-blue-500" />
+                    <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                      Total Users
+                    </span>
+                  </div>
+                  <Badge
+                    variant="secondary"
+                    className="bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200"
+                  >
+                    {data?.companyStats.totalUsers}
+                  </Badge>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        <Card className="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700">
+          <CardHeader className="pb-3">
+            <CardTitle className="flex items-center gap-2 text-lg font-semibold text-gray-900 dark:text-gray-100">
+              <CheckCircle className="w-5 h-5 text-green-500" />
+              Task Insights
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              {projects.map((project) => (
-                <div
-                  key={project.id}
-                  className="p-4 rounded-lg border border-gray-200 dark:border-gray-800 hover:border-blue-200 dark:hover:border-blue-900 transition-colors"
-                >
-                  <div className="flex items-center mb-3">
-                    <span
-                      className={`w-2.5 h-2.5 ${project.color} rounded-full mr-2`}
-                    ></span>
-                    <h3 className="text-sm font-medium">{project.name}</h3>
-                  </div>
-                  <div className="space-y-1 mb-3">
-                    <p className="text-xs flex justify-between">
-                      <span className="text-gray-500 dark:text-gray-400">
-                        Members:
-                      </span>
-                      <span className="font-medium">{project.members}</span>
-                    </p>
-                    <p className="text-xs flex justify-between">
-                      <span className="text-gray-500 dark:text-gray-400">
-                        Tasks:
-                      </span>
-                      <span className="font-medium">{project.tasks} open</span>
-                    </p>
-                  </div>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="w-full mt-2 text-xs"
-                  >
-                    View Space
-                  </Button>
+            <div className="space-y-6">
+              <div className="space-y-3">
+                <div className="flex justify-between items-center">
+                  <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                    Overall Progress
+                  </span>
+                  <span className="text-sm text-gray-600 dark:text-gray-400">
+                    {data?.taskStats.completed}/{data?.taskStats.totalTasks}{" "}
+                    tasks
+                  </span>
                 </div>
-              ))}
+                <Progress value={completionPercentage} className="h-3" />
+                <div className="text-center">
+                  <span className="text-2xl font-bold text-gray-900 dark:text-gray-100">
+                    {completionPercentage}%
+                  </span>
+                  <span className="text-sm text-gray-600 dark:text-gray-400 ml-1">
+                    completed
+                  </span>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="flex items-center justify-between p-4 rounded-lg bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800">
+                  <div className="flex items-center gap-3">
+                    <Clock className="w-6 h-6 text-amber-600 dark:text-amber-400" />
+                    <div>
+                      <p className="text-sm font-medium text-amber-700 dark:text-amber-300">
+                        Due Tasks
+                      </p>
+                      <p className="text-2xl font-bold text-amber-800 dark:text-amber-200">
+                        {data?.taskStats.dueTasks}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex items-center justify-between p-4 rounded-lg bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800">
+                  <div className="flex items-center gap-3">
+                    <ClipboardCheck className="w-6 h-6 text-blue-600 dark:text-blue-400" />
+                    <div>
+                      <p className="text-sm font-medium text-blue-700 dark:text-blue-300">
+                        Assigned Tasks
+                      </p>
+                      <p className="text-2xl font-bold text-blue-800 dark:text-blue-200">
+                        {data?.taskStats.totalTasks}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex items-center justify-between p-4 rounded-lg bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800">
+                  <div className="flex items-center gap-3">
+                    <CheckCircle className="w-6 h-6 text-green-600 dark:text-green-400" />
+                    <div>
+                      <p className="text-sm font-medium text-green-700 dark:text-green-300">
+                        Completed Tasks
+                      </p>
+                      <p className="text-2xl font-bold text-green-800 dark:text-green-200">
+                        {data?.taskStats.completed}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           </CardContent>
         </Card>
       </div>
-    </>
+    </div>
   );
 };
 
-export default DefaultDashboard;
+export default UserDashboard;

@@ -39,7 +39,14 @@ export function EditSubscriptionModal({
   const [meeting, setMeeting] = React.useState(subscription.features.meeting);
 
   const handleSave = async () => {
-    const data = { name, description, users, spaces, managers, chat, meeting };
+    const features = {
+      userCount: users,
+      spaces: spaces,
+      managerCount: managers,
+      chat,
+      meeting,
+    };
+    const data = { name, description, features };
     const response = await adminEditSubscription(subscription._id, data);
     if (response.success) {
       toast.success("subscription went succesful");

@@ -466,4 +466,82 @@ export interface ISubscriber {
     spaces: number;
   };
   points: number;
+  company: string;
 }
+
+export interface DashboardTotals {
+  totalRevenue: number;
+  totalCompanies: number;
+  totalSubscriptions: number;
+  totalUsers: number;
+  latestSubscribers: ISubscriber[];
+  topSubscriptions: SubscriptionType[];
+}
+
+export type OwnerDashboard = {
+  subscripitionData: {
+    name: string;
+    status: string;
+    amount: number | string;
+    billingDate: string | "N/A";
+    validSubscription: boolean;
+  };
+  quotaData: {
+    ownManagers: number;
+    ownUsers: number;
+    ownSpaces: number;
+    managerLimit?: number;
+    userLimit?: number;
+    spaceLimit?: number;
+  };
+  ownerSpaces: {
+    name: string;
+    users: number;
+    managers: number;
+    tasks: number;
+  }[];
+  managerData: {
+    name: string;
+    status: "active" | "inactive";
+    image?: string;
+  }[];
+};
+
+type SubscriptionStats = {
+  name: string;
+  status: string;
+};
+
+type CompanyStats = {
+  name: string;
+  description: string;
+  totalUsers: number;
+  owner: string;
+};
+
+type TaskStats = {
+  completed: number;
+  totalTasks: number;
+  dueTasks: number;
+};
+
+type UserData = {
+  name: string;
+  role: string;
+  status: string;
+  image: string;
+}[];
+
+export type ManagerDashboard = {
+  userData: UserData;
+  companyStats: CompanyStats;
+  taskStats: TaskStats;
+  subscriptionStats: SubscriptionStats;
+  totalUsers: number;
+};
+
+export type UserDashboard = {
+  companyStats: CompanyStats;
+  taskStats: TaskStats;
+  subscriptionStats: SubscriptionStats;
+};

@@ -1,5 +1,3 @@
-"use client";
-
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { useSubscriberQuery } from "@/queries/admin/subscribers/useSubscriberQuery";
 import { PaginationComponent } from "@/shared/components/Pagination";
@@ -70,6 +68,7 @@ const SubscribersTable = () => {
                 <tr>
                   <th className="px-4 py-2">Index</th>
                   <th className="px-4 py-2">Customer</th>
+                  <th className="px-4 py-2">Company</th>
                   <th className="px-4 py-2">Subscription</th>
                   <th className="px-4 py-2">Status</th>
                   <th className="px-4 py-2">Amount</th>
@@ -82,6 +81,7 @@ const SubscribersTable = () => {
                     <tr key={row._id} className="border-b">
                       <td className="px-4 py-2">{index + 1}</td>
                       <td className="px-4 py-2">{row.customerName}</td>
+                      <td className="px-4 py-2">{row.company}</td>
                       <td className="px-4 py-2">{row.name}</td>
                       <td className="px-4 py-2">{row.status}</td>
                       <td className="px-4 py-2">{row.amount}</td>

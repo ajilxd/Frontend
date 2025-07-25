@@ -237,3 +237,15 @@ export async function adminFetchSalesReport() {
     return catchResponse(error);
   }
 }
+
+export async function adminFetchDashboard() {
+  try {
+    const response = await adminApi.get(`${baseUrl}/admin/dashboard`);
+    if (response.status === 200) {
+      return response.data.data;
+    }
+    throw new Error("Unexpected response from server");
+  } catch (error) {
+    return catchResponse(error);
+  }
+}
