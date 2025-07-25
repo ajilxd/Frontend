@@ -126,7 +126,7 @@ const Transactions = () => {
                         <TableCell>{tx.customerName}</TableCell>
                         <TableCell>{tx.companyName}</TableCell>
                         <TableCell>{tx.subscriptionName}</TableCell>
-                        <TableCell>${tx.amount.toFixed(2)}</TableCell>
+                        <TableCell>₹{tx.amount.toFixed(2)}</TableCell>
                         <TableCell>
                           <Badge
                             variant="secondary"

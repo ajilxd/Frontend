@@ -181,9 +181,8 @@ export async function ownerFetchSubscriptions() {
   }
 }
 
-export async function ownerPaymentCheckoutService(
-  value: CheckoutPayment<string>
-) {
+export async function ownerPaymentCheckoutService(value: CheckoutPayment) {
+  console.log("checkout session value before sending", value);
   try {
     const response = await ownerApi.post(
       `${baseUrl}/payment/create-checkout-session`,
@@ -216,10 +215,14 @@ export async function ownerFetchOwnSubscription(ownerId: string) {
   }
 }
 
-export async function ownerCancelSubscriptionService(id: string) {
+export async function ownerCancelSubscriptionService(
+  stripeSubscriptionId: string,
+  ownerId: string
+) {
   try {
-    const response = await ownerApi.delete(
-      `${baseUrl}/payment/cancel-subscription/${id}`
+    const response = await ownerApi.post(
+      `${baseUrl}/payment/cancel-subscription/${stripeSubscriptionId}`,
+      { ownerId }
     );
     if (response.status === 200) {
       return {
@@ -443,6 +446,20 @@ export const ownerUpdateManagerDetails = async (data: {
         data: response.data.data,
         message: response.data.message,
       };
+    }
+    throw new Error("Unexpected response from server");
+  } catch (error) {
+    return catchResponse(error);
+  }
+};
+
+export const ownerFetchDashboard = async (ownerId: string) => {
+  try {
+    const response = await ownerApi.get(
+      `${baseUrl}/owner/dashboard?ownerId=${ownerId}`
+    );
+    if (response.status === 200) {
+      return response.data.data;
     }
     throw new Error("Unexpected response from server");
   } catch (error) {

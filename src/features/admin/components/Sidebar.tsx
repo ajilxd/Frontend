@@ -1,4 +1,13 @@
-import { X, Users, ShoppingBag, UserSearch, Receipt } from "lucide-react";
+import {
+  X,
+  Users,
+  ShoppingBag,
+  UserSearch,
+  Receipt,
+  DiamondPlus,
+  icons,
+  FileChartColumnIncreasingIcon,
+} from "lucide-react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
@@ -8,10 +17,11 @@ import SidebarLink from "./Sidebarlink";
 
 enum AdminSidebarType {
   Dashboard = "Dashboard",
-  Owners = "Owners",
   Subscriptions = "Subscriptions",
   AllUsers = "AllUsers",
   Transactions = "Transactions",
+  Add_Subscripition = "Add Subscription",
+  Sales_Report = "Sales Report",
 }
 
 type SidebarProps = {
@@ -39,13 +49,13 @@ export default function Sidebar({ isOpen, toggleSidebar }: SidebarProps) {
       icon: <ShoppingBag size={18} />,
       label: "Subscriptions",
     },
-    [AdminSidebarType.Owners]: {
+    [AdminSidebarType.Add_Subscripition]: {
       onClick: () => {
-        setActive(AdminSidebarType.Owners);
-        navigate("/admin/dashboard/owners");
+        setActive(AdminSidebarType.Add_Subscripition);
+        navigate("/admin/dashboard/new-subscription");
       },
-      icon: <Users size={18} />,
-      label: "Owners",
+      icon: <DiamondPlus size={18} />,
+      label: "Add Subscription",
     },
     [AdminSidebarType.AllUsers]: {
       onClick: () => {
@@ -62,6 +72,14 @@ export default function Sidebar({ isOpen, toggleSidebar }: SidebarProps) {
       },
       icon: <Receipt size={18} />,
       label: "Transactions",
+    },
+    [AdminSidebarType.Sales_Report]: {
+      onClick: () => {
+        setActive(AdminSidebarType.Sales_Report);
+        navigate("/admin/dashboard/sales-report");
+      },
+      icon: <FileChartColumnIncreasingIcon size={18} />,
+      label: "Sales report",
     },
   };
   return (

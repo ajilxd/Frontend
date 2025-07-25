@@ -531,3 +531,17 @@ export const managerFetchEvents = async (managerId: string) => {
     throw catchResponse(error);
   }
 };
+
+export const managerFetchDashboard = async (managerId: string) => {
+  try {
+    const res = await managerApi.get(
+      `${baseUrl}/manager/dashboard?managerId=${managerId}`
+    );
+    if (res.status === 200) {
+      return res.data.data;
+    }
+    throw new Error("Unexpected response from server");
+  } catch (error) {
+    throw catchResponse(error);
+  }
+};

@@ -34,16 +34,19 @@ export const adminLogOutService = async () => {
   }
 };
 
-export const adminFetchSubscriptions = async () => {
+export const adminFetchSubscriptions = async (
+  page: number,
+  itemPerPage: number,
+  search: string,
+  billingCycle: string,
+  status: string
+) => {
   try {
-    const res = await adminApi.get(`${baseUrl}/admin/subscriptions`);
-    if (res.status === 201) {
+    const res = await adminApi.get(
+      `${baseUrl}/admin/subscriptions?page=${page}&itemPerPage=${itemPerPage}&search=${search}&billingCycle=${billingCycle}&status=${status}`
+    );
+    if (res.status === 200) {
       return res.data.data;
-    }
-
-    if (res.status === 204) {
-      console.warn("no subscriptons found");
-      return [];
     }
 
     throw new Error("Unexpected response from server");
@@ -52,7 +55,9 @@ export const adminFetchSubscriptions = async () => {
   }
 };
 
-export const adminAddSubscriptionService = async (data: SubscriptionType) => {
+export const adminAddSubscriptionService = async (
+  data: Partial<SubscriptionType>
+) => {
   try {
     const res = await adminApi.post(`${baseUrl}/admin/subscription`, data);
     if (res.status === 201) {
@@ -103,6 +108,27 @@ export async function adminToggleOwnerStatus(id: string) {
     throw new Error("unexpected response from server");
   } catch (err) {
     return catchResponse(err);
+  }
+}
+
+export async function adminEditSubscription(
+  subscriptionId: string,
+  data: Partial<SubscriptionType>
+) {
+  try {
+    const res = await adminApi.put(
+      `${baseUrl}/admin/subscription/${subscriptionId}`,
+      data
+    );
+    if (res.status === 200) {
+      return {
+        success: true,
+        message: "updation went succesful",
+      };
+    }
+    throw new Error("Unexpected response from server");
+  } catch (error) {
+    return catchResponse(error);
   }
 }
 
@@ -176,6 +202,49 @@ export async function adminFetchAllTransactions(
       return response.data.data;
     }
     throw new Error("unexpected response from server");
+  } catch (error) {
+    return catchResponse(error);
+  }
+}
+
+export async function adminFetchAllSubscribers(
+  page: number,
+  itemPerPage: number,
+  search: "" | string,
+  status: "" | string
+) {
+  try {
+    const response = await adminApi.get(
+      `${baseUrl}/admin/subscribers?page=${page}&itemPerPage=${itemPerPage}&search=${search}&status=${status}`
+    );
+    if (response.status === 200) {
+      return response.data.data;
+    }
+    throw new Error("unexpected response from server");
+  } catch (error) {
+    return catchResponse(error);
+  }
+}
+
+export async function adminFetchSalesReport() {
+  try {
+    const response = await adminApi.get(`${baseUrl}/admin/sales-report`);
+    if (response.status === 200) {
+      return response.data.data;
+    }
+    throw new Error("Unexpcted response from server");
+  } catch (error) {
+    return catchResponse(error);
+  }
+}
+
+export async function adminFetchDashboard() {
+  try {
+    const response = await adminApi.get(`${baseUrl}/admin/dashboard`);
+    if (response.status === 200) {
+      return response.data.data;
+    }
+    throw new Error("Unexpected response from server");
   } catch (error) {
     return catchResponse(error);
   }

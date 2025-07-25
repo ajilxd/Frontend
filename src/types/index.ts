@@ -87,34 +87,48 @@ export type ManagerType = {
   companyName?: string;
 };
 
-export type SubscriptionType = {
-  _id: string;
-  billingCycle: string;
-  amount: string;
-  name: string;
-  stripe_product_id?: string;
-  stripe_price_id?: string;
-  isActive: boolean;
-  description: string;
-  features: Array<string>;
-  createdAt?: Date;
+export type Features = {
+  managerCount: number;
+  userCount: number;
+  chat: boolean;
+  meeting: boolean;
+  spaces: number;
 };
 
+export interface SubscriptionType {
+  _id: string;
+  name: string;
+  billingCycleType: string;
+  isActive: boolean;
+  yearlyAmount: number | string;
+  monthlyAmount: number | string;
+  stripe_product_id?: string;
+  description: string;
+  stripe_monthly_price_id?: string;
+  stripe_yearly_price_id?: string;
+  yearlyDiscountPercentage?: number;
+  features: Features;
+  userCount?: Number;
+  points?: string;
+  createdAt: Date;
+}
+
 export type OwnerSubscriptionType = {
-  name?: string;
-  status?: string;
-  billingCycle?: string;
-  stripe_subscription_id?: string;
-  subscription_id?: string;
+  name: string;
+  status: string;
+  billingCycle: string;
+  stripe_subscription_id: string;
+  subscription_id: string;
   next_invoice?: string;
   cancel_at?: string;
   canceled_at?: string;
-  created?: string;
-  features?: Array<string>;
-  amount?: string;
-  expires_at?: string;
+  created: string;
+  features: Features;
+  amount: string;
+  expires_at: string;
   invoice?: string;
   cancel_at_period_end?: boolean;
+  points: string;
 };
 
 export type InvoiceType = {
@@ -391,3 +405,143 @@ export interface TransactionType {
   errorMessage?: string;
   billingCycle?: string;
 }
+
+export type MonthName =
+  | "Jan"
+  | "Feb"
+  | "Mar"
+  | "Apr"
+  | "May"
+  | "Jun"
+  | "Jul"
+  | "Aug"
+  | "Sep"
+  | "Oct"
+  | "Nov"
+  | "Dec";
+
+export interface MonthData {
+  sales: number;
+  revenue: number;
+  newCustomers: number;
+}
+
+export interface YearlyReportItem extends MonthData {
+  month: MonthName;
+}
+
+export interface SubscriptionSalesDataItem {
+  _id: string;
+  count: number;
+}
+
+export interface SalesReportResponse {
+  yearlyReport: YearlyReportItem[];
+  churnRate: number;
+  lostCustomersCount: number;
+  activeCustomersCount: number;
+  totalRevenue: number;
+  upgradeCount: number;
+  failedPaymentsCount: number;
+  subscriptionSalesData: SubscriptionSalesDataItem[];
+}
+
+export interface ISubscriber {
+  _id: string;
+  name: string;
+  status: string;
+  billingCycle: string;
+  cancelledAt: string;
+  expiresAt: Date;
+  subscriptionId: string;
+  amount: number;
+  customerName: string;
+  customerId: string;
+  createdAt: string;
+  features: {
+    managerCount: number;
+    userCount: number;
+    chat: boolean;
+    meeting: boolean;
+    spaces: number;
+  };
+  points: number;
+  company: string;
+}
+
+export interface DashboardTotals {
+  totalRevenue: number;
+  totalCompanies: number;
+  totalSubscriptions: number;
+  totalUsers: number;
+  latestSubscribers: ISubscriber[];
+  topSubscriptions: SubscriptionType[];
+}
+
+export type OwnerDashboard = {
+  subscripitionData: {
+    name: string;
+    status: string;
+    amount: number | string;
+    billingDate: string | "N/A";
+    validSubscription: boolean;
+  };
+  quotaData: {
+    ownManagers: number;
+    ownUsers: number;
+    ownSpaces: number;
+    managerLimit?: number;
+    userLimit?: number;
+    spaceLimit?: number;
+  };
+  ownerSpaces: {
+    name: string;
+    users: number;
+    managers: number;
+    tasks: number;
+  }[];
+  managerData: {
+    name: string;
+    status: "active" | "inactive";
+    image?: string;
+  }[];
+};
+
+type SubscriptionStats = {
+  name: string;
+  status: string;
+};
+
+type CompanyStats = {
+  name: string;
+  description: string;
+  totalUsers: number;
+  owner: string;
+};
+
+type TaskStats = {
+  completed: number;
+  totalTasks: number;
+  dueTasks: number;
+};
+
+type UserData = {
+  name: string;
+  role: string;
+  status: string;
+  image: string;
+}[];
+
+export type ManagerDashboard = {
+  userData: UserData;
+  companyStats: CompanyStats;
+  taskStats: TaskStats;
+  subscriptionStats: SubscriptionStats;
+  totalUsers: number;
+};
+
+export type UserDashboard = {
+  companyStats: CompanyStats;
+  taskStats: TaskStats;
+  subscriptionStats: SubscriptionStats;
+};

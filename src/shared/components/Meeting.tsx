@@ -1,4 +1,4 @@
-import { UseQueryResult } from "@tanstack/react-query";
+import { useQueryClient, UseQueryResult } from "@tanstack/react-query";
 import {
   Search,
   Calendar,
@@ -37,6 +37,7 @@ type Props = {
 const Meeting: React.FC<Props> = ({ user, useMeetingsQuery }) => {
   const { spaceid } = useParams();
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
 
   const [scheduledDate, setScheduledDate] = useState<Date | null>(null);
   const [expandedMeetingId, setExpandedMeetingId] = useState<string | null>(
@@ -110,6 +111,12 @@ const Meeting: React.FC<Props> = ({ user, useMeetingsQuery }) => {
         response = await managerMakeCall(callData);
       }
       if (response && response.success) {
+        queryClient.invalidateQueries({
+          queryKey: ["user", "meetings", spaceid],
+        });
+        queryClient.invalidateQueries({
+          queryKey: ["manager", "meetings", spaceid],
+        });
         console.log("Call initiated");
         triggerRefreshMeeting(spaceid);
         sendNotification(
@@ -202,6 +209,12 @@ const Meeting: React.FC<Props> = ({ user, useMeetingsQuery }) => {
       response = await managerMakeCall(callData);
     }
     if (response && response.success) {
+      queryClient.invalidateQueries({
+        queryKey: ["user", "meetings", spaceid],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["manager", "meetings", spaceid],
+      });
       enqueueSnackbar(
         `Meeting scheduled for ${scheduledDate.toLocaleString()}`,
         { variant: "success" }
@@ -256,6 +269,12 @@ const Meeting: React.FC<Props> = ({ user, useMeetingsQuery }) => {
       }
       if (response && response.success) {
         console.log("joining call");
+        queryClient.invalidateQueries({
+          queryKey: ["user", "meetings", spaceid],
+        });
+        queryClient.invalidateQueries({
+          queryKey: ["manager", "meetings", spaceid],
+        });
         sendNotification(
           spaceid,
           user.profile.name + " has joined  the call " + meetingId,

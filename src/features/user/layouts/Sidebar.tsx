@@ -9,6 +9,7 @@ import {
   PhoneCall,
   User,
   MessageSquareIcon,
+  LayoutDashboard,
 } from "lucide-react";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
@@ -59,6 +60,14 @@ export const Sidebar: React.FC<SidebarPropsType> = ({
       <div className="flex-1 overflow-y-auto">
         <nav className="p-2">
           <div className="space-y-1">
+            <Button
+              variant="ghost"
+              className="w-full justify-start"
+              onClick={() => navigate("/user/dashboard")}
+            >
+              <LayoutDashboard className="h-5 w-5 mr-3" />
+              <span>Dashboard</span>
+            </Button>
             <Button
               variant="ghost"
               className="w-full justify-start"

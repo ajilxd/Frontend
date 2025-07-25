@@ -11,9 +11,15 @@ export type CompanyDetailsType = {
   ownerId: string;
 };
 
-export type CheckoutPayment<T> = {
-  planId: T;
-  ownerId: T;
-  stripeCustomerId: T;
-  subscriptionId: T;
+export type CheckoutPayment = {
+  planId: string;
+  ownerId: string;
+  stripeCustomerId: string;
+  subscriptionId: string;
+  billingCycleType: string;
+  yearly: boolean;
+  monthly: boolean;
+  amount: string;
+  points: string;
+  upgrade: boolean;
 };
