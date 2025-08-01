@@ -1,6 +1,11 @@
 import { createContext } from "react";
 import { Socket } from "socket.io-client";
 import { EventType, PeerMessageType } from "./NotificationContextProvider";
+import {
+  MeetingEventPayloadType,
+  SpaceEventPayloadType,
+  TaskEventPayloadType,
+} from "@/types";
 
 type NotificationSocketContextType = {
   notificationSocket: Socket;
@@ -20,6 +25,9 @@ type NotificationSocketContextType = {
   receiveMessageFromPeer: (
     callback: (msg: PeerMessageType) => void
   ) => () => void;
+  sendMeetingEvent: (data: MeetingEventPayloadType) => void;
+  sendSpaceEvent: (data: SpaceEventPayloadType) => void;
+  sendTaskEvent: (data: TaskEventPayloadType) => void;
 };
 
 export const NotificationContext =

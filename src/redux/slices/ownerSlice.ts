@@ -10,6 +10,8 @@ interface ownerState<T> {
   stripe_customer_id?: T;
   email?: T;
   _id?: T;
+  companyName?: T;
+  companyId?: T;
 }
 
 const initialState: ownerState<string> = {
@@ -67,6 +69,14 @@ const ownerSlice = createSlice({
     resetOwnerForgetPassword(state: ownerState<string>) {
       state.forgetPasswordEmail = "";
     },
+
+    updateCompanyDetails(
+      state: ownerState<string>,
+      action: PayloadAction<{ companyName: string; companyId: string }>
+    ) {
+      state.companyId = action.payload.companyId;
+      state.companyName = action.payload.companyName;
+    },
   },
 });
 
@@ -75,6 +85,7 @@ export const {
   ownerLogOutSuccess,
   ownerForgetPassword,
   resetOwnerForgetPassword,
+  updateCompanyDetails,
 } = ownerSlice.actions;
 
 export default ownerSlice.reducer;

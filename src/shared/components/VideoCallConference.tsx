@@ -1,4 +1,4 @@
-import { UseQueryResult } from "@tanstack/react-query";
+import { useQueryClient, UseQueryResult } from "@tanstack/react-query";
 import {
   Mic,
   MicOff,
@@ -21,12 +21,14 @@ import { MeetingType } from "@/types";
 
 import { usePeerSocket } from "../hooks/usePeerSocket";
 import { useTransport } from "../hooks/useTransport";
+import { useNotification } from "../hooks/useNotification";
 
 type Props = {
   user: {
     id: string;
     profile: { name?: string; image?: string };
     role: string;
+    companyId: string;
   };
   useMeetingsQuery: (spaceId: string) => UseQueryResult<MeetingType[], Error>;
 };
@@ -39,6 +41,8 @@ type Participant = {
 };
 
 const VideoCallConference: React.FC<Props> = ({ user, useMeetingsQuery }) => {
+  const queryClient = useQueryClient();
+  const { sendMeetingEvent } = useNotification();
   const {
     sendTransport,
     consumeFromPeer,
@@ -57,7 +61,7 @@ const VideoCallConference: React.FC<Props> = ({ user, useMeetingsQuery }) => {
     newParticipant,
     terminateMeeting,
     meetingIsTerminated,
-    resetMeetingTermination
+    resetMeetingTermination,
   } = usePeerSocket();
   const navigate = useNavigate();
   const { spaceid } = useParams();
@@ -165,7 +169,6 @@ const VideoCallConference: React.FC<Props> = ({ user, useMeetingsQuery }) => {
   }, [stream, sendTransport, audioProducer, videoProducer]);
 
   useEffect(() => {
-    console.log("hey im the consumer inititater");
     const consume = async () => {
       if (!device?.rtpCapabilities || !recvTransport) return;
 
@@ -211,11 +214,11 @@ const VideoCallConference: React.FC<Props> = ({ user, useMeetingsQuery }) => {
     meetingId,
     producersForConsuming,
     user.id,
-    consumeFromPeer,
-    newParticipant,
     recvTransportConnected,
     consumers,
   ]);
+
+  console.log("new participant " + newParticipant);
 
   useEffect(() => {
     const userId = recentQuitter?.userId;
@@ -250,7 +253,6 @@ const VideoCallConference: React.FC<Props> = ({ user, useMeetingsQuery }) => {
   };
 
   const endCall = () => {
-  
     stream?.getTracks().forEach((track) => track.stop());
     audioProducer?.close();
     videoProducer?.close();
@@ -273,8 +275,19 @@ const VideoCallConference: React.FC<Props> = ({ user, useMeetingsQuery }) => {
 
     if (res?.success) {
       enqueueSnackbar("Meeting ended", { variant: "success" });
-      terminateMeeting(user.id,meetingId)
-
+      terminateMeeting(user.id, meetingId);
+      sendMeetingEvent({
+        companyId: user.companyId,
+        type: "ended",
+        notificationContent: `${user.profile.name} has ended the call`,
+        spaceId: spaceid,
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["user", "meetings", spaceid],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["manager", "meetings", spaceid],
+      });
       const path =
         user.role === "user"
           ? `/user/dashboard/spaces/${spaceid}/meeting`
@@ -305,21 +318,19 @@ const VideoCallConference: React.FC<Props> = ({ user, useMeetingsQuery }) => {
     }
   };
 
-
-
-  useEffect(()=>{
-    if(meetingIsTerminated){
+  useEffect(() => {
+    if (meetingIsTerminated) {
       endCall();
-      resetMeetingTermination()
-       const path =
+      resetMeetingTermination();
+      const path =
         user.role === "user"
           ? `/user/dashboard/spaces/${spaceid}/meeting`
           : `/manager/dashboard/spaces/${spaceid}/meeting`;
 
       setTimeout(() => navigate(path), 1500);
-      console.log("meeting is terminated")
+      console.log("meeting is terminated");
     }
-  },[meetingIsTerminated])
+  }, [meetingIsTerminated]);
 
   return (
     <div className="flex flex-col h-screen bg-gray-900 text-white">

@@ -34,6 +34,7 @@ import { ownerAddSpace } from "../api/owner.api";
 import { SpaceVisibility, SpaceStatus } from "../constants";
 import { SpaceVisibilityType, SpaceStatusType } from "../types";
 import { SpacevalidationSchema } from "../validation/owner.validation";
+import { useNotification } from "@/shared/hooks/useNotification";
 
 interface SpaceFormValues {
   name: string;
@@ -57,6 +58,7 @@ const initialValues: SpaceFormValues = {
 
 export const AddSpaceForm: React.FC<Prop> = ({ ownerId }) => {
   const queryClient = useQueryClient();
+  const { sendSpaceEvent } = useNotification();
   const [tags, setTags] = useState<string[]>([]);
   const [tagInput, setTagInput] = useState("");
 
@@ -64,7 +66,6 @@ export const AddSpaceForm: React.FC<Prop> = ({ ownerId }) => {
 
   const { company } = useContext(OwnerContext);
   const { data: managers } = useManagersQuery(ownerId);
-
 
   const handleTagInput = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter" && tagInput.trim() !== "") {
@@ -104,6 +105,20 @@ export const AddSpaceForm: React.FC<Prop> = ({ ownerId }) => {
       queryClient.invalidateQueries({
         queryKey: ["owner", "spaces", "" + owner._id],
       });
+      let managersIds;
+      if (res.data && res.data.managers) {
+        const { managers } = res.data;
+        managersIds = managers.map((i: any) => i.managerId);
+      }
+      if (owner.companyId && managersIds) {
+        sendSpaceEvent({
+          companyId: owner.companyId,
+          type: "new-space",
+          notificationContent: `owner has created a new space - ${values.name}`,
+          notificationTimeStamp: new Date(),
+          managers: managersIds,
+        });
+      }
       enqueueSnackbar("Space added succesfully", { variant: "success" });
     } else {
       console.error(res.message);

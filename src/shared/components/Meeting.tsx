@@ -22,7 +22,6 @@ import { MeetingType } from "@/types";
 
 import { useTransport } from "../hooks/useTransport";
 import { useNotification } from "../hooks/useNotification";
-import { usePeerSocket } from "../hooks/usePeerSocket";
 
 type Props = {
   user: {
@@ -39,20 +38,22 @@ const Meeting: React.FC<Props> = ({ user, useMeetingsQuery }) => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
 
+  if (!spaceid) {
+    throw new Error("failed to find the space id , Please login");
+  }
+
   const [scheduledDate, setScheduledDate] = useState<Date | null>(null);
   const [expandedMeetingId, setExpandedMeetingId] = useState<string | null>(
     null
   );
-  const { refreshMeeting, resetRefreshMeeting, triggerRefreshMeeting } =
-    usePeerSocket();
+
   const {
     data: meetings,
     isError: hasMeetingFetchError,
     error: meetingFetchError,
-    refetch,
-  } = useMeetingsQuery(spaceid!);
+  } = useMeetingsQuery(spaceid);
 
-  const { sendNotification } = useNotification();
+  const { sendNotification, sendMeetingEvent } = useNotification();
 
   const [showScheduleModal, setShowScheduleModal] = useState(false);
   const { loadDevice, createSendTransport, createRecvTransport } =
@@ -61,18 +62,6 @@ const Meeting: React.FC<Props> = ({ user, useMeetingsQuery }) => {
   if (hasMeetingFetchError) {
     console.error("Error at fetching meetings", meetingFetchError);
   }
-
-  React.useEffect(() => {
-    console.log("inside refresh meeting useEffect", refreshMeeting);
-    if (refreshMeeting) {
-      const refresh = async () => {
-        await refetch();
-        resetRefreshMeeting();
-        console.log("Meeting refreshed and flag reset.");
-      };
-      refresh();
-    }
-  }, [refreshMeeting]);
 
   const formatDate = (dateString: string) => {
     if (!dateString) return "N/A";
@@ -118,15 +107,25 @@ const Meeting: React.FC<Props> = ({ user, useMeetingsQuery }) => {
           queryKey: ["manager", "meetings", spaceid],
         });
         console.log("Call initiated");
-        triggerRefreshMeeting(spaceid);
-        sendNotification(
-          user.companyId,
-          spaceid,
-          `${user.profile.name} has initiated a call`,
-          "info",
-          false,
-          user.id
-        );
+
+        // sendNotification(
+        //   user.companyId,
+        //   spaceid,
+        //   `${user.profile.name} has initiated a call`,
+        //   "info",
+        //   false,
+        //   user.id
+        // );
+
+        sendMeetingEvent({
+          companyId: user.companyId,
+          spaceId: spaceid,
+          type: "new-meeting",
+          notificationContent: `${user.profile.name} has initiated a call`,
+          notificationSenderId: user.id,
+          notificationTimeStamp: new Date(),
+        });
+
         const rtpCapabilities = response.data.rtpCapabilities;
         const sendtransportOptions = response.data.sendtransportOptions;
         const recvTransportOptions = response.data.recvTransportOptions;
@@ -276,9 +275,12 @@ const Meeting: React.FC<Props> = ({ user, useMeetingsQuery }) => {
           queryKey: ["manager", "meetings", spaceid],
         });
         sendNotification(
+          user.companyId,
           spaceid,
           user.profile.name + " has joined  the call " + meetingId,
-          "info"
+          "info",
+          false,
+          user.id
         );
         const rtpCapabilities = response.data.rtpCapabilities;
         const sendtransportOptions = response.data.sendtransportOptions;

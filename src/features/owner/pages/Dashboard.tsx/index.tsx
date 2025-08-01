@@ -18,7 +18,7 @@ import { RootState } from "@/redux/store/appStore";
 const OwnerDashboard = () => {
   const ownerData = useSelector((state: RootState) => state.owner);
   if (!ownerData._id) {
-    return console.warn("no owner Id found");
+    throw new Error("no owner Id found");
   }
   const { data } = useOwnerDashboardQuery(ownerData._id);
 
@@ -55,21 +55,21 @@ const OwnerDashboard = () => {
           <CardContent className="space-y-4">
             <div>
               <h3 className="text-lg md:text-xl font-bold text-gray-900 dark:text-gray-100 mb-2">
-                {data?.subscripitionData.name}
+                {data?.subscripitionData?.name || "N/A"}
               </h3>
               <Badge
                 variant={
-                  data?.subscripitionData.status === "active"
+                  data?.subscripitionData?.status === "active"
                     ? "default"
                     : "secondary"
                 }
                 className={
-                  data?.subscripitionData.status === "active"
+                  data?.subscripitionData?.status === "active"
                     ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200"
                     : ""
                 }
               >
-                {data?.subscripitionData.status === "active"
+                {data?.subscripitionData?.status === "active"
                   ? "Active"
                   : "Inactive"}
               </Badge>
@@ -81,7 +81,7 @@ const OwnerDashboard = () => {
                   Billing Amount
                 </span>
                 <span className="text-lg font-semibold text-gray-900 dark:text-gray-100">
-                  {data?.subscripitionData.amount}
+                  {data?.subscripitionData?.amount}
                 </span>
               </div>
 
@@ -89,14 +89,13 @@ const OwnerDashboard = () => {
                 <Calendar className="w-4 h-4" />
                 <span>
                   Next billing:{" "}
-                  {formatDate(data?.subscripitionData.billingDate)}
+                  {formatDate(data?.subscripitionData?.billingDate)}
                 </span>
               </div>
             </div>
           </CardContent>
         </Card>
 
-        {/* 2. Subscription Quota Section */}
         <Card className="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 lg:col-span-1">
           <CardHeader className="pb-3">
             <CardTitle className="text-lg font-semibold text-gray-900 dark:text-gray-100">
@@ -104,7 +103,6 @@ const OwnerDashboard = () => {
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            {/* Managers */}
             <div className="space-y-2">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
@@ -114,19 +112,18 @@ const OwnerDashboard = () => {
                   </span>
                 </div>
                 <span className="text-sm text-gray-600 dark:text-gray-400">
-                  {data?.quotaData.ownManagers}/{data?.quotaData.managerLimit}
+                  {data?.quotaData?.ownManagers}/{data?.quotaData?.managerLimit}
                 </span>
               </div>
               <Progress
                 value={getProgressPercentage(
-                  data?.quotaData.ownManagers,
-                  data?.quotaData.managerLimit
+                  data?.quotaData?.ownManagers,
+                  data?.quotaData?.managerLimit
                 )}
                 className="h-2"
               />
             </div>
 
-            {/* Spaces */}
             <div className="space-y-2">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
@@ -136,19 +133,18 @@ const OwnerDashboard = () => {
                   </span>
                 </div>
                 <span className="text-sm text-gray-600 dark:text-gray-400">
-                  {data?.quotaData.ownSpaces}/{data?.quotaData.spaceLimit}
+                  {data?.quotaData?.ownSpaces}/{data?.quotaData?.spaceLimit}
                 </span>
               </div>
               <Progress
                 value={getProgressPercentage(
-                  data?.quotaData.ownSpaces,
-                  data?.quotaData.spaceLimit
+                  data?.quotaData?.ownSpaces,
+                  data?.quotaData?.spaceLimit
                 )}
                 className="h-2"
               />
             </div>
 
-            {/* Users */}
             <div className="space-y-2">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
@@ -158,13 +154,13 @@ const OwnerDashboard = () => {
                   </span>
                 </div>
                 <span className="text-sm text-gray-600 dark:text-gray-400">
-                  {data?.quotaData.ownUsers}/{data?.quotaData.userLimit}
+                  {data?.quotaData?.ownUsers}/{data?.quotaData?.userLimit}
                 </span>
               </div>
               <Progress
                 value={getProgressPercentage(
-                  data?.quotaData.ownUsers,
-                  data?.quotaData.userLimit
+                  data?.quotaData?.ownUsers,
+                  data?.quotaData?.userLimit
                 )}
                 className="h-2"
               />
@@ -172,7 +168,6 @@ const OwnerDashboard = () => {
           </CardContent>
         </Card>
 
-        {/* 3. Spaces Statistics Section */}
         <Card className="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 lg:col-span-2">
           <CardHeader className="pb-3">
             <CardTitle className="text-lg font-semibold text-gray-900 dark:text-gray-100">
@@ -196,9 +191,9 @@ const OwnerDashboard = () => {
                 </div>
               </div>
 
-              {data?.ownerSpaces.map((space) => (
+              {data?.ownerSpaces?.map((space) => (
                 <div
-                  key={space.id}
+                  key={space.name}
                   className="p-3 rounded-lg border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-750 transition-colors md:grid md:grid-cols-4 md:gap-4 md:items-center md:border-0 md:p-2"
                 >
                   <div className="md:hidden space-y-2">
@@ -268,7 +263,7 @@ const OwnerDashboard = () => {
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-              {data?.managerData.map((manager) => (
+              {data?.managerData?.map((manager) => (
                 <div
                   key={manager.name}
                   className="flex items-center space-x-3 p-3 rounded-lg border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-750 transition-colors"
