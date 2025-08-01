@@ -79,7 +79,11 @@ const ManagerRoutes: React.FC = () => {
                 path="call"
                 element={
                   <VideoCallConference
-                    user={{ ...manager, role: "manager" }}
+                    user={{
+                      ...manager,
+                      companyId: manager.company.id,
+                      role: "manager",
+                    }}
                     useMeetingsQuery={useManagerMeetingsQuery}
                   />
                 }

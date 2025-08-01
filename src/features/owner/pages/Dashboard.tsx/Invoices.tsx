@@ -62,7 +62,7 @@ const Invoices: React.FC = () => {
                     <TableCell>
                       <PDFDownloadLink
                         document={<InvoicePDF invoice={invoice} />}
-                        fileName="invoice.pdf"
+                        fileName={new Date() + "invoice.pdf"}
                         className="border border-indigo-500 text-indigo-500 rounded hover:bg-indigo-500/10 dark:hover:bg-indigo-500/20 transition-colors p-2 "
                       >
                         {({ loading }) =>

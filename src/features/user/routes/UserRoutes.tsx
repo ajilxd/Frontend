@@ -58,7 +58,7 @@ const UserRoutes: React.FC = () => {
               path="call"
               element={
                 <VideoCallConference
-                  user={{ ...user, role: "user" }}
+                  user={{ ...user, role: "user", companyId: user.company.id! }}
                   useMeetingsQuery={useUserMeetingsQuery}
                 />
               }

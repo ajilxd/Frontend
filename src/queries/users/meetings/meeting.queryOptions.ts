@@ -8,5 +8,4 @@ export const userMeetingsQueryOptions = (
 ): UseQueryOptions<MeetingType[], Error> => ({
   queryKey: ["user", "meetings", spaceId],
   queryFn: () => userFetchMeetings(spaceId),
-  staleTime: 10 * 60 * 1000,
 });

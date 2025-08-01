@@ -1,7 +1,9 @@
 import * as Yup from "yup";
 
 export const addSubscriptionValidationSchema = Yup.object({
-  name: Yup.string().required("Plan name is required"),
+  name: Yup.string()
+    .matches(/^[^\s]+$/, "No spaces are allowed")
+    .required("Plan name is required"),
   description: Yup.string().required("Description is required"),
   monthlyAmount: Yup.number().when("billingCycleType", {
     is: (val: string) => val === "month" || val === "both",
@@ -22,13 +24,16 @@ export const addSubscriptionValidationSchema = Yup.object({
   numberOfSpaces: Yup.number()
     .typeError("Spaces must be a number")
     .min(1, "At least 1 space required")
+    .max(10, "You can only add upto 10 spaces")
     .required("Number of spaces is required"),
   numberOfManagers: Yup.number()
     .typeError("Managers must be a number")
     .min(1, "At least 1 manager required")
+    .max(10, "you can only add 10 managers")
     .required("Number of managers is required"),
   numberOfUsers: Yup.number()
     .typeError("Users must be a number")
     .min(1, "At least 1 user required")
+    .max(50, "you can only add 50 users")
     .required("Number of users is required"),
 });

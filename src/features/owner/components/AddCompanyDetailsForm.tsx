@@ -1,7 +1,7 @@
 import { useFormik } from "formik";
 import { Check, Plus } from "lucide-react";
 import { useState } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
@@ -26,6 +26,7 @@ import { RootState } from "@/redux/store/appStore";
 import { ownerAddCompanyDetails } from "../api/owner.api";
 import companyDetailsSchema from "../validation/owner.validation";
 import { useQueryClient } from "@tanstack/react-query";
+import { updateCompanyDetails } from "@/redux/slices/ownerSlice";
 
 interface Industry {
   value: string;
@@ -47,6 +48,7 @@ export function AddCompanyDetailsForm() {
   const [newIndustry, setNewIndustry] = useState("");
   const owner = useSelector((state: RootState) => state.owner);
   const queryClient = useQueryClient();
+  const dispatch = useDispatch();
 
   const formik = useFormik({
     initialValues: {
@@ -64,7 +66,16 @@ export function AddCompanyDetailsForm() {
       });
       if (res.success) {
         toast.success("Company added succesfully");
-
+        if (res.data.data) {
+          dispatch(
+            updateCompanyDetails({
+              companyName: res.data.data.companyName,
+              companyId: res.data.data._id,
+            })
+          );
+        } else {
+          console.warn("failed to update the company details at redux");
+        }
         formik.resetForm();
         queryClient.invalidateQueries({
           queryKey: ["owner", "company", owner._id],

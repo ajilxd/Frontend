@@ -545,3 +545,39 @@ export type UserDashboard = {
   taskStats: TaskStats;
   subscriptionStats: SubscriptionStats;
 };
+
+// meeting events - socket io type
+export type MeetingEventPayloadType = {
+  companyId: string;
+  type: "new-meeting" | "new-joinee" | "leftee" | "ended";
+  spaceId: string;
+  notificationContent?: string;
+  notificationSenderId?: string;
+  notificationTimeStamp?: Date;
+};
+
+// space events - socket io type
+
+export type SpaceEventPayloadType = {
+  companyId: string;
+  type: "new-space";
+  managers: string[];
+  notificationContent?: string;
+  notificationSenderId?: string;
+  notificationTimeStamp?: Date;
+};
+
+// task events - socket io type
+
+export type TaskEventPayloadType = {
+  companyId: string;
+  type: "created";
+  taskName: string;
+  taskPriority: string;
+  taskType: string;
+  assigneeId: string;
+  assigneeName: string;
+  notificationContent?: string;
+  notificationSenderId?: string;
+  notificationTimeStamp?: Date;
+};

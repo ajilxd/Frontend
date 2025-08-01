@@ -3,7 +3,12 @@ import { useEffect, useState } from "react";
 import { notificationSocket } from "@/socket/notificationSocket";
 
 import { NotificationContext } from "./NotificationContext";
-import { IUserMessage } from "@/types";
+import {
+  IUserMessage,
+  MeetingEventPayloadType,
+  SpaceEventPayloadType,
+  TaskEventPayloadType,
+} from "@/types";
 import { useQueryClient } from "@tanstack/react-query";
 
 type Props = {
@@ -47,6 +52,7 @@ export type EventType = {
   producerId?: string;
   producerImageUrl?: string;
   type?: "notification" | "event" | "both";
+  isNewMeetingEvent?: boolean;
   isTaskUpdatedEvent?: boolean;
   task?: TaskType;
   notificationContent?: string;
@@ -122,6 +128,29 @@ export const NotificationSocketProvider = ({ children }: Props) => {
       console.log(` data from the message `, data);
       handleNewMessage(data);
     });
+    notificationSocket.on("meeting", (data) => {
+      console.log("data from meeting event", data);
+      queryClient.invalidateQueries({
+        queryKey: ["manager", "meetings", data.spaceId],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["user", "meetings", data.spaceId],
+      });
+    });
+
+    notificationSocket.on("space", (data) => {
+      console.log("data from space event");
+      const { type, managers } = data;
+      if (type === "new-space") {
+        if (managers.length) {
+          managers.map((i: string) => {
+            queryClient.invalidateQueries({
+              queryKey: ["manager", "spaces", i],
+            });
+          });
+        }
+      }
+    });
     return () => {
       notificationSocket.off("notification", handleNotification);
     };
@@ -173,6 +202,11 @@ export const NotificationSocketProvider = ({ children }: Props) => {
     notificationSocket.emit("notification", payload);
   };
 
+  const sendMeetingEvent = (payload: MeetingEventPayloadType) => {
+    console.log(` im sending data `, payload);
+    notificationSocket.emit("meeting", payload);
+  };
+
   const sendMessageToPeer = (data: PeerMessageType) => {
     notificationSocket.emit("send-peer-message", data);
   };
@@ -200,6 +234,14 @@ export const NotificationSocketProvider = ({ children }: Props) => {
     }
   };
 
+  const sendSpaceEvent = (data: SpaceEventPayloadType) => {
+    notificationSocket.emit("space", data);
+  };
+
+  const sendTaskEvent = (data: TaskEventPayloadType) => {
+    notificationSocket.emit("task", data);
+  };
+
   return (
     <NotificationContext.Provider
       value={{
@@ -211,6 +253,9 @@ export const NotificationSocketProvider = ({ children }: Props) => {
         updateNotifications,
         sendMessageToPeer,
         receiveMessageFromPeer,
+        sendMeetingEvent,
+        sendSpaceEvent,
+        sendTaskEvent,
       }}
     >
       {children}
