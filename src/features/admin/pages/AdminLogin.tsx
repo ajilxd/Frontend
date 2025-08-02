@@ -1,5 +1,4 @@
 import { Formik } from "formik";
-import { useSnackbar } from "notistack";
 import { useState } from "react";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
@@ -8,14 +7,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { LOGIN_IMAGE_ADMIN_URL } from "@/constants/images";
 import { adminLoginSuccess } from "@/redux/slices/adminSlice";
-import { setActiveRole } from "@/redux/slices/globalSlice";
 
 import { adminSignInService } from "../api/admin.api";
 import { adminSigninValidationSchema } from "../validation/admin.validation";
 
 const AdminLogin: React.FC = () => {
   const [loginError, setLoginError] = useState("");
-  const { enqueueSnackbar } = useSnackbar();
+
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const initialValues = {
@@ -26,22 +24,16 @@ const AdminLogin: React.FC = () => {
   async function handleAdminSignInSubmit(values: typeof initialValues) {
     const res = await adminSignInService(values);
     if (res.success) {
-      dispatch(adminLoginSuccess({ accessToken: res.data.accessToken }));
-      localStorage.setItem("activeRole", "admin");
-      localStorage.setItem("adminAccessToken", res.data.accessToken);
-      dispatch(setActiveRole({ activeRole: "admin" }));
-      enqueueSnackbar(res.message, { variant: "success" });
+      dispatch(adminLoginSuccess({ accessToken: res.data.data.accessToken }));
+      localStorage.setItem("adminAccessToken", res.data.data.accessToken);
       setTimeout(() => navigate("/admin/dashboard"), 500);
     } else {
       if ("status" in res) {
         if (res.status === 404) {
-          enqueueSnackbar(res.message, { variant: "error" });
           setLoginError(res.message);
         } else if (res.status === 401) {
-          enqueueSnackbar(res.message, { variant: "error" });
           setLoginError(res.message);
         } else {
-          enqueueSnackbar(res.message, { variant: "error" });
           setLoginError(res.message);
         }
       }

@@ -3,7 +3,6 @@ import { persistReducer, persistStore } from "redux-persist";
 import storage from "redux-persist/lib/storage";
 
 import adminReducer from "../slices/adminSlice";
-import globalReducer from "../slices/globalSlice";
 import managerReducer from "../slices/managerSlice";
 import ownerReducer from "../slices/ownerSlice";
 import userReducer from "../slices/userSlice";
@@ -16,7 +15,6 @@ const persistConfig = {
 const rootReducer = combineReducers({
   admin: adminReducer,
   owner: ownerReducer,
-  global: globalReducer,
   manager: managerReducer,
   user: userReducer,
 });

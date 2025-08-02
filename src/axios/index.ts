@@ -31,6 +31,7 @@ export const setupInterceptors = ({
 }) => {
   apiInstance.interceptors.request.use((config) => {
     const accessToken = localStorage.getItem(`${role}AccessToken`);
+    console.log("accessToken", accessToken);
     const excludeUrls = ["/owner/login", "/owner/register"];
 
     if (excludeUrls.some((url) => config.url && config.url.includes(url))) {
@@ -86,7 +87,7 @@ export const setupInterceptors = ({
         } catch (refreshError) {
           console.log(refreshError);
           if (role === "admin") {
-            navigate("/admin/login");
+            navigate("/admin/signin");
           } else if (role === "owner") {
             navigate("/owner/signin");
           } else {
