@@ -14,5 +14,4 @@ export const adminTransactionsQueryOptions = (
 > => ({
   queryKey: ["admin", "transactions", { page, search, status }],
   queryFn: () => adminFetchAllTransactions(page, itemPerPage, search, status),
-  staleTime: 5 * 60 * 1000,
 });
