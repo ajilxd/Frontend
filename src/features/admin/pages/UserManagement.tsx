@@ -199,6 +199,9 @@ const AllUserTable = () => {
                                   member.status === "active" ? false : true
                                 }
                                 page={page}
+                                filteredRole={role}
+                                search={search}
+                                status={status}
                               />
                             </div>
                           </TableCell>

@@ -13,5 +13,4 @@ export const adminAllUsersQueryOptions = (
 ): UseQueryOptions<{ users: AccountType[]; totalPage: number }, Error> => ({
   queryKey: ["admin", "allusers", { page, search, role, status }],
   queryFn: () => adminFetchAllUsers(page, itemPerPage, search, role, status),
-  staleTime: 5 * 60 * 1000,
 });

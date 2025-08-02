@@ -14,9 +14,20 @@ type Props = {
   id: string;
   block: boolean;
   page: number;
+  search: string;
+  status: string;
+  filteredRole: string;
 };
 
-const AllUserMorePopOver: React.FC<Props> = ({ role, id, block, page }) => {
+const AllUserMorePopOver: React.FC<Props> = ({
+  role,
+  id,
+  block,
+  page,
+  search,
+  status,
+  filteredRole,
+}) => {
   const queryClient = useQueryClient();
   const handleBlockToggle = async () => {
     console.log(
@@ -25,7 +36,13 @@ const AllUserMorePopOver: React.FC<Props> = ({ role, id, block, page }) => {
     const res = await adminBlockUser(role, id, !block);
     if (res.success) {
       toast.success("status updated", { position: "top-center" });
-      queryClient.invalidateQueries({ queryKey: ["admin", "allusers", page] });
+      queryClient.invalidateQueries({
+        queryKey: [
+          "admin",
+          "allusers",
+          { page, search, role: filteredRole, status },
+        ],
+      });
     } else {
       alert("something went wrong");
     }

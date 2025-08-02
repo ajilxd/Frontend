@@ -162,7 +162,7 @@ export async function adminFetchAllUsers(
       throw new Error("Page and itemPerpage is missing");
     }
     const response = await adminApi.get(
-      `${baseUrl}/admin/users?page=${page}&itemPerPage=${itemPerPage}&search=${search}&role=${role}&$status=${status}`
+      `${baseUrl}/admin/users?page=${page}&itemPerPage=${itemPerPage}&search=${search}&role=${role}&status=${status}`
     );
     if (response.status === 200) {
       return response.data.data;
