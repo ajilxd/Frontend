@@ -4,9 +4,9 @@ import { ownerFetchInvoices } from "@/features/owner/api/owner.api";
 import type { InvoiceType } from "@/types";
 
 export const ownerInvoicesQueryOptions = (
-  ownerId: string
-): UseQueryOptions<InvoiceType[], Error> => ({
+  ownerId: string,
+  page: number
+): UseQueryOptions<{ invoices: InvoiceType[]; totalPage: number }, Error> => ({
   queryKey: ["owner", "invoices", ownerId],
-  queryFn: () => ownerFetchInvoices(ownerId),
-  staleTime: 10 * 60 * 1000,
+  queryFn: () => ownerFetchInvoices(ownerId, page),
 });

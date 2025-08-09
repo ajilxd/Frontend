@@ -238,9 +238,11 @@ export async function ownerCancelSubscriptionService(
 
 // Owner api for handling invoice ops
 
-export async function ownerFetchInvoices(id: string) {
+export async function ownerFetchInvoices(id: string, page: number) {
   try {
-    const response = await ownerApi.get(`${baseUrl}/owner/invoices/${id}`);
+    const response = await ownerApi.get(
+      `${baseUrl}/owner/invoices/${id}?page=${page}`
+    );
     if (response.status === 200) {
       return response.data.data;
     }

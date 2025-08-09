@@ -132,15 +132,15 @@ export type OwnerSubscriptionType = {
 };
 
 export type InvoiceType = {
-  total: number;
+  amount: number;
   currency: string;
-  hosted_invoice_url: string;
-  invoice_pdf: string;
-  customer_email: string;
-  name: string;
-  subscription_id: string;
-  created: string;
-  id: string;
+  customerEmail: string;
+  customerName: string;
+  customerId: string;
+  subscriptionId: string;
+  subscriptionName: string;
+  createdAt: string;
+  invoiceId: string;
 };
 
 export type CompanyType = {

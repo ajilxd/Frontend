@@ -107,15 +107,6 @@ type InvoiceProps = {
 };
 
 const InvoicePDF: React.FC<InvoiceProps> = ({ invoice }) => {
-  const formatDate = (timestamp: number) =>
-    new Date(timestamp * 1000).toLocaleDateString("en-US", {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-    });
-
-  const date = formatDate(+invoice.created);
-
   return (
     <Document>
       <Page size="A4" style={styles.page}>
@@ -134,28 +125,30 @@ const InvoicePDF: React.FC<InvoiceProps> = ({ invoice }) => {
           <Text style={styles.heading}>Invoice Summary</Text>
           <View style={styles.row}>
             <Text style={styles.label}>Invoice ID:</Text>
-            <Text style={styles.value}>{invoice.id}</Text>
+            <Text style={styles.value}>{invoice.invoiceId}</Text>
           </View>
           <View style={styles.row}>
             <Text style={styles.label}>Plan:</Text>
-            <Text style={styles.value}>{invoice.name}</Text>
+            <Text style={styles.value}>{invoice.subscriptionName}</Text>
           </View>
           <View style={styles.row}>
             <Text style={styles.label}>Customer Email:</Text>
-            <Text style={styles.value}>{invoice.customer_email}</Text>
+            <Text style={styles.value}>{invoice.customerEmail}</Text>
           </View>
           <View style={styles.row}>
             <Text style={styles.label}>Subscription ID:</Text>
-            <Text style={styles.value}>{invoice.subscription_id}</Text>
+            <Text style={styles.value}>{invoice.subscriptionId}</Text>
           </View>
           <View style={styles.row}>
             <Text style={styles.label}>Created On:</Text>
-            <Text style={styles.value}>{date}</Text>
+            <Text style={styles.value}>
+              {new Date(invoice.createdAt).toDateString()}
+            </Text>
           </View>
           <View style={styles.totalRow}>
             <Text style={styles.totalLabel}>Total:</Text>
             <Text style={styles.totalValue}>
-              ${(invoice.total / 100).toFixed(2)}{" "}
+              ${(invoice.amount / 100).toFixed(2)}{" "}
               {invoice.currency.toUpperCase()}
             </Text>
           </View>

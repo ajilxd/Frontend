@@ -20,9 +20,11 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { useAdminDashboardQuery } from "@/queries/admin/dashboard/useDashboardQuery";
+import { useNavigate } from "react-router-dom";
 
 const AdminDashboard = () => {
   const { data } = useAdminDashboardQuery();
+  const navigate = useNavigate();
 
   return (
     <div className="min-h-screen">
@@ -91,14 +93,15 @@ const AdminDashboard = () => {
                     </CardTitle>
                   </div>
                 </div>
-                <Button
+                {/* navigate to companies page */}
+                {/* <Button
                   variant="ghost"
                   size="sm"
                   className="text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100"
                 >
                   <Eye className="w-4 h-4 mr-2" />
                   View All Companies
-                </Button>
+                </Button> */}
               </div>
             </CardHeader>
             <CardContent>
@@ -171,7 +174,7 @@ const AdminDashboard = () => {
               variant="ghost"
               size="sm"
               className="text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100"
-              onClick={() => alert("Navigate to /subscriptions")}
+              onClick={() => navigate("/admin/dashboard/subscriptions")}
             >
               View More
               <ChevronRight className="w-4 h-4 ml-1" />
@@ -179,74 +182,75 @@ const AdminDashboard = () => {
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            {data?.topSubscriptions.map((subscription) => (
-              <Card
-                key={subscription._id}
-                className={`border-slate-200 dark:border-slate-800 hover:shadow-md dark:hover:shadow-lg transition-all duration-200 ${subscription.color}`}
-              >
-                <CardContent className="p-6 space-y-3">
-                  <h3 className="font-semibold text-lg text-slate-900 dark:text-slate-100">
-                    {subscription.name}
-                  </h3>
+            {data &&
+              data?.topSubscriptions?.map((subscription) => (
+                <Card
+                  key={subscription._id}
+                  className={`border-slate-200 dark:border-slate-800 hover:shadow-md dark:hover:shadow-lg transition-all duration-200 ${subscription.color}`}
+                >
+                  <CardContent className="p-6 space-y-3">
+                    <h3 className="font-semibold text-lg text-slate-900 dark:text-slate-100">
+                      {subscription.name}
+                    </h3>
 
-                  <div className="text-sm text-slate-600 dark:text-slate-400">
-                    Status:{" "}
-                    <span
-                      className={`inline-block px-2 py-0.5 rounded-full ${
-                        subscription.isActive
-                          ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-900 dark:text-emerald-300"
-                          : "bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300"
-                      }`}
-                    >
-                      {subscription.isActive ? "Active" : "Inactive"}
-                    </span>
-                  </div>
+                    <div className="text-sm text-slate-600 dark:text-slate-400">
+                      Status:{" "}
+                      <span
+                        className={`inline-block px-2 py-0.5 rounded-full ${
+                          subscription.isActive
+                            ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-900 dark:text-emerald-300"
+                            : "bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300"
+                        }`}
+                      >
+                        {subscription.isActive ? "Active" : "Inactive"}
+                      </span>
+                    </div>
 
-                  <div className="text-sm text-slate-600 dark:text-slate-400">
-                    Billing Cycle:{" "}
-                    <span className="font-medium text-slate-900 dark:text-slate-100">
-                      {subscription.billingCycleType.charAt(0).toUpperCase() +
-                        subscription.billingCycleType.slice(1)}
-                    </span>
-                  </div>
+                    <div className="text-sm text-slate-600 dark:text-slate-400">
+                      Billing Cycle:{" "}
+                      <span className="font-medium text-slate-900 dark:text-slate-100">
+                        {subscription.billingCycleType.charAt(0).toUpperCase() +
+                          subscription.billingCycleType.slice(1)}
+                      </span>
+                    </div>
 
-                  <ul className="space-y-1 text-sm text-slate-700 dark:text-slate-300">
-                    {subscription.billingCycleType === "both" && (
-                      <>
-                        <li>
-                          Yearly:{" "}
-                          <span className="font-semibold">
-                            ${subscription.yearlyAmount}
-                          </span>
-                        </li>
+                    <ul className="space-y-1 text-sm text-slate-700 dark:text-slate-300">
+                      {subscription.billingCycleType === "both" && (
+                        <>
+                          <li>
+                            Yearly:{" "}
+                            <span className="font-semibold">
+                              ${subscription.yearlyAmount}
+                            </span>
+                          </li>
+                          <li>
+                            Monthly:{" "}
+                            <span className="font-semibold">
+                              ${subscription.monthlyAmount}
+                            </span>
+                          </li>
+                        </>
+                      )}
+                      {subscription.billingCycleType === "month" && (
                         <li>
                           Monthly:{" "}
                           <span className="font-semibold">
                             ${subscription.monthlyAmount}
                           </span>
                         </li>
-                      </>
-                    )}
-                    {subscription.billingCycleType === "month" && (
-                      <li>
-                        Monthly:{" "}
-                        <span className="font-semibold">
-                          ${subscription.monthlyAmount}
-                        </span>
-                      </li>
-                    )}
-                    {subscription.billingCycleType === "year" && (
-                      <li>
-                        Yearly:{" "}
-                        <span className="font-semibold">
-                          ${subscription.yearlyAmount}
-                        </span>
-                      </li>
-                    )}
-                  </ul>
-                </CardContent>
-              </Card>
-            ))}
+                      )}
+                      {subscription.billingCycleType === "year" && (
+                        <li>
+                          Yearly:{" "}
+                          <span className="font-semibold">
+                            ${subscription.yearlyAmount}
+                          </span>
+                        </li>
+                      )}
+                    </ul>
+                  </CardContent>
+                </Card>
+              ))}
           </div>
         </section>
       </div>
