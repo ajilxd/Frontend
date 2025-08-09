@@ -1,7 +1,6 @@
 import { useSelector } from "react-redux";
 import { Route, Routes } from "react-router-dom";
 
-import { ManagerContextProvider } from "@/context/ManagerContextProvider";
 import PrivateRoute from "@/hoc/PrivateRoute";
 import { useManagerChatsQuery } from "@/queries/managers/chats/useChatQuery";
 import { useManagerSpacesByIdQuery } from "@/queries/managers/spaces/useManagerSpaceByIdQuery";
@@ -28,83 +27,81 @@ const ManagerRoutes: React.FC = () => {
   const manager = useSelector((state: RootState) => state.manager);
   return (
     <>
-      <ManagerContextProvider>
-        <Routes>
+      <Routes>
+        <Route
+          path="dashboard"
+          element={<PrivateRoute Component={Dashboard} role="manager" />}
+        >
+          <Route index element={<DefaultDashboard />}></Route>
+          <Route path="users" element={<UsersDashboard />}></Route>
           <Route
-            path="dashboard"
-            element={<PrivateRoute Component={Dashboard} role="manager" />}
-          >
-            <Route index element={<DefaultDashboard />}></Route>
-            <Route path="users" element={<UsersDashboard />}></Route>
+            path="chat"
+            element={
+              <ChatLayout
+                navCollapsedSize={8}
+                defaultLayout={undefined}
+                user={{ ...manager, role: "manager" }}
+                usePeerChatQuery={useManagerPeerChatsQuery}
+                usePeerMessageQuery={useManagerPeerMessagesQuery}
+              />
+            }
+          ></Route>
+          <Route path="spaces/:spaceid">
+            <Route path="members" element={<Members />}></Route>
+            <Route path="tasks" element={<Tasks />}></Route>
             <Route
               path="chat"
               element={
-                <ChatLayout
-                  navCollapsedSize={8}
-                  defaultLayout={undefined}
+                <Chat
+                  useChatQuery={useManagerChatsQuery}
                   user={{ ...manager, role: "manager" }}
-                  usePeerChatQuery={useManagerPeerChatsQuery}
-                  usePeerMessageQuery={useManagerPeerMessagesQuery}
+                  useSpaceQuery={useManagerSpacesByIdQuery}
                 />
               }
             ></Route>
-            <Route path="spaces/:spaceid">
-              <Route path="members" element={<Members />}></Route>
-              <Route path="tasks" element={<Tasks />}></Route>
-              <Route
-                path="chat"
-                element={
-                  <Chat
-                    useChatQuery={useManagerChatsQuery}
-                    user={{ ...manager, role: "manager" }}
-                    useSpaceQuery={useManagerSpacesByIdQuery}
-                  />
-                }
-              ></Route>
-              <Route path="docs" element={<Docs />}></Route>
-              <Route
-                path="meeting"
-                element={
-                  <Meeting
-                    user={{
-                      ...manager,
-                      role: "manager",
-                      companyId: manager.company.id,
-                    }}
-                    useMeetingsQuery={useManagerMeetingsQuery}
-                  />
-                }
-              ></Route>
-              <Route
-                path="call"
-                element={
-                  <VideoCallConference
-                    user={{
-                      ...manager,
-                      companyId: manager.company.id,
-                      role: "manager",
-                    }}
-                    useMeetingsQuery={useManagerMeetingsQuery}
-                  />
-                }
-              ></Route>
-            </Route>
+            <Route path="docs" element={<Docs />}></Route>
             <Route
-              path="profile"
-              element={<Profile id={manager.id} role="manager" />}
+              path="meeting"
+              element={
+                <Meeting
+                  user={{
+                    ...manager,
+                    role: "manager",
+                    companyId: manager.company.id,
+                  }}
+                  useMeetingsQuery={useManagerMeetingsQuery}
+                />
+              }
             ></Route>
             <Route
-              path="calendar"
+              path="call"
               element={
-                <CalendarEvents
-                  useEventsQuery={useManagerEventsQuery}
-                  user={{ ...manager, role: "manager" }}
+                <VideoCallConference
+                  user={{
+                    ...manager,
+                    companyId: manager.company.id,
+                    role: "manager",
+                  }}
+                  useMeetingsQuery={useManagerMeetingsQuery}
                 />
               }
             ></Route>
           </Route>
-        </Routes>
-      </ManagerContextProvider>
+          <Route
+            path="profile"
+            element={<Profile id={manager.id} role="manager" />}
+          ></Route>
+          <Route
+            path="calendar"
+            element={
+              <CalendarEvents
+                useEventsQuery={useManagerEventsQuery}
+                user={{ ...manager, role: "manager" }}
+              />
+            }
+          ></Route>
+        </Route>
+      </Routes>
     </>
   );
 };

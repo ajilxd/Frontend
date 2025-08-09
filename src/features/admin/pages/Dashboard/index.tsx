@@ -220,13 +220,13 @@ const AdminDashboard = () => {
                           <li>
                             Yearly:{" "}
                             <span className="font-semibold">
-                              ${subscription.yearlyAmount}
+                              ₹{subscription.yearlyAmount}
                             </span>
                           </li>
                           <li>
                             Monthly:{" "}
                             <span className="font-semibold">
-                              ${subscription.monthlyAmount}
+                              ₹{subscription.monthlyAmount}
                             </span>
                           </li>
                         </>
@@ -235,7 +235,7 @@ const AdminDashboard = () => {
                         <li>
                           Monthly:{" "}
                           <span className="font-semibold">
-                            ${subscription.monthlyAmount}
+                            ₹{subscription.monthlyAmount}
                           </span>
                         </li>
                       )}
@@ -243,7 +243,7 @@ const AdminDashboard = () => {
                         <li>
                           Yearly:{" "}
                           <span className="font-semibold">
-                            ${subscription.yearlyAmount}
+                            ₹{subscription.yearlyAmount}
                           </span>
                         </li>
                       )}
