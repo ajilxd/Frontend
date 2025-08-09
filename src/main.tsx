@@ -6,6 +6,7 @@ import { Provider } from "react-redux";
 import { BrowserRouter } from "react-router-dom";
 
 import "./index.css";
+import "./axios/index.ts";
 import App from "./App.tsx";
 import { PeerSocketProvider } from "./context/PeerSocketContextProvider.tsx";
 import { SocketProvider } from "./context/SocketContextProvider.tsx";
@@ -14,10 +15,8 @@ import { TransportProvider } from "./context/TransportContextProvider.tsx";
 import { ErrorFallback } from "./errors/ErrorFallback.tsx";
 import { store } from "./redux/store/appStore.ts";
 import { NotificationSocketProvider } from "./context/NotificationContextProvider.tsx";
-import AuthContextProvider from "./context/AuthContextProvider.tsx";
 import { Calendar } from "./shared/components/Calander/context/CalendarContextProvider.tsx";
 import { Toaster } from "sonner";
-import { EventType } from "react-hook-form";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -40,23 +39,21 @@ createRoot(document.getElementById("root")!).render(
             <SocketProvider>
               <Provider store={store}>
                 <BrowserRouter>
-                  <AuthContextProvider>
-                    <ThemeContextProvider>
-                      <Calendar>
-                        <SnackbarProvider
-                          maxSnack={3}
-                          anchorOrigin={{
-                            vertical: "top",
-                            horizontal: "right",
-                          }}
-                          autoHideDuration={3000}
-                        >
-                          <App />
-                          <Toaster position="top-center" richColors />
-                        </SnackbarProvider>
-                      </Calendar>
-                    </ThemeContextProvider>
-                  </AuthContextProvider>
+                  <ThemeContextProvider>
+                    <Calendar>
+                      <SnackbarProvider
+                        maxSnack={3}
+                        anchorOrigin={{
+                          vertical: "top",
+                          horizontal: "right",
+                        }}
+                        autoHideDuration={3000}
+                      >
+                        <App />
+                        <Toaster position="top-center" richColors />
+                      </SnackbarProvider>
+                    </Calendar>
+                  </ThemeContextProvider>
                 </BrowserRouter>
               </Provider>
             </SocketProvider>

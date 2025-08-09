@@ -3,8 +3,6 @@ import axios, { AxiosInstance } from "axios";
 import { baseUrl } from "@/constants/app";
 
 const createApi = (role: string): AxiosInstance => {
-  // console.log("inside interceptor...");
-
   return axios.create({
     baseURL: baseUrl,
     withCredentials: true,
@@ -20,14 +18,12 @@ export const ownerApi = createApi("owner");
 export const managerApi = createApi("manager");
 export const adminApi = createApi("admin");
 
-export const setupInterceptors = ({
+const setupInterceptors = ({
   apiInstance,
   role,
-  navigate,
 }: {
   apiInstance: AxiosInstance;
   role: string;
-  navigate: (path: string) => void;
 }) => {
   apiInstance.interceptors.request.use((config) => {
     const accessToken = localStorage.getItem(`${role}AccessToken`);
@@ -87,11 +83,11 @@ export const setupInterceptors = ({
         } catch (refreshError) {
           console.log(refreshError);
           if (role === "admin") {
-            navigate("/admin/signin");
+            window.location.href = "/admin/signin";
           } else if (role === "owner") {
-            navigate("/owner/signin");
+            window.location.href = "/owner/signin";
           } else {
-            navigate("/auth/login-email");
+            window.location.href = "/auth/login-email";
           }
 
           return Promise.reject(refreshError);
@@ -102,3 +98,8 @@ export const setupInterceptors = ({
     }
   );
 };
+
+setupInterceptors({ apiInstance: userApi, role: "user" });
+setupInterceptors({ apiInstance: ownerApi, role: "owner" });
+setupInterceptors({ apiInstance: managerApi, role: "manager" });
+setupInterceptors({ apiInstance: adminApi, role: "admin" });

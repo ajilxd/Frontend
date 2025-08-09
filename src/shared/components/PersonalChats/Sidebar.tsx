@@ -17,7 +17,7 @@ import {
   IParticipantMetadata,
   IUserChatlist,
 } from "@/types";
-import { useInterceptor } from "@/hooks/useIntercepter";
+
 import { SidebarUserItem } from "./SidebarUserItem";
 import { SidebarChatItem } from "./SidebarChatItem";
 import { UseQueryResult } from "@tanstack/react-query";
@@ -51,7 +51,6 @@ export function Sidebar({
   const [availableUsers, setAvailableUsers] = useState<IParticipantMetadata[]>(
     []
   );
-  const { interceptorReady } = useInterceptor();
 
   const { data: chats, refetch } = usePeerChatQuery(user.id);
 
@@ -61,28 +60,22 @@ export function Sidebar({
 
   useEffect(() => {
     async function updateMembers() {
-      if (interceptorReady) {
-        const fetchFn =
-          user.role === "manager"
-            ? managerFetchCompanyMembers
-            : userFetchCompanyMembers;
-        const res = await fetchFn(user.company.id);
+      const fetchFn =
+        user.role === "manager"
+          ? managerFetchCompanyMembers
+          : userFetchCompanyMembers;
+      const res = await fetchFn(user.company.id);
 
-        if (res.success) {
-          setAvailableUsers(
-            res.data.filter(
-              (i: CompanyMemberP2PChatType) => i.userId !== user.id
-            )
-          );
-        } else {
-          console.warn("Error fetching chats", res.message);
-        }
+      if (res.success) {
+        setAvailableUsers(
+          res.data.filter((i: CompanyMemberP2PChatType) => i.userId !== user.id)
+        );
       } else {
-        console.warn("Wait...Intercepter is loading");
+        console.warn("Error fetching chats", res.message);
       }
     }
     updateMembers();
-  }, [interceptorReady, user.company.id, user.id, user.role]);
+  }, [user.company.id, user.id, user.role]);
 
   const filteredChats = chats?.filter((chat) =>
     chat.participantsMetadata.some((i) =>
