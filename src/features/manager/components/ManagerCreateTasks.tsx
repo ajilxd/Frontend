@@ -225,7 +225,6 @@ export const ManagerCreateTasks: React.FC = () => {
               options={[
                 { label: "To Do", value: "todo" },
                 { label: "In Progress", value: "in_progress" },
-                { label: "Review", value: "review" },
                 { label: "Done", value: "done" },
                 { label: "Cancelled", value: "cancelled" },
               ]}

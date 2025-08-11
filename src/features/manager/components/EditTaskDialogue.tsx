@@ -176,7 +176,6 @@ export const EditTaskDialog = ({
                   options={[
                     { label: "To Do", value: "todo" },
                     { label: "In Progress", value: "in_progress" },
-                    { label: "Review", value: "review" },
                     { label: "Done", value: "done" },
                     { label: "Cancelled", value: "cancelled" },
                   ]}
@@ -196,7 +195,7 @@ export const EditTaskDialog = ({
               <AnimatedSelect
                 defaultValues={
                   task.tags &&
-                  task.tags?.map((tag) => ({ label: tag, value: tag }))
+                  task.tags.map((tag) => ({ label: tag, value: tag }))
                 }
                 options={TasksTagsOption}
                 handleChangeFunction={handleTagsChange}

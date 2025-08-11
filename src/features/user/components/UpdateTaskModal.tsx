@@ -1,6 +1,6 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { enqueueSnackbar } from "notistack";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
 
@@ -34,22 +34,33 @@ export function UpdateTaskModal({
   open: boolean;
   task: TaskType;
 }) {
+  if (!task) return;
   const { spaceid } = useParams();
   const { sendNotification } = useNotification();
   const user = useSelector((state: RootState) => state.user);
   const queryClient = useQueryClient();
-  const [status, setStatus] = useState(task?.status);
-  if (!task) return;
+  const [status, setStatus] = useState(task.status);
+
+  useEffect(() => {
+    setStatus(task.status);
+  }, [task.status]);
 
   const handleSubmit = async (task: TaskType) => {
     const response = await userUpdateTaskStatus(task._id, "status", { status });
     if (response.success) {
       enqueueSnackbar("Task updated successfully", { variant: "success" });
-      if(!user.company.id||!spaceid){
-        return console.warn("failed finding space id and company id")
+      if (!user.company.id || !spaceid) {
+        return console.warn("failed finding space id and company id");
       }
-      const message =  user.profile.name + " updated an task";
-      sendNotification(user.company.id,spaceid,message,"info",true,user.id)
+      const message = user.profile.name + " updated an task";
+      sendNotification(
+        user.company.id,
+        spaceid,
+        message,
+        "info",
+        true,
+        user.id
+      );
       queryClient.invalidateQueries({ queryKey: ["user", "tasks", spaceid] });
       queryClient.invalidateQueries({ queryKey: ["user", "tasks", user.id] });
     } else {
@@ -91,7 +102,6 @@ export function UpdateTaskModal({
               options={[
                 { label: "To Do", value: "todo" },
                 { label: "In Progress", value: "in_progress" },
-                { label: "Review", value: "review" },
                 { label: "Done", value: "done" },
                 { label: "Cancelled", value: "cancelled" },
               ]}

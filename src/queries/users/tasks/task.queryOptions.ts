@@ -11,7 +11,6 @@ export const userTasksQueryOptions = (
 ): UseQueryOptions<TaskType[], Error> => ({
   queryKey: ["user", "tasks", userId],
   queryFn: () => userFetchOwnTasks(userId),
-  staleTime: 5 * 60 * 1000,
 });
 
 export const userTasksBySpaceIdQueryOptions = (

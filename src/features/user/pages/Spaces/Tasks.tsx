@@ -1,18 +1,18 @@
 import { Filter, ArrowUpCircle, Calendar, CheckCircle } from "lucide-react";
 import { useState } from "react";
-import { useParams } from "react-router-dom";
-
-import { useUserTasksBySpaceIdQuery } from "@/queries/users/tasks/useUserTasksBySpaceIdQuery";
 import { TaskType } from "@/types";
 
 import { TaskDropdown } from "../../components/TaskDropDown";
 import { UpdateTaskModal } from "../../components/UpdateTaskModal";
 import { getStatusConfig } from "../../constants/StatusConfig";
+import { useUserTaskQuery } from "@/queries/users/tasks/useUserTasksQuery";
+import { useSelector } from "react-redux";
+import { RootState } from "@/redux/store/appStore";
 
 export function Tasks() {
-  const { spaceid } = useParams();
+  const userId = useSelector((state: RootState) => state.user.id);
 
-  const { data: tasks } = useUserTasksBySpaceIdQuery(spaceid!);
+  const { data: tasks } = useUserTaskQuery(userId);
 
   const [statusFilter, setStatusFilter] = useState("all");
   const [priorityFilter, setPriorityFilter] = useState("all");

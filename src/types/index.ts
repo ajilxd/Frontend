@@ -181,20 +181,9 @@ export type TaskFile = {
   s3key: string;
 };
 
-export type TaskStatusType =
-  | "todo"
-  | "in_progress"
-  | "review"
-  | "done"
-  | "cancelled";
+export type TaskStatusType = "todo" | "in_progress" | "done" | "cancelled";
 
-export const TaskStatus = [
-  "todo",
-  "in_progress",
-  "review",
-  "done",
-  "cancelled",
-];
+export const TaskStatus = ["todo", "in_progress", "done", "cancelled"];
 
 export type TaskAssigneeType = {
   id: string;
