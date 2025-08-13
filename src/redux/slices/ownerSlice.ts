@@ -1,29 +1,27 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
-interface ownerState<T> {
+interface ownerState {
   isAuthenticated: boolean;
-  accessToken: T | null;
-  loading: boolean;
-  error: T | null;
-  subscription?: object;
-  forgetPasswordEmail?: T;
-  stripe_customer_id?: T;
-  email?: T;
-  _id?: T;
-  companyName?: T;
-  companyId?: T;
+  subscription: object | null;
+  forgetPasswordEmail: string | null;
+  stripe_customer_id: string | null;
+  email: string | null;
+  _id: string | null;
+  companyName: string | null;
+  companyId: string | null;
+  name: string | null;
 }
 
-const initialState: ownerState<string> = {
+const initialState: ownerState = {
   isAuthenticated: false,
-  accessToken: null,
-  loading: false,
-  error: null,
-  subscription: {},
-  forgetPasswordEmail: "",
-  stripe_customer_id: "",
-  email: "",
-  _id: "",
+  subscription: null,
+  forgetPasswordEmail: null,
+  stripe_customer_id: null,
+  email: null,
+  _id: null,
+  name: null,
+  companyId: null,
+  companyName: null,
 };
 
 const ownerSlice = createSlice({
@@ -31,47 +29,42 @@ const ownerSlice = createSlice({
   initialState,
   reducers: {
     ownerLoginSuccess(
-      state: ownerState<string>,
+      state: ownerState,
       action: PayloadAction<{
         accessToken: string;
         subscription: object;
-        stripe_customer_id?: string;
-        _id?: string;
-        email?: string;
+        stripe_customer_id: string;
+        _id: string;
+        email: string;
+        name: string;
       }>
     ) {
       state.isAuthenticated = true;
-      state.accessToken = action.payload.accessToken;
-      state.loading = false;
-      state.error = null;
       state.subscription = action.payload.subscription;
-      state.stripe_customer_id = action.payload.stripe_customer_id ?? "";
+      state.stripe_customer_id = action.payload.stripe_customer_id;
       state._id = action.payload._id;
       state.email = action.payload.email;
     },
-    ownerLogOutSuccess(state: ownerState<string>) {
-      state.error = null;
+    ownerLogOutSuccess(state: ownerState) {
       state.isAuthenticated = false;
-      state.accessToken = null;
-      state.loading = false;
-      state.subscription = {};
-      state.stripe_customer_id = "";
-      state._id = "";
-      state.email = "";
+      state.subscription = null;
+      state.stripe_customer_id = null;
+      state._id = null;
+      state.email = null;
     },
     ownerForgetPassword(
-      state: ownerState<string>,
+      state: ownerState,
       action: PayloadAction<{ forgetPasswordEmail: string }>
     ) {
       state.forgetPasswordEmail = action.payload.forgetPasswordEmail;
     },
 
-    resetOwnerForgetPassword(state: ownerState<string>) {
+    resetOwnerForgetPassword(state: ownerState) {
       state.forgetPasswordEmail = "";
     },
 
     updateCompanyDetails(
-      state: ownerState<string>,
+      state: ownerState,
       action: PayloadAction<{ companyName: string; companyId: string }>
     ) {
       state.companyId = action.payload.companyId;
