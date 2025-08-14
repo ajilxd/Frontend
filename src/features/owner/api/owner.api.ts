@@ -126,8 +126,11 @@ export async function resetPasswordService(formData: {
 
 export async function ownerLogoutService() {
   try {
-    await ownerApi.get(`${baseUrl}/owner/logout`);
-    return { success: true, message: "Logout went successfull" };
+    const res = await ownerApi.get(`${baseUrl}/owner/logout`);
+    if (res.status === 200) {
+      return { success: true, message: "Logout went successfull" };
+    }
+    throw new Error("Unexpcted response from server");
   } catch (err) {
     return catchResponse(err);
   }
@@ -141,7 +144,8 @@ export async function ownerGetData(ownerId: string) {
       `${baseUrl}/owner?field=_id&value=${ownerId}`
     );
     if (response.status === 200) {
-      return response.data.data[0];
+      console.log(response.data);
+      return response.data.data;
     }
     throw new Error("Unexpected responsef from server");
   } catch (error) {

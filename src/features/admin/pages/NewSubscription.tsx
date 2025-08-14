@@ -26,7 +26,7 @@ export default function AddSubscriptionPage() {
   const calculateYearlyAmount = (monthly: number) => {
     const yearlyBeforeDiscount = monthly * 12;
     const discount = (yearlyBeforeDiscount * yearlyDiscountPercentage) / 100;
-    return (yearlyBeforeDiscount - discount).toFixed(2);
+    return Number((yearlyBeforeDiscount - discount).toFixed(2));
   };
 
   const formik = useFormik({
@@ -54,7 +54,7 @@ export default function AddSubscriptionPage() {
     },
   });
 
-  const handleMonthlyAmountChange = (e) => {
+  const handleMonthlyAmountChange = (e: any) => {
     const val = parseFloat(e.target.value);
     formik.setFieldValue("monthlyAmount", isNaN(val) ? "" : val);
     if (formik.values.billingCycleType === "both") {
@@ -63,7 +63,7 @@ export default function AddSubscriptionPage() {
     }
   };
 
-  const handleDiscountPercentageChange = (e) => {
+  const handleDiscountPercentageChange = (e: any) => {
     const val = parseFloat(e.target.value);
     setYearlyDiscountPercentage(isNaN(val) ? 0 : val);
     if (
@@ -71,7 +71,7 @@ export default function AddSubscriptionPage() {
       formik.values.monthlyAmount
     ) {
       const calculatedYearly = calculateYearlyAmount(
-        parseFloat(formik.values.monthlyAmount) || 0
+        formik.values.monthlyAmount
       );
       formik.setFieldValue("yearlyAmount", calculatedYearly);
     }
@@ -233,101 +233,94 @@ export default function AddSubscriptionPage() {
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="numberOfSpaces">Spaces *</Label>
+                  <Label htmlFor="spaceCount">Spaces *</Label>
                   <Input
-                    id="numberOfSpaces"
-                    name="numberOfSpaces"
+                    id="spaceCount"
+                    name="spaceCount"
                     type="number"
-                    value={formik.values.numberOfSpaces}
+                    value={formik.values.spaceCount}
                     onChange={(e) =>
                       formik.setFieldValue(
-                        "numberOfSpaces",
+                        "spaceCount",
                         parseInt(e.target.value) || ""
                       )
                     }
                     onBlur={formik.handleBlur}
                   />
-                  {formik.touched.numberOfSpaces &&
-                    formik.errors.numberOfSpaces && (
+                  {formik.touched.spaceCount && formik.errors.spaceCount && (
+                    <p className="text-sm text-red-500 flex items-center gap-1">
+                      <AlertCircle size={14} /> {formik.errors.spaceCount}
+                    </p>
+                  )}
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="managerCount">Managers *</Label>
+                  <Input
+                    id="managerCount"
+                    name="managerCount"
+                    type="number"
+                    value={formik.values.managerCount}
+                    onChange={(e) =>
+                      formik.setFieldValue(
+                        "managerCount",
+                        parseInt(e.target.value) || ""
+                      )
+                    }
+                    onBlur={formik.handleBlur}
+                  />
+                  {formik.touched.managerCount &&
+                    formik.errors.managerCount && (
                       <p className="text-sm text-red-500 flex items-center gap-1">
-                        <AlertCircle size={14} /> {formik.errors.numberOfSpaces}
+                        <AlertCircle size={14} /> {formik.errors.managerCount}
                       </p>
                     )}
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="numberOfManagers">Managers *</Label>
+                  <Label htmlFor="userCount">Users *</Label>
                   <Input
-                    id="numberOfManagers"
-                    name="numberOfManagers"
+                    id="userCount"
+                    name="userCount"
                     type="number"
-                    value={formik.values.numberOfManagers}
+                    value={formik.values.userCount}
                     onChange={(e) =>
                       formik.setFieldValue(
-                        "numberOfManagers",
+                        "userCount",
                         parseInt(e.target.value) || ""
                       )
                     }
                     onBlur={formik.handleBlur}
                   />
-                  {formik.touched.numberOfManagers &&
-                    formik.errors.numberOfManagers && (
-                      <p className="text-sm text-red-500 flex items-center gap-1">
-                        <AlertCircle size={14} />{" "}
-                        {formik.errors.numberOfManagers}
-                      </p>
-                    )}
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="numberOfUsers">Users *</Label>
-                  <Input
-                    id="numberOfUsers"
-                    name="numberOfUsers"
-                    type="number"
-                    value={formik.values.numberOfUsers}
-                    onChange={(e) =>
-                      formik.setFieldValue(
-                        "numberOfUsers",
-                        parseInt(e.target.value) || ""
-                      )
-                    }
-                    onBlur={formik.handleBlur}
-                  />
-                  {formik.touched.numberOfUsers &&
-                    formik.errors.numberOfUsers && (
-                      <p className="text-sm text-red-500 flex items-center gap-1">
-                        <AlertCircle size={14} /> {formik.errors.numberOfUsers}
-                      </p>
-                    )}
+                  {formik.touched.userCount && formik.errors.userCount && (
+                    <p className="text-sm text-red-500 flex items-center gap-1">
+                      <AlertCircle size={14} /> {formik.errors.userCount}
+                    </p>
+                  )}
                 </div>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="flex items-center space-x-2">
                   <Checkbox
-                    id="allowChatWithSpace"
-                    checked={formik.values.allowChatWithSpace}
+                    id="allowChat"
+                    checked={formik.values.allowChat}
                     onCheckedChange={(val) =>
-                      formik.setFieldValue("allowChatWithSpace", val)
+                      formik.setFieldValue("allowChat", val)
                     }
                   />
-                  <Label htmlFor="allowChatWithSpace">
-                    Allow Chat with Space
-                  </Label>
+                  <Label htmlFor="allowChat">Allow Chat with Space</Label>
                 </div>
 
                 <div className="flex items-center space-x-2">
                   <Checkbox
-                    id="allowMeetingWithSpace"
-                    checked={formik.values.allowMeetingWithSpace}
+                    id="allowMeeting"
+                    checked={formik.values.allowMeeting}
                     onCheckedChange={(val) =>
-                      formik.setFieldValue("allowMeetingWithSpace", val)
+                      formik.setFieldValue("allowMeeting", val)
                     }
                   />
-                  <Label htmlFor="allowMeetingWithSpace">
-                    Allow Meeting with Space
-                  </Label>
+                  <Label htmlFor="allowMeeting">Allow Meeting with Space</Label>
                 </div>
               </div>
             </div>

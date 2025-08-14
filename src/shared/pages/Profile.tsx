@@ -1,5 +1,4 @@
 import { Edit2, Upload } from "lucide-react";
-import { enqueueSnackbar } from "notistack";
 import React, { useState, ChangeEvent, useEffect } from "react";
 
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
@@ -18,6 +17,7 @@ import {
   ownerProfileUpdate,
 } from "@/features/owner/api/owner.api";
 import { userGetData, userProfileUpdate } from "@/features/user/api/user.api";
+import { toast } from "sonner";
 
 export interface Profile {
   image: string;
@@ -25,7 +25,10 @@ export interface Profile {
   bio: string;
   createdAt?: string;
   managerName?: string;
-  companyName?: string;
+  company?: {
+    companyName: string;
+    companyId: string;
+  };
   role?: string;
   userId?: string;
   managerId?: string;
@@ -83,7 +86,6 @@ const Profile: React.FC<Props> = ({ role, id }) => {
     console.log(uploadRes);
     if (uploadRes.ok) {
       const publicUrl = `https://fluentawork-assets.s3.eu-north-1.amazonaws.com/${filename}`;
-      console.log("Uploaded to:", publicUrl);
       setAvatarUrl(publicUrl);
     } else {
       const errorDetails = await uploadRes.text();
@@ -101,33 +103,27 @@ const Profile: React.FC<Props> = ({ role, id }) => {
   const handleUserSubmission = async (data: Profile) => {
     const response = await userProfileUpdate(data);
     if (response.success) {
-      enqueueSnackbar("profile updation went succesfull", {
-        variant: "success",
-      });
+      toast.success("profile updation went succesfull");
     } else {
-      console.warn("something went wrong", response.message);
+      toast.error("Something went wrong,try again later");
     }
   };
 
   const handleManagerSubmission = async (data: Profile) => {
     const response = await managerProfileUpdate(data);
     if (response.success) {
-      enqueueSnackbar("profile updation went succesfull", {
-        variant: "success",
-      });
+      toast.success("profile updation went succesfull");
     } else {
-      console.warn("something went wrong", response.message);
+      toast.error("Something went wrong,try again later");
     }
   };
 
   const handleOwnerSubmission = async (data: Profile) => {
     const response = await ownerProfileUpdate(data);
     if (response.success) {
-      enqueueSnackbar("profile updation went succesfull", {
-        variant: "success",
-      });
+      toast.success("profile updation went succesfull");
     } else {
-      console.warn("something went wrong", response.message);
+      toast.error("Something went wrong,try again later");
     }
   };
 
@@ -159,10 +155,11 @@ const Profile: React.FC<Props> = ({ role, id }) => {
                 <Avatar className="relative flex h-24 w-24 shrink-0 overflow-hidden rounded-full border-2 border-gray-200 dark:border-gray-700">
                   <AvatarImage src={avatarUrl} alt="Profile" />
                   <AvatarFallback className="bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200">
-                    {profile.name
-                      .split(" ")
-                      .map((n) => n[0])
-                      .join("")}
+                    {profile &&
+                      profile.name
+                        .split(" ")
+                        .map((n) => n[0])
+                        .join("")}
                   </AvatarFallback>
                 </Avatar>
                 {isEditing && (
@@ -264,7 +261,7 @@ const Profile: React.FC<Props> = ({ role, id }) => {
                   Company Name
                 </Label>
                 <p className="mt-1 text-gray-900 dark:text-white">
-                  {profile?.companyName}
+                  {profile?.company?.companyName || "N/A"}
                 </p>
               </div>
             </div>

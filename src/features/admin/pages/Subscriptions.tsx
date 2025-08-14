@@ -1,3 +1,4 @@
+import { toast } from "sonner";
 import { useState, useCallback } from "react";
 import { Search } from "lucide-react";
 import { PaginationComponent } from "@/shared/components/Pagination";
@@ -6,7 +7,6 @@ import { SubscriptionType } from "@/types";
 import { SubscriptionMorePopOver } from "../components/SubscriptionMorePopOver";
 import { useSubscriptonsQuery } from "@/queries/admin/subscriptions/useSubscripitonQuery";
 import { adminToggleSubscriptionStatus } from "../api/admin.api";
-import { toast } from "sonner";
 import { useQueryClient } from "@tanstack/react-query";
 
 const Subscription = () => {
@@ -16,7 +16,7 @@ const Subscription = () => {
   const [status, setStatus] = useState("");
   const [page, setPage] = useState(1);
   const { data } = useSubscriptonsQuery(page, 10, search, billingCycle, status);
-  console.log(data);
+
   const queryClient = useQueryClient();
 
   const memoisedPageUpdater = useCallback((page: number) => {

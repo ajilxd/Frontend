@@ -21,8 +21,9 @@ const OwnerSignup: React.FC = () => {
 
   const handleSubmit = async (values: typeof initialValues) => {
     setLoading(true);
-
-    const response = await ownerSignupService(values);
+    const { confirmPassword, ...payload } = values;
+    const response = await ownerSignupService(payload);
+    
     if (response.success) {
       setVisibility(true);
       setEmail(values.email.toLowerCase());

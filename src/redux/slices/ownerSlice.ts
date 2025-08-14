@@ -44,6 +44,7 @@ const ownerSlice = createSlice({
       state.stripe_customer_id = action.payload.stripe_customer_id;
       state._id = action.payload._id;
       state.email = action.payload.email;
+      state.name = action.payload.name;
     },
     ownerLogOutSuccess(state: ownerState) {
       state.isAuthenticated = false;
@@ -51,6 +52,7 @@ const ownerSlice = createSlice({
       state.stripe_customer_id = null;
       state._id = null;
       state.email = null;
+      state.name = null;
     },
     ownerForgetPassword(
       state: ownerState,

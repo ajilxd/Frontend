@@ -52,8 +52,10 @@ const OwnerSignin: React.FC = () => {
         stripe_customer_id,
         _id,
         email,
+        name,
       } = response.data.data;
       const { accessToken } = response.data;
+      console.log(response.data);
       enqueueSnackbar("login success", { variant: "success" });
       dispatch(
         ownerLoginSuccess({
@@ -62,6 +64,7 @@ const OwnerSignin: React.FC = () => {
           _id,
           stripe_customer_id,
           email,
+          name,
         })
       );
       localStorage.setItem("ownerAccessToken", accessToken);
