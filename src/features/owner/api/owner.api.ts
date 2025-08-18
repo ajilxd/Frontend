@@ -173,7 +173,8 @@ export async function ownerFetchSubscriptions() {
   try {
     const response = await ownerApi.get(`${baseUrl}/owner/subscriptions`);
     if (response.status === 200) {
-      return response.data.data;
+      console.log(`owner can use these subs`, response.data.data);
+      return response.data.data.subscriptions;
     }
 
     if (response.status === 204) {
@@ -186,7 +187,6 @@ export async function ownerFetchSubscriptions() {
 }
 
 export async function ownerPaymentCheckoutService(value: CheckoutPayment) {
-  console.log("checkout session value before sending", value);
   try {
     const response = await ownerApi.post(
       `${baseUrl}/payment/create-checkout-session`,
@@ -306,9 +306,9 @@ export async function ownerAddCompanyDetails(data: CompanyDetailsType) {
 
 export async function ownerFetchAllManagers(id: string) {
   try {
-    const response = await ownerApi.get(`${baseUrl}/owner/managers/${id}`);
+    const response = await ownerApi.get(`${baseUrl}/owner/managers`);
     if (response.status === 200) {
-      return response.data.data;
+      return response.data.data.managers;
     }
 
     if (response.status === 204) {
@@ -320,16 +320,10 @@ export async function ownerFetchAllManagers(id: string) {
   }
 }
 
-export async function ownerToggleManagerStatus(
-  managerId: string,
-  ownerId: string
-) {
+export async function ownerToggleManagerStatus(managerId: string) {
   try {
     const response = await ownerApi.patch(
-      `${baseUrl}/owner/managers/${managerId}`,
-      {
-        ownerId,
-      }
+      `${baseUrl}/owner/managers/${managerId}`
     );
     if (response.status === 200) {
       return {

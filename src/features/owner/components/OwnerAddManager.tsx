@@ -44,11 +44,7 @@ export function OwnerAddManagers() {
       }
 
       setLoading(true);
-      const response = await ownerCreateManager({
-        ...values,
-        ownerId: "" + owner._id,
-        companyId: Company._id!,
-      });
+      const response = await ownerCreateManager(values);
 
       if (response.success) {
         enqueueSnackbar(response.message, { variant: "success" });

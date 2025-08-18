@@ -1,6 +1,5 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { MoreHorizontal } from "lucide-react";
-import { enqueueSnackbar } from "notistack";
 import { useState } from "react";
 import { useSelector } from "react-redux";
 
@@ -26,10 +25,12 @@ import { ChaseSpinner } from "@/shared/components/ChaseSpinner";
 import { ownerToggleManagerStatus } from "../api/owner.api";
 import { EditManagerModal } from "./editManagerModal";
 import { ManagerType } from "@/types";
+import { toast } from "sonner";
 
 export function OwnerViewManagers() {
-  const owner = useSelector((state: RootState) => state.owner);
-  if (!owner || !owner._id) {
+  const ownerId = useSelector((state: RootState) => state.owner)._id;
+  if (!ownerId) {
+    console.warn("Failed to find the owner id, Try login again");
     return;
   }
   const queryClient = useQueryClient();
@@ -40,15 +41,14 @@ export function OwnerViewManagers() {
   );
 
   const handleToggleStatus = async (managerId: string) => {
-    const response = await ownerToggleManagerStatus(managerId, "" + owner._id);
+    const response = await ownerToggleManagerStatus(managerId);
     if (response.success) {
-      enqueueSnackbar(response.message, { variant: "success" });
+      toast.success(response.message);
       queryClient.invalidateQueries({
-        queryKey: ["owner", "managers", "" + owner._id],
+        queryKey: ["owner", "managers", ownerId],
       });
     } else {
-      enqueueSnackbar("Something went wrong, try again", { variant: "error" });
-      console.error(response.message);
+      toast.error("something went wrong");
     }
   };
 
@@ -57,7 +57,7 @@ export function OwnerViewManagers() {
     error,
     isError,
     isLoading,
-  } = useManagersQuery(owner._id!);
+  } = useManagersQuery(ownerId);
 
   return (
     <>
@@ -65,7 +65,7 @@ export function OwnerViewManagers() {
         canShow={canShowEditManagerModal}
         managerData={editManagerData}
         onClose={() => setCanShowEditManagerModal(false)}
-        ownerId={owner._id}
+        ownerId={ownerId}
       />
 
       <div className="w-full p-4 space-y-4 bg-white dark:bg-slate-900 rounded-lg">

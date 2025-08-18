@@ -27,8 +27,8 @@ function OAuth() {
         },
         { withCredentials: true }
       );
-      console.log("response from server", res.data);
-      const { accessToken } = res.data;
+
+      const { accessToken } = res.data.data;
       if (!accessToken) {
         throw new Error("No access token found on response");
       }

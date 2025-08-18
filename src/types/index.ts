@@ -100,16 +100,16 @@ export interface SubscriptionType {
   name: string;
   billingCycleType: string;
   isActive: boolean;
-  yearlyAmount: number | string;
-  monthlyAmount: number | string;
+  yearlyAmount: number;
+  monthlyAmount: number;
   stripe_product_id?: string;
   description: string;
   stripe_monthly_price_id?: string;
   stripe_yearly_price_id?: string;
-  yearlyDiscountPercentage?: number;
+  yearlyDiscountPercentage: number;
   features: Features;
-  userCount?: Number;
-  points?: string;
+  userCount: number;
+  points: number;
   createdAt: Date;
 }
 
@@ -119,16 +119,14 @@ export type OwnerSubscriptionType = {
   billingCycle: string;
   stripe_subscription_id: string;
   subscription_id: string;
-  next_invoice?: string;
   cancel_at?: string;
   canceled_at?: string;
   created: string;
   features: Features;
-  amount: string;
+  amount: number;
   expires_at: string;
-  invoice?: string;
   cancel_at_period_end?: boolean;
-  points: string;
+  points: number;
 };
 
 export type InvoiceType = {

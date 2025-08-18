@@ -21,7 +21,7 @@ const Subscription: React.FC = () => {
     return;
   }
   const { _id: ownerId, stripe_customer_id: stripeCustomerId } = owner || {};
-  const { data: subscripitons } = useSubscriptionsQuery();
+  const { data: subscriptions } = useSubscriptionsQuery();
   const { data: activeSubscription } = useOwnerSubscriptionQuery(
     "" + owner._id
   );
@@ -41,12 +41,12 @@ const Subscription: React.FC = () => {
     billingCycleType: string,
     yearly: boolean,
     monthly: boolean,
-    amount: string,
-    points: string,
+    amount: number,
+    points: number,
     upgrade: boolean
   ) => {
     if (!company) {
-      toast("Fill company details first!");
+      toast.warning("Fill company details first!");
       return;
     }
     if (
@@ -127,12 +127,12 @@ const Subscription: React.FC = () => {
           </CardHeader>
           <CardContent className="pt-2">
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {subscripitons?.length === 0 ? (
+              {subscriptions?.length === 0 ? (
                 <p className="text-gray-500 dark:text-gray-400 text-sm">
                   No plans available.
                 </p>
               ) : (
-                subscripitons?.map((plan) => (
+                subscriptions?.map((plan) => (
                   <PlanCard
                     key={plan._id}
                     name={plan.name}
@@ -141,8 +141,8 @@ const Subscription: React.FC = () => {
                     billingCycleType={plan.billingCycleType}
                     alreadySubscribed={!!activeSubscription}
                     description={plan.description}
-                    monthlyAmount={+plan.monthlyAmount}
-                    yearlyAmount={+plan.yearlyAmount}
+                    monthlyAmount={plan.monthlyAmount}
+                    yearlyAmount={plan.yearlyAmount}
                     onSubscribeMonthly={() =>
                       handleSubscribe(
                         plan.stripe_monthly_price_id!,
@@ -150,8 +150,8 @@ const Subscription: React.FC = () => {
                         plan.billingCycleType,
                         false,
                         true,
-                        "" + plan.monthlyAmount,
-                        "" + plan.points,
+                        plan.monthlyAmount,
+                        plan.points,
                         !!activeSubscription
                       )
                     }
@@ -162,12 +162,16 @@ const Subscription: React.FC = () => {
                         plan.billingCycleType,
                         true,
                         false,
-                        "" + plan.yearlyAmount,
-                        "" + plan.points,
+                        plan.yearlyAmount,
+                        plan.points,
                         !!activeSubscription
                       )
                     }
-                    allowUpgrade={+plan.points! > +activeSubscription?.points!}
+                    allowUpgrade={
+                      (!!activeSubscription &&
+                        plan.points > activeSubscription.points) ||
+                      true
+                    }
                   />
                 ))
               )}

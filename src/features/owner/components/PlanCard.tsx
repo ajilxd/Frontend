@@ -15,7 +15,7 @@ interface PlanCardProps extends Plan {
   onSubscribeYearly?: () => void;
   alreadySubscribed?: boolean;
   description: string;
-  allowUpgrade: string;
+  allowUpgrade: boolean;
 }
 
 export const PlanCard: React.FC<PlanCardProps> = ({
